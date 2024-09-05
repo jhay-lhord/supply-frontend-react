@@ -11,7 +11,7 @@ import api from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants";
 
 const Login = () => {
-  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -25,7 +25,7 @@ const Login = () => {
 
     api
       .post("/api/token/", {
-        username,
+        email,
         password,
       })
       .then((response) => {
@@ -49,8 +49,8 @@ const Login = () => {
       });
   };
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,13 +67,13 @@ const Login = () => {
           </p>
           {error && <ErrorCard description={error.toString()} />}
           <Label htmlFor="username" className="my-2">
-            Username
+            Email
           </Label>
           <Input
-            id="username"
+            id="email"
             className="mb-4"
-            onChange={handleUsernameChange}
-            value={username}
+            onChange={handleEmailChange}
+            value={email}
           />
           <Label htmlFor="password" className="">
             Password
