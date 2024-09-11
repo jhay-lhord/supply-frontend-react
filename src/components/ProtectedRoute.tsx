@@ -56,7 +56,6 @@ const ProtectedRoute:React.FC<ProtectedRouteProps> = ({ children } ) => {
     const tokenExpiration: number | undefined= decoded_token?.exp
     const nowInSeconds: number = Date.now() / 1000;
     const isTokenExpired = tokenExpiration && tokenExpiration < nowInSeconds
-
     if (!isTokenExpired) {
       setIsAuthorized(true)
     }

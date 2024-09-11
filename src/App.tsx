@@ -4,13 +4,11 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import SupplyDashboard from "./pages/SupplyDashboard";
-import BACDashboard from "./pages/BACDashboard";
-import BudgetDashboard from "./pages/BudgetDashboard";
+import Login from "@/pages/Forms/Login";
+import Register from "@/pages/Forms/Register";
 import ProtectedRoutes from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import RoleBaseRouting from "./components/Auth/RoleBaseRouting";
 
 const Logout = () => {
   localStorage.clear();
@@ -28,26 +26,10 @@ const App = () => {
       <Router>
         <Routes>
           <Route
-            path="/supply-dashboard"
+            path="/dashboard"
             element={
               <ProtectedRoutes>
-                <SupplyDashboard />
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/budget-dashboard"
-            element={
-              <ProtectedRoutes>
-                <BudgetDashboard />
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/bac-dashboard"
-            element={
-              <ProtectedRoutes>
-                <BACDashboard />
+                <RoleBaseRouting />
               </ProtectedRoutes>
             }
           />
