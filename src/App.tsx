@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Login from "@/pages/Forms/Login";
 import Register from "@/pages/Forms/Register";
-import ProtectedRoutes from "./components/ProtectedRoute";
+import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import RoleBaseRouting from "./components/Auth/RoleBaseRouting";
 
