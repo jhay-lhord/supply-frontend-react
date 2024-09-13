@@ -90,11 +90,6 @@ const Register = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setConfirmPassword(event.target.value);
-    if (password !== password2) {
-      setPasswordError("Password didn't match");
-    } else {
-      setPasswordError("");
-    }
   };
 
   return (
