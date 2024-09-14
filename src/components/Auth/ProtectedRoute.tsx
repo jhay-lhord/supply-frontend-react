@@ -12,6 +12,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [isLoading, setIsloading] = useState<boolean>(true);
 
+  console.log('from protected route')
+
   useEffect(() => {
     const checkAuth = () => {
       try {
@@ -27,15 +29,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   const refresh_token = async () => {
     const refresh_token = localStorage.getItem(REFRESH_TOKEN);
+    console.log('trying to refresh the token')
     try {
       const request = await api.post("/api/token/refresh/", {
         refresh: refresh_token,
       });
       if (request.status === 200) {
         localStorage.setItem(ACCESS_TOKEN, request.data.access);
-        await setIsAuthorized(true);
+        setIsAuthorized(true);
       } else {
-        await setIsAuthorized(false);
+        setIsAuthorized(false);
       }
     } catch (error) {
       setIsAuthorized(false);
@@ -54,6 +57,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const tokenExpiration: number | undefined = decoded_token?.exp;
     const nowInSeconds: number = Date.now() / 1000;
     const isTokenExpired = tokenExpiration && tokenExpiration < nowInSeconds;
+    console.log(`The Token is Expired: ${isTokenExpired}`)
     if (!isTokenExpired) {
       setIsAuthorized(true);
     } else {
@@ -65,7 +69,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <div>Loading...</div>;
   }
 
-  return isAuthorized ? children : <Navigate to="/login" />;
+  return isAuthorized && children 
 };
 
 export default ProtectedRoute;
