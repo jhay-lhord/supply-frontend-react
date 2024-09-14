@@ -88,7 +88,7 @@ const Login = () => {
             <p>
               Don't Have an account?
               <span className="px-1 text-sky-500">
-                <Link to="/">Register</Link>
+                <Link to="/register">Register</Link>
               </span>
             </p>
           </div>
