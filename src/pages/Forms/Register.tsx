@@ -42,7 +42,7 @@ const Register = () => {
       password2: data.password2
     }).then((response) => {
       console.log(response)
-      navigate('/login')
+      navigate('/')
     }).catch((error) => {
       console.log(error)
       setEmailError(error?.response?.data?.email || "An error occured")
