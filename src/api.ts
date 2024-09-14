@@ -2,7 +2,7 @@ import axios from "axios";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants"; // Assume you store the refresh token as well
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_RENDER_API_URL,
 });
 
 let isRefreshing = false;
@@ -71,7 +71,7 @@ api.interceptors.response.use(
       // Try refreshing the token
       return new Promise(function (resolve, reject) {
         axios
-          .post(`${import.meta.env.VITE_API_URL}/api/token/refresh/`, {
+          .post(`${import.meta.env.VITE_RENDER_API_URL}/api/token/refresh/`, {
             refresh: refreshToken,
           })
           .then(({ data }) => {
