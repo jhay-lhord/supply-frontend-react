@@ -33,9 +33,9 @@ const App = () => {
               </ProtectedRoutes>
             }
           />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
-          <Route path="/" element={<RegisterAndLogout />} />
+          <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
