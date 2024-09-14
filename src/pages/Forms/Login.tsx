@@ -37,6 +37,10 @@ const Login = () => {
         if(error.code === 'ERR_NETWORK'){
           setError(`${error.message}, Please check your Internet Connection`)
         }
+
+        if(error.code === 'ERR_BAD_REQUEST'){
+          setError('No active account found with the given credentials')
+        }
       })
       .finally(() => {
         setIsloading(false);
