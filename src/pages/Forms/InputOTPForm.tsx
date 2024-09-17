@@ -37,6 +37,7 @@ export function InputOTPForm() {
     },
   });
   const [isLoading, setIsloading] = useState<boolean>(false);
+  const [otpError, setOtpError] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -44,6 +45,7 @@ export function InputOTPForm() {
     const email = localStorage.getItem("email");
     const otp_code = data.otp_code;
     setIsloading(true);
+    setOtpError("")
     console.log(data.otp_code);
     api
       .post("/api/user/login_verify_otp/", { email, otp_code })
@@ -58,6 +60,10 @@ export function InputOTPForm() {
       })
       .catch((error) => {
         console.error(error);
+
+        if (error.code === 'ERR_BAD_REQUEST'){
+          setOtpError(error.response?.data?.error)
+        }
       })
       .finally(() => {
         setIsloading(false);
@@ -93,6 +99,7 @@ export function InputOTPForm() {
                   Please enter the one-time password sent to your phone.
                 </FormDescription>
                 <FormMessage />
+                {otpError && <p className="text-red-500 text-sm">{otpError}</p>}
               </FormItem>
             )}
           />
