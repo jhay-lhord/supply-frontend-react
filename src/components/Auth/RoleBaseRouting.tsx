@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
-import BACDashboard from "@/pages/Dashboard/BACDashboard";
-import SupplyDashboard from "@/pages/Dashboard/SupplyDashboard";
-import BudgetDashboard from "@/pages/Dashboard/BudgetDashboard";
+import BACDashboard from "@/pages/Dashboard/BACDashboard/BACDashboard";
+import SupplyDashboard from "@/pages/Dashboard/SupplyDashboard/Dashboard";
+import BudgetDashboard from "@/pages/Dashboard/BudgetDashboard/BudgetDashboard";
 
 const RoleBaseRouting = () => {
   const { role } = useAuth();
