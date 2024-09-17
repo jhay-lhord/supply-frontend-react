@@ -46,8 +46,7 @@ export const UserNav = () => {
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator/>
         <DropdownMenuItem onClick={handleClick}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
