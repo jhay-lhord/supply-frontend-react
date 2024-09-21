@@ -1,12 +1,4 @@
-import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  FileText,
-  ShoppingCart,
-  FileSpreadsheet,
-  FileSymlink,
-} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,60 +6,38 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
+import { getPurchaseRequestCount } from "@/services/purchaseRequestServices";
+import PurchaseSidebar from "./components/PurchaseSidebar";
 
 const SupplyDashboard: React.FC = () => {
+  const [purchaseRequestCount, setPurchaseRequestCount] = useState<number | null>(null);
+  const [error, setError] = useState<string | null >(null)
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchPurchaseRequestCount = async () => {
+      try {
+        const count = await getPurchaseRequestCount()
+        setPurchaseRequestCount(count)
+      } catch (err) {
+        setError('something went wrong')
+        console.log(error)
+      }
+    }
+
+    fetchPurchaseRequestCount()
+  }, [])
   return (
     <DashboardLayout>
-      <TooltipProvider>
-        <aside className="hidden md:flex flex-col w-auto h-screen p-2 border-r border-gray-200 sticky top-0 pt-16">
-          <SideNav
-            isCollapsed={false}
-            links={[
-              {
-                title: "Dashboard",
-                label: "",
-                link_to: "/dashboard",
-                icon: LayoutDashboard,
-                variant: "default",
-              },
-              {
-                title: "Purchase Request",
-                label: "",
-                link_to: "/purchase-request",
-                icon: FileText,
-                variant: "default",
-              },
-              {
-                title: "Purchase Order",
-                label: "",
-                link_to: "/purchase-order",
-                icon: ShoppingCart,
-                variant: "default",
-              },
-              {
-                title: "Reports",
-                label: "",
-                link_to: "/reports",
-                icon: FileSpreadsheet,
-                variant: "default",
-              },
-              {
-                title: "Transaction",
-                label: "",
-                link_to: "/transaction",
-                icon: FileSymlink,
-                variant: "default",
-              },
-            ]}
-          />
-        </aside>
-      </TooltipProvider>
+      <PurchaseSidebar/>
       {/* Main Content */}
       <ScrollArea className="w-full mt-14">
         <main className=" flex-grow">
@@ -78,13 +48,15 @@ const SupplyDashboard: React.FC = () => {
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
                 <div className="flex items-center space-x-2">
                   <CalendarDateRangePicker className="border-1 rounded border-orange-200" />
-                  <Button className="bg-orange-100 text-black hover:bg-orange-200">
+                  <Button className="bg-orange-200 text-black hover:bg-orange-300">
                     Download
                   </Button>
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-                <Card className="hover:bg-orange-100 border-2 border-orange-100">
+                <Card className="hover:bg-orange-200 border-2 border-orange-200" onClick={() => {
+                  navigate('/purchase-request')
+                }}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Active Request
@@ -103,13 +75,13 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">453</div>
+                    <div className="text-2xl font-bold">{purchaseRequestCount}</div>
                     <p className="text-xs text-muted-foreground">
                       +20.1% from last month
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="hover:bg-orange-100 border-2 border-orange-100">
+                <Card className="hover:bg-orange-200 border-2 border-orange-200">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Qoutation
@@ -136,7 +108,7 @@ const SupplyDashboard: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="hover:bg-orange-100 border-2 border-orange-100">
+                <Card className="hover:bg-orange-200 border-2 border-orange-200">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Order in Progress
@@ -165,7 +137,7 @@ const SupplyDashboard: React.FC = () => {
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
-                  <CardHeader className="">
+                  <CardHeader className="flex">
                     <CardTitle>Purchase Request</CardTitle>
                   </CardHeader>
                   <CardContent className="pl-2">
