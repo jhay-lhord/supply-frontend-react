@@ -15,7 +15,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 
-import { registerFormSchema, type RegisterInputData } from "@/types/input";
+import { registerFormSchema, type RegisterInputData } from "@/types/request/input";
 import api from "@/api";
 
 const Register = () => {
