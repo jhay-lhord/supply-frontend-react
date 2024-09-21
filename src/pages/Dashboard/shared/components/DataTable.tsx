@@ -38,84 +38,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { purchaseRequestType } from "@/types/response/puchase-request";
+import { getPurchaseRequest} from "@/services/purchaseRequestServices";
 
-const data: Payment[] = [
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-  {
-    pr_no: "bhqecj4p",
-    date: new Date(),
-    purpose: "Cyber Days",
-    status: "pending",
-    requested_by: "Jaylord",
-    total_cost: 23121
-  },
-];
 
-export type Payment = {
-  pr_no: string;
-  date: Date;
-  purpose: string;
-  status: "pending" | "approved" | "rejected";
-  requested_by: string;
-  total_cost: number;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -174,21 +101,7 @@ export const columns: ColumnDef<Payment>[] = [
       <div className="capitalize">{row.getValue("requested_by")}</div>
     ),
   },
-  {
-    accessorKey: "total_cost",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("total_cost"));
 
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "PHP",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
   {
     id: "actions",
     enableHiding: false,
@@ -221,6 +134,8 @@ export const columns: ColumnDef<Payment>[] = [
 ];
 
 export function DataTable() {
+  const [purchaseRequest, setPurchaseRequest] = React.useState<purchaseRequestType[]>([])
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -229,8 +144,22 @@ export function DataTable() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  React.useEffect(() => {
+    const fetchPurchaseRequest = async () => {
+      const result = await getPurchaseRequest();
+
+      if(result.status === 'success'){
+        const resultInArray = Array.isArray(result.data) ? result.data : []
+        setPurchaseRequest(resultInArray)
+      }
+    }
+    fetchPurchaseRequest()
+  }, [])
+
+  console.log(purchaseRequest)
+
   const table = useReactTable({
-    data,
+    data: purchaseRequest,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

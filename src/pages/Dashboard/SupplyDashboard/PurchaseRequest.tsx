@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
+import PurchaseRequestDataTable from "./components/PurchaseRequestDataTable";
+
 
 const PurchaseRequest: React.FC = () => {
   return (
@@ -57,7 +59,9 @@ const PurchaseRequest: React.FC = () => {
         </aside>
       </TooltipProvider>
       {/* Main Content */}
-      <h1 className="pt-20 p-4  text-3xl font-bold tracking-tight">Purchase Request</h1>
+      <div className="pt-16 w-full">
+      <PurchaseRequestDataTable/>
+      </div>
     </DashboardLayout>
   );
 };
