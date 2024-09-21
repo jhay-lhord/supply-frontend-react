@@ -60,7 +60,7 @@ export function SideNav({ links, isCollapsed }: NavProps) {
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" &&
-                  "dark:bg-orange-300 dark:text-white dark:hover:bg-orange-100 dark:hover:text-white bg-white text-slate-900 hover:bg-orange-100",
+                  "dark:bg-orange-300 dark:text-white dark:hover:bg-orange-100 dark:hover:text-white bg-white text-slate-900 hover:bg-orange-200",
                 "justify-start m-2 px-7 py-5 "
               )}
             >
