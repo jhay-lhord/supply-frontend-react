@@ -3,9 +3,18 @@ import { ApiResponse } from "@/types/response/api-response"
 import { purchaseRequestType } from "@/types/response/puchase-request"
 import { handleError, handleSucess } from "@/utils/apiHelper"
 
-export const getPurchaseRequest = async (): Promise<ApiResponse<purchaseRequestType>> => {
+export const getPurchaseRequest = async (): Promise<ApiResponse<purchaseRequestType[]>> => {
   try {
     const response = await api.get<purchaseRequestType[]>('/api/purchase-request/');
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const getPurchaseRequestItem = async (): Promise<ApiResponse<purchaseRequestType[]>> => {
+  try {
+    const response = await api.get<purchaseRequestType[]>('/api/purchase-request-item/');
     return handleSucess(response);
   } catch (error) {
     return handleError(error)
