@@ -105,8 +105,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original;
+    cell: () => {
 
       return (
         <DropdownMenu>
@@ -118,14 +117,9 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.pr_no)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View Details</DropdownMenuItem>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
