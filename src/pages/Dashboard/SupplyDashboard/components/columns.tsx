@@ -89,10 +89,18 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => {
+      const createdAt = row.getValue("created_at") as string | number;
+      const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short", // Shortened month name (e.g., Sep)
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("created_at")}
+            {formattedDate}
           </span>
         </div>
       );
