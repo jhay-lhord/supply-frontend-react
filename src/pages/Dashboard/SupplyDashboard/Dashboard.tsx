@@ -13,14 +13,25 @@ import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
-import { getPurchaseRequestCount } from "@/services/purchaseRequestServices";
-import PurchaseSidebar from "./components/PurchaseSidebar";
+import { getPurchaseRequestCount, getPurchaseRequestItem } from "@/services/purchaseRequestServices";
+import SupplySidebar from "./components/SupplySidebar";
 
 const SupplyDashboard: React.FC = () => {
   const [purchaseRequestCount, setPurchaseRequestCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null >(null)
 
   const navigate = useNavigate()
+  const fetchPurchaseRequestItem = async () => {
+
+    const items = await getPurchaseRequestItem()
+    const filteredPr = items.data?.filter(item => item.pr_no.pr_no === pr_no)
+    const displayItemDescription = filteredPr?.map(item => item.item_no.item_description)
+    console.log(displayItemDescription)
+  }
+
+  fetchPurchaseRequestItem()
+
+
 
   useEffect(() => {
     const fetchPurchaseRequestCount = async () => {
@@ -29,7 +40,7 @@ const SupplyDashboard: React.FC = () => {
         setPurchaseRequestCount(count)
       } catch (err) {
         setError('something went wrong')
-        console.log(error)
+        console.error(err, error)
       }
     }
 
@@ -37,7 +48,7 @@ const SupplyDashboard: React.FC = () => {
   }, [])
   return (
     <DashboardLayout>
-      <PurchaseSidebar/>
+      <SupplySidebar/>
       {/* Main Content */}
       <ScrollArea className="w-full mt-14">
         <main className=" flex-grow">
@@ -135,8 +146,8 @@ const SupplyDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 ">
+                <Card className="col-span-4 border-orange-200 rounded border-2">
                   <CardHeader className="flex">
                     <CardTitle>Purchase Request</CardTitle>
                   </CardHeader>
@@ -145,7 +156,7 @@ const SupplyDashboard: React.FC = () => {
                     <DataTable />
                   </CardContent>
                 </Card>
-                <Card className="col-span-3">
+                <Card className="col-span-3 border-2 border-orange-200">
                   <CardHeader className="sticky top-0 rounded-md bg-white z-50">
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
