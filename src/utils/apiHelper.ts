@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { ApiResponse } from "@/types/api-response";
+import { ApiResponse } from "@/types/response/api-response";
 
 
 export const handleSucess = <T>(response: { data: T }): ApiResponse<T> => {
