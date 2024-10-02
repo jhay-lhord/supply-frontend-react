@@ -4,11 +4,10 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants";
 const react_env = import.meta.env.VITE_REACT_ENV
 const development_url = import.meta.env.VITE_API_URL;
 const production_url = import.meta.env.VITE_RENDER_API_URL;
-console.log(react_env)
+console.log(`Running in ${react_env} Mode`)
 
 const baseURL = react_env === 'development' ? development_url : production_url
 
-console.log(baseURL)
 
 const api = axios.create({
   baseURL
@@ -73,7 +72,7 @@ api.interceptors.response.use(
       console.log(refreshToken)
 
       if (!refreshToken) {
-        // If no refresh token, log the user out or handle accordingly
+        localStorage.clear()
         return Promise.reject(error);
       }
 
