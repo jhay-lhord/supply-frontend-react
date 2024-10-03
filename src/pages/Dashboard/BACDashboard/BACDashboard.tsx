@@ -1,12 +1,4 @@
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import {
-  LayoutDashboard,
-  FileSpreadsheet,
-  FileSymlink,
-  FileText,
-  FileCheck,
- 
-} from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -17,60 +9,18 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";   
 
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
+import BACSidebar from "./components/BACSidebar";
 
 const BACDashboard: React.FC = () => {
   
   return (
     <DashboardLayout>
-      <TooltipProvider>
-        <aside className="hidden md:flex flex-col w-auto h-screen p-2 border-r border-gray-200 sticky top-0 pt-16">
-          <SideNav
-            isCollapsed={false}
-            links={[
-              {
-                title: "Dashboard",
-                label: "",
-                link_to: "/dashboard",
-                icon: LayoutDashboard,
-                variant: "default",
-              },
-              {
-                title: "Reports",
-                label: "",
-                link_to: "/reports",
-                icon: FileSpreadsheet,
-                variant: "default",
-              },
-              {
-                title: "Abstract of Quotation",
-                label: "",
-                link_to: "/AbstractOfQuotation",
-                icon: FileText,
-                variant: "default",
-              },
-              {
-                title: "Request of Quotation",
-                label: "",
-                link_to: "/RequestOfQuotation",
-                icon: FileCheck,
-                variant: "default",
-              },
-              {
-                title: "Transaction",
-                label: "",
-                link_to: "/transaction",
-                icon: FileSymlink,
-                variant: "default",
-              },
-            
-            ]}
-          />
-        </aside>
-      </TooltipProvider>
+
+      <BACSidebar/> 
+      
 
       {/* Main Content */}
       <ScrollArea className="w-full mt-14">
@@ -79,7 +29,7 @@ const BACDashboard: React.FC = () => {
           <div className="hidden flex-col md:flex">
             <div className=" space-y-4 p-8 pt-6">
               <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2> 
+                <h2 className="text-3xl font-bold tracking-tight"> BAC Dashboard</h2> 
 
                 <div className="flex items-center space-x-2">
                   <CalendarDateRangePicker 
