@@ -21,10 +21,19 @@ import { getEmailFromToken } from "@/utils/jwtHelper"
 export const UserNav = () => {
   const userRole = getRoleFromToken();
   const userEmail = getEmailFromToken();
+  const trimmedUserRole = userRole
+  .split(' ')                  
+  .map(word => word[0])       
+  .join(''); 
+
+  console.log(trimmedUserRole)
   const navigate = useNavigate();
   const handleClick = () => {
     navigate('/')
   }
+
+  console.log(userRole)
+
 
 
   return (
@@ -33,7 +42,7 @@ export const UserNav = () => {
         <Button variant="ghost" className="relative h-10 w-10  rounded-full p-2 ">
           <Avatar className="h-10 w-10">
             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-            <AvatarFallback>SC</AvatarFallback>
+            <AvatarFallback>{trimmedUserRole}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
