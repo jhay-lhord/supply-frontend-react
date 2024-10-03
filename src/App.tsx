@@ -17,6 +17,9 @@ import RequestForQuotation from "./pages/Dashboard/BACDashboard/RequestForQuotat
 import AbstractOfQuotation from "./pages/Dashboard/BACDashboard/AbstractOfQuotation";
 import BACReports from "./pages/Dashboard/BACDashboard/BACReports";
 import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
+import Budget from "./pages/Dashboard/BudgetDashboard/Budget";
+import BudgetReports from "./pages/Dashboard/BudgetDashboard/BudgetReports";
+import BudgetTransaction from "./pages/Dashboard/BudgetDashboard/BudgetTransaction";
 
 const Logout = () => {
   localStorage.clear();
@@ -57,6 +60,11 @@ const App = () => {
           <Route path="/abstract-of-quotation" element={<AbstractOfQuotation/>}/>
           <Route path="/bac-reports" element={<BACReports/>}/>
           <Route path="/bac-transaction" element={<BACTransaction/>} />
+
+          {/* Pages in Budget Dashboard */}
+          <Route path="/budget" element={<Budget/>} />
+          <Route path="/budget-reports" element={<BudgetReports/>}/>
+          <Route path="/budget-transaction" element={<BudgetTransaction/>}/>
         </Routes>
       </Router>
     </>
