@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,57 +5,60 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";   
+import { Button } from "@/components/ui/button"; // Import the button if it's part of your UI library
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"; // Import dropdown components
+
+import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
-import { MainNav } from "../shared/components/MainNav";
-import { Overview } from "../shared/components/Overview";
 import { RecentActivity } from "../shared/components/RecentActivity";
-import { Search } from "../shared/components/Search";
-import TeamSwitcher from "../shared/components/TeamSwitcher";
-import { UserNav } from "../shared/components/UserNav";
+import { DataTable } from "../shared/components/DataTable";
+import BudgetSidebar from "./components/BudgetSidebar";
 
 const BudgetDashboard = () => {
   return (
-    <>
-      <div className="md:hidden"></div>
-      <div className="hidden flex-col md:flex">
-        <div className="border-b sticky top-0 bg-white z-50">
-          <div className="flex h-16 items-center px-4">
-            <TeamSwitcher />
-            <MainNav className="mx-6" />
-            <div className="ml-auto flex items-center space-x-4">
-              <Search />
-              <UserNav />
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            <div className="flex items-center space-x-2">
-              <CalendarDateRangePicker />
-              <Button>Download</Button>
-            </div>
-          </div>
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
-                Notifications
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+    <DashboardLayout>
+      <BudgetSidebar /> 
+      
+      {/* Main Content */}
+      <ScrollArea className="w-full mt-14">
+        <main className=" flex-grow">
+          <div className="md:hidden"></div>
+          <div className="hidden flex-col md:flex">
+            <div className=" space-y-4 p-8 pt-6">
+              <div className="flex items-center justify-between space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight"> BUDGET Dashboard</h2> 
+
+                <div className="flex items-center space-x-2">
+                  <CalendarDateRangePicker className="border-1 rounded border-orange-200" />
+                  
+                  {/* Dropdown button */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="border-1 rounded border-orange-200">
+                        Department
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="border-orange-200">
+                      <DropdownMenuItem onClick={() => alert('COTE')}>
+                        COTE
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => alert('CoEd')}>
+                        CoEd
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => alert('CAS')}>
+                        CAS
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+                <Card className="hover:bg-orange-100 border-2 border-orange-100">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total Revenue
+                    <CardTitle className="text-sm font-medium"> 
+                      Budget Allocation
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -72,16 +74,16 @@ const BudgetDashboard = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">$45,231.89</div>
+                    <div className="text-2xl font-bold">453</div> 
                     <p className="text-xs text-muted-foreground">
                       +20.1% from last month
                     </p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="hover:bg-orange-100 border-2 border-orange-100">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Subscriptions
+                    <CardTitle className="text-sm font-medium">   
+                      Fund Request
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -99,15 +101,17 @@ const BudgetDashboard = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+2350</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold">50</div>
+                    <p className="text-xs text-muted-foreground"> 
                       +180.1% from last month
                     </p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="hover:bg-orange-100 border-2 border-orange-100">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sales</CardTitle>
+                    <CardTitle className="text-sm font-medium"> 
+                      Budget Balance
+                    </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -123,64 +127,44 @@ const BudgetDashboard = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+12,234</div>
+                    <div className="text-2xl font-bold">4</div> 
                     <p className="text-xs text-muted-foreground">
                       +19% from last month
                     </p>
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Active Now
-                    </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+573</div>
-                    <p className="text-xs text-muted-foreground">
-                      +201 since last hour
-                    </p>
-                  </CardContent>
-                </Card>
               </div>
+
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
-                  <CardHeader>
-                    <CardTitle>Overview</CardTitle>
+                  <CardHeader className="">
+                    <CardTitle>Fund Request</CardTitle>
                   </CardHeader>
                   <CardContent className="pl-2">
-                    <Overview />
+                    {/* <Overview /> */}
+                    <DataTable />
                   </CardContent>
                 </Card>
+                
                 <Card className="col-span-3">
-                  <CardHeader>
+                  <CardHeader className="sticky top-0 rounded-md bg-white z-50">
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
                       You made 265 sales this month.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <RecentActivity />
-                  </CardContent>
+                  <ScrollArea className="h-96">
+                    <CardContent className="">
+                      <RecentActivity />
+                    </CardContent>
+                  </ScrollArea>
                 </Card>
               </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </>
+            </div>
+          </div>
+        </main>
+      </ScrollArea>
+    </DashboardLayout>
   );
 };
 
