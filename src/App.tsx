@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 import Login from "@/pages/Forms/Login";
 import Register from "@/pages/Forms/Register";
 import ProtectedRoutes from "./components/Auth/ProtectedRoute";
@@ -21,6 +22,8 @@ import Budget from "./pages/Dashboard/BudgetDashboard/Budget";
 import BudgetReports from "./pages/Dashboard/BudgetDashboard/BudgetReports";
 import BudgetTransaction from "./pages/Dashboard/BudgetDashboard/BudgetTransaction";
 
+const queryClient = new QueryClient();
+
 const Logout = () => {
   localStorage.clear();
   return <Navigate to="/login" />;
@@ -34,6 +37,7 @@ const RegisterAndLogout = () => {
 const App = () => {
   return (
     <>
+    <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
           <Route
@@ -67,6 +71,7 @@ const App = () => {
           <Route path="/budget-transaction" element={<BudgetTransaction/>}/>
         </Routes>
       </Router>
+      </QueryClientProvider>
     </>
   );
 };

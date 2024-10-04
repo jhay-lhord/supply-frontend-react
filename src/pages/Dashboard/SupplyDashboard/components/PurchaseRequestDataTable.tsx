@@ -1,53 +1,48 @@
 import { Button } from "@/components/ui/button";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { getPurchaseRequest } from "@/services/purchaseRequestServices";
+import { usePurchaseRequest } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 import PurchaseRequestForm from "./PurchaseRequestForm";
 
 export default function PurchaseRequestDataTable() {
-  const [purchaseRequest, setPurchaseRequest] = useState<purchaseRequestType[]>(
-    []
-  );
+  const { isLoading, error, data } = usePurchaseRequest();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [lastPrNo, setLastPrNo] = useState<string | null>(null)
+
+  if (isLoading) return "Loading...";
+
+  if (error) return console.log(error);
+
+  const purchaseRequestData: purchaseRequestType[] =
+    data?.status === "success" ? data.data || [] : [];
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
 
-
-
-  useEffect(() => {
-    const fetchPurchaseRequest = async () => {
-      const response = await getPurchaseRequest();
-
-      const lastPrNo = Array.isArray(response.data) && response.data[response.data.length - 1]
-      setLastPrNo(lastPrNo.pr_no)
-
-
-      if (response.status === "success") {
-        const responseInArray = Array.isArray(response.data)
-          ? response.data
-          : [];
-        setPurchaseRequest(responseInArray);
-      }
-    };
-    fetchPurchaseRequest();
-  }, []);
-
-  console.log(lastPrNo)
+  const lastPrNo =
+    data?.status === "success" && data.data?.length
+      ? data.data[data.data.length - 1].pr_no
+      : undefined;
+  console.log(lastPrNo);
 
   return (
     <>
       <div className="hidden w-full flex-col space-y-8 p-8 md:flex">
-        <Button className="px-6 bg-orange-200 w-40 flex-1 hover:bg-orange-300 hover:scale-110 ease-in-out transition duration-300 hover:ease-in text-black" onClick={handleOpenDialog}>
+        <Button
+          className="px-6 bg-orange-200 w-40 flex-1 hover:bg-orange-300 hover:scale-110 ease-in-out transition duration-300 hover:ease-in text-black"
+          onClick={handleOpenDialog}
+        >
           <PlusIcon className="mr-2"></PlusIcon>Add
         </Button>
-        <PurchaseRequestForm isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} lastPrNo={lastPrNo}/>
-        <DataTable data={purchaseRequest} columns={columns} />
+        <PurchaseRequestForm
+          isDialogOpen={isDialogOpen}
+          setIsDialogOpen={setIsDialogOpen}
+          lastPrNo={lastPrNo?.toString()}
+        />
+        <DataTable data={purchaseRequestData} columns={columns} />
       </div>
     </>
   );
