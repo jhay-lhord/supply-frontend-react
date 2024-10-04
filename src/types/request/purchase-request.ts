@@ -19,7 +19,6 @@ export const purchaseRequestFormSchema = z.object({
   status: z.string().min(1, 'Required'),
   requested_by: z.string().min(1, 'Required'),
   approved_by: z.string().min(1, 'Required'),
-  items: z.array(itemFormSchema), // Include items array in the schema
 });
 
 export type PurchaseRequestData = z.infer<typeof purchaseRequestFormSchema>;
