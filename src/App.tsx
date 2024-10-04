@@ -13,6 +13,10 @@ import PurchaseRequest from "./pages/Dashboard/SupplyDashboard/PurchaseRequest";
 import PurchaseOrder from "./pages/Dashboard/SupplyDashboard/PurchaseOrder";
 import Reports from "./pages/Dashboard/SupplyDashboard/Reports";
 import Inventory from "./pages/Dashboard/SupplyDashboard/Inventory";
+import RequestForQuotation from "./pages/Dashboard/BACDashboard/RequestForQuotation";
+import AbstractOfQuotation from "./pages/Dashboard/BACDashboard/AbstractOfQuotation";
+import BACReports from "./pages/Dashboard/BACDashboard/BACReports";
+import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
 
 const Logout = () => {
   localStorage.clear();
@@ -47,6 +51,12 @@ const App = () => {
           <Route path="/purchase-order" element={<PurchaseOrder />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/inventory" element={<Inventory />} />
+
+          {/* Pages in BAC Dashboard */}
+          <Route path="/request-for-quotation" element={<RequestForQuotation/>}/>
+          <Route path="/abstract-of-quotation" element={<AbstractOfQuotation/>}/>
+          <Route path="/bac-reports" element={<BACReports/>}/>
+          <Route path="/bac-transaction" element={<BACTransaction/>} />
         </Routes>
       </Router>
     </>
