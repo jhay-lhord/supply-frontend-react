@@ -10,6 +10,9 @@ import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import RoleBaseRouting from "./components/Auth/RoleBaseRouting";
 import PurchaseRequest from "./pages/Dashboard/SupplyDashboard/PurchaseRequest";
+import PurchaseOrder from "./pages/Dashboard/SupplyDashboard/PurchaseOrder";
+import Reports from "./pages/Dashboard/SupplyDashboard/Reports";
+import Inventory from "./pages/Dashboard/SupplyDashboard/Inventory";
 
 const Logout = () => {
   localStorage.clear();
@@ -39,8 +42,11 @@ const App = () => {
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="*" element={<NotFound />} />
           
-          {/* purchase request */}
+          {/* Pages in Supply Dashboard*/}
           <Route path="/purchase-request" element={<PurchaseRequest />} />
+          <Route path="/purchase-order" element={<PurchaseOrder />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/inventory" element={<Inventory />} />
         </Routes>
       </Router>
     </>

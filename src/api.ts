@@ -1,8 +1,17 @@
 import axios from "axios";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants"; 
 
+const react_env = import.meta.env.VITE_REACT_ENV
+const development_url = import.meta.env.VITE_API_URL;
+const production_url = import.meta.env.VITE_RENDER_API_URL;
+console.log(react_env)
+
+const baseURL = react_env === 'development' ? development_url : production_url
+
+console.log(baseURL)
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_RENDER_API_URL,
+  baseURL
 });
 
 let isRefreshing = false;
@@ -71,7 +80,7 @@ api.interceptors.response.use(
       // Try refreshing the token
       return new Promise(function (resolve, reject) {
         axios
-          .post(`${import.meta.env.VITE_RENDER_API_URL}/api/token/refresh/`, {
+          .post(`${baseURL}/api/token/refresh/`, {
             refresh: refreshToken,
           })
           .then(({ data }) => {
