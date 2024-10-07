@@ -16,6 +16,9 @@ import {
   type PurchaseRequestData,
 } from "@/types/request/purchase-request";
 import { Description } from "@radix-ui/react-dialog";
+import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { generateNextPrNo } from "@/services/generateNextPrNo";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -36,50 +39,20 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     resolver: zodResolver(purchaseRequestFormSchema),
   });
 
+  const queryClient = useQueryClient()
+
+  const addPurchaseRequestMutation = useMutation({
+    mutationFn: AddPurchaseRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['purchase-request']})
+      console.log('refetch and invalidated')
+    }
+
+  });
+
   const currentPurchaseNumber = lastPrNo && lastPrNo;
 
-  const purchaseRequestNumberFormat = (
-    currentYear: number,
-    currentMonthFormatted: string | number,
-    nextPurchaseNumber: number
-  ) => {
-    return nextPurchaseNumber < 1000
-      ? `${currentYear}-${currentMonthFormatted}-${nextPurchaseNumber
-          .toString()
-          .padStart(4, "0")}`
-      : `${currentYear}-${currentMonthFormatted}-${nextPurchaseNumber.toString()}`;
-  };
-
-  const generateNextPrNo = (currentPurchaseNumber: string | undefined) => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-    const currentMonthFormatted =
-      currentMonth < 10 ? `0${currentMonth}` : currentMonth;
-    const currentYear = currentDate.getFullYear();
-
-    const last4DigitPRNumber = currentPurchaseNumber?.split("-").pop() ?? '0000';
-
-    const nextPurchaseNumber = parseInt(last4DigitPRNumber) + 1;
-
-    if (!currentPurchaseNumber) {
-      console.log("kaniposd");
-      return purchaseRequestNumberFormat(
-        currentYear,
-        currentMonthFormatted,
-        nextPurchaseNumber
-      );
-    } else {
-      console.log("nigana");
-      return purchaseRequestNumberFormat(
-        currentYear,
-        currentMonthFormatted,
-        nextPurchaseNumber
-      );
-    }
-  };
-
-  generateNextPrNo(currentPurchaseNumber);
-  console.log(generateNextPrNo(currentPurchaseNumber))
+  console.log(generateNextPrNo(currentPurchaseNumber));
 
   const onSubmit = async (data: PurchaseRequestData) => {
     try {
@@ -102,7 +75,18 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
           }
         );
 
-        console.log(purchaseRequestResponse)
+        const defaultPrStatus = "pending";
+
+        addPurchaseRequestMutation.mutate({
+          pr_no: data.pr_no,
+          res_center_code: data.res_center_code,
+          purpose: data.purpose,
+          pr_status: defaultPrStatus,
+          requested_by: data.requested_by,
+          approved_by: data.approved_by,
+        });
+
+        console.log(purchaseRequestResponse);
 
         console.log("Purchase request saved successfully.");
       }
