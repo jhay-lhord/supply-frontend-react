@@ -18,6 +18,7 @@ export default function PurchaseRequestDataTable() {
   const purchaseRequestData: purchaseRequestType[] =
     data?.status === "success" ? data.data || [] : [];
 
+  console.log(purchaseRequestData)
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
