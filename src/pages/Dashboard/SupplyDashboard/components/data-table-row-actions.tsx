@@ -22,37 +22,58 @@ import {
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { deletePurchaseRequest } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
+import ItemForm from "./ItemForm";
+import { useItem } from "@/services/itemServices";
+import { itemType } from "@/types/response/item";
 
 interface DataTableRowActionsProps {
-  data: purchaseRequestType;
+  pr_no: string;
+  _data: purchaseRequestType;
 }
 
-export const DataTableRowActions = ({data}:DataTableRowActionsProps) => {
+export const DataTableRowActions = ({
+  _data,
+  pr_no,
+}: DataTableRowActionsProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false) ;
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isItemDialogOpen, setIsItemDialogOpen] = useState<boolean>(false);
+  const [prNo, setPrNo] = useState<string | undefined>("");
+
+  const { isLoading, error, data } = useItem();
+
+  if (isLoading) return <div>Loading ...</div>;
+
+  if (error) return <div>Error Occured: {error.message}</div>;
+
+  const handleViewItemsClick = () => {
+    setIsSheetOpen(true);
+    setIsDropdownOpen(false);
+  };
 
   const handleAddItemsClick = () => {
-    setIsSheetOpen(true); 
+    console.log(`The Pr No: ${pr_no}`);
+    setIsItemDialogOpen(true);
+    setIsDropdownOpen(false);
+    setPrNo(pr_no);
+    console.log(`Final Pr Number: ${prNo}`);
   };
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
-    setIsDropdownOpen(false)
-  }
+    setIsDropdownOpen(false);
+  };
 
   const handleDeletePurchaseRequest = async () => {
-    alert(data.pr_no)
-    const selectedPrNo = data.pr_no;
+    const selectedPrNo = _data.pr_no;
     try {
-      const response = await deletePurchaseRequest(selectedPrNo)
-      console.log(response)
-      
-    } catch (error) {
-      console.log(error)
-    }
+      await deletePurchaseRequest(selectedPrNo);
 
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -67,8 +88,12 @@ export const DataTableRowActions = ({data}:DataTableRowActionsProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={handleAddItemsClick}>
+          <DropdownMenuItem onClick={handleViewItemsClick}>
             View Items
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleAddItemsClick}>
+            Add Items
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Edit</DropdownMenuItem>
@@ -80,30 +105,46 @@ export const DataTableRowActions = ({data}:DataTableRowActionsProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-[60rem] ">
-          <h2>Add Items</h2>
-          {/* Content of the Sheet */}
-          <p>Here you can add items.</p>
+          <h1 className="text-2xl my-5">Items</h1>
+          <p ><span className="font-bold">PR number:</span> {_data?.pr_no}</p> 
+          {data && data.data?.filter((item: itemType) => (
+            item.purchase_request === _data.pr_no
+          )).map((item) => (
+            <p key={item.item_no}>{item.item_description}</p>
+          ))}
         </SheetContent>
       </Sheet>
-
 
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete Purchase Request
+              This action cannot be undone. This will permanently delete
+              Purchase Request
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-none outline-none bg-slate-300 hover:bg-slate-400">Cancel</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-400 hover:bg-red-500" onClick={handleDeletePurchaseRequest}>Delete</AlertDialogAction>
+            <AlertDialogCancel className="border-none outline-none bg-slate-300 hover:bg-slate-400">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-400 hover:bg-red-500"
+              onClick={handleDeletePurchaseRequest}
+            >
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ItemForm
+        isItemDialogOpen={isItemDialogOpen}
+        setIsItemDialogOpen={setIsItemDialogOpen}
+        pr_no={prNo!}
+      />
     </>
   );
 };
