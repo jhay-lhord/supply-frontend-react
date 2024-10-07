@@ -1,5 +1,4 @@
 import React from "react";
-import api from "@/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -39,15 +38,14 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     resolver: zodResolver(purchaseRequestFormSchema),
   });
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const addPurchaseRequestMutation = useMutation({
     mutationFn: AddPurchaseRequest,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['purchase-request']})
-      console.log('refetch and invalidated')
-    }
-
+      queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
+      console.log("refetch and invalidated");
+    },
   });
 
   const currentPurchaseNumber = lastPrNo && lastPrNo;
@@ -56,24 +54,13 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
 
   const onSubmit = async (data: PurchaseRequestData) => {
     try {
+      console.log("submitting");
       const result = purchaseRequestFormSchema.safeParse(data);
       console.log(result);
 
       if (result.success) {
         console.log("no errors");
         setIsDialogOpen(false);
-
-        const purchaseRequestResponse = await api.post(
-          "/api/purchase-request/",
-          {
-            pr_no: data.pr_no,
-            res_center_code: data.res_center_code,
-            purpose: data.purpose,
-            status: data.status,
-            requested_by: data.requested_by,
-            approved_by: data.approved_by,
-          }
-        );
 
         const defaultPrStatus = "pending";
 
@@ -85,8 +72,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
           requested_by: data.requested_by,
           approved_by: data.approved_by,
         });
-
-        console.log(purchaseRequestResponse);
 
         console.log("Purchase request saved successfully.");
       }
@@ -137,15 +122,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   {errors.purpose && (
                     <span className="text-red-400 text-xs">
                       {errors.purpose.message}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <Input placeholder="Status" {...register("status")} />
-                  {errors.status && (
-                    <span className="text-red-400 text-xs">
-                      {errors.status.message}
                     </span>
                   )}
                 </div>
