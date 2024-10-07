@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { purchaseRequestType } from "@/types/response/puchase-request";
-import { getPurchaseRequest} from "@/services/purchaseRequestServices";
+import { GetPurchaseRequest} from "@/services/purchaseRequestServices";
 
 
 export const columns: ColumnDef<purchaseRequestType>[] = [
@@ -140,7 +140,7 @@ export function DataTable() {
 
   React.useEffect(() => {
     const fetchPurchaseRequest = async () => {
-      const result = await getPurchaseRequest();
+      const result = await GetPurchaseRequest();
 
       if(result.status === 'success'){
         const resultInArray = Array.isArray(result.data) ? result.data : []

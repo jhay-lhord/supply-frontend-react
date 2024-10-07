@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { getPurchaseRequest } from "@/services/purchaseRequestServices";
+import { GetPurchaseRequest } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useState, useEffect } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
@@ -22,7 +22,7 @@ export default function BudgetDataTable() {
 
   useEffect(() => {
     const fetchPurchaseRequest = async () => {
-      const response = await getPurchaseRequest();
+      const response = await GetPurchaseRequest();
 
       const lastPrNo = Array.isArray(response.data) && response.data[response.data.length - 1]
       setLastPrNo(lastPrNo.pr_no)

@@ -13,7 +13,7 @@ import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
-import { getPurchaseRequestCount, getPurchaseRequestItem } from "@/services/purchaseRequestServices";
+import { getPurchaseRequestCount, GetPurchaseRequestItem } from "@/services/purchaseRequestServices";
 import SupplySidebar from "./components/SupplySidebar";
 
 const SupplyDashboard: React.FC = () => {
@@ -23,7 +23,7 @@ const SupplyDashboard: React.FC = () => {
   const navigate = useNavigate()
   const fetchPurchaseRequestItem = async () => {
 
-    const items = await getPurchaseRequestItem()
+    const items = await GetPurchaseRequestItem()
     const filteredPr = items.data?.filter(item => item.pr_no.pr_no === pr_no)
     const displayItemDescription = filteredPr?.map(item => item.item_no.item_description)
     console.log(displayItemDescription)
