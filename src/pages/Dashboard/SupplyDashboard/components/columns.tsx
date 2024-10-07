@@ -109,7 +109,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     id: "actions",
     cell: ({row}) => (
-      <DataTableRowActions data={row.original} />
+      <DataTableRowActions pr_no={row.getValue("pr_no")} _data={row.original} />
     ),
   },
 ];
