@@ -14,8 +14,7 @@ import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangeP
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
 import {
-  getPurchaseRequestCount,
-  GetPurchaseRequestItem,
+  GetPurchaseRequestCount,
 } from "@/services/purchaseRequestServices";
 import SupplySidebar from "./components/SupplySidebar";
 
@@ -30,7 +29,7 @@ const SupplyDashboard: React.FC = () => {
   useEffect(() => {
     const fetchPurchaseRequestCount = async () => {
       try {
-        const count = await getPurchaseRequestCount();
+        const count = await GetPurchaseRequestCount();
         setPurchaseRequestCount(count);
       } catch (err) {
         setError("something went wrong");
