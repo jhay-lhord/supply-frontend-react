@@ -48,7 +48,7 @@ export const GetPurchaseRequestItem = async (): Promise<
   }
 };
 
-export const getPurchaseRequestCount = async (): Promise<number> => {
+export const GetPurchaseRequestCount = async (): Promise<number> => {
   const purchasePurchase = await GetPurchaseRequest();
 
   if (purchasePurchase.status === "success") {
