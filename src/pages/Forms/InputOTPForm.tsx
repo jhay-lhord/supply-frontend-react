@@ -45,7 +45,7 @@ export function InputOTPForm() {
     const email = localStorage.getItem("email");
     const otp_code = data.otp_code;
     setIsloading(true);
-    setOtpError("")
+    setOtpError("");
     console.log(data.otp_code);
     api
       .post("/api/user/login_verify_otp/", { email, otp_code })
@@ -60,9 +60,8 @@ export function InputOTPForm() {
       })
       .catch((error) => {
         console.error(error);
-
-        if (error.code === 'ERR_BAD_REQUEST'){
-          setOtpError(error.response?.data?.error)
+        if (error.code === "ERR_BAD_REQUEST") {
+          setOtpError(error.response?.data?.error);
         }
       })
       .finally(() => {
@@ -71,21 +70,20 @@ export function InputOTPForm() {
   };
 
   return (
-    <div className="h-screen  flex justify-center items-center">
+    <div>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="p-4 rounded border-2 border-slate w-1/4"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
             control={form.control}
             name="otp_code"
             render={({ field }) => (
-              <FormItem className="">
-                <FormLabel>One-Time Password</FormLabel>
+              <FormItem>
+                <FormLabel className="text-1xl font-normal text-gray-900 text-center mt-0 mb-6">
+                  One-Time Password
+                </FormLabel>
                 <FormControl>
                   <InputOTP maxLength={6} {...field}>
-                    <InputOTPGroup className=" w-full flex">
+                    <InputOTPGroup className="w-full flex">
                       <InputOTPSlot className="flex-grow" index={0} />
                       <InputOTPSlot className="flex-grow" index={1} />
                       <InputOTPSlot className="flex-grow" index={2} />
@@ -105,7 +103,7 @@ export function InputOTPForm() {
           />
 
           <Button className="w-full mt-4 rounded-full">
-            {isLoading ? <Loader2 className=" animate-spin" /> : "Submit"}
+            {isLoading ? <Loader2 className="animate-spin" /> : "Submit"}
           </Button>
         </form>
       </Form>
