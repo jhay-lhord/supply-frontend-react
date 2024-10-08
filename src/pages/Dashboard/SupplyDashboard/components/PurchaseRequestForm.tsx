@@ -82,15 +82,15 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[60rem]">
-        <ScrollArea className="h-[20rem] mb-8">
+      <DialogContent className="max-w-full w-[30rem]">
+        <ScrollArea className="h-[25rem] mb-8">
           <DialogHeader>
             <DialogTitle className="py-6">Create Purchase Request</DialogTitle>
           </DialogHeader>
           <Description>
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Purchase Request Fields */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4">
                 <div>
                   <Input
                     placeholder="PR No"
