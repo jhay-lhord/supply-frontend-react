@@ -25,6 +25,7 @@ import { purchaseRequestType } from "@/types/response/puchase-request";
 import ItemForm from "./ItemForm";
 import { useItem } from "@/services/itemServices";
 import { itemType } from "@/types/response/item";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface DataTableRowActionsProps {
   pr_no: string;
@@ -41,11 +42,21 @@ export const DataTableRowActions = ({
   const [isItemDialogOpen, setIsItemDialogOpen] = useState<boolean>(false);
   const [prNo, setPrNo] = useState<string | undefined>("");
 
+  const queryClient = useQueryClient();
+
+  const deletePurchasePurchaseMutation = useMutation({
+    mutationFn: deletePurchaseRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
+    },
+  });
+
   const { isLoading, error, data } = useItem();
 
   if (isLoading) return <div>Loading ...</div>;
 
   if (error) return <div>Error Occured: {error.message}</div>;
+
 
   const handleViewItemsClick = () => {
     setIsSheetOpen(true);
@@ -68,8 +79,7 @@ export const DataTableRowActions = ({
   const handleDeletePurchaseRequest = async () => {
     const selectedPrNo = _data.pr_no;
     try {
-      await deletePurchaseRequest(selectedPrNo);
-
+      deletePurchasePurchaseMutation.mutate(selectedPrNo)
     } catch (error) {
       console.log(error);
     }
@@ -108,12 +118,15 @@ export const DataTableRowActions = ({
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-[60rem] ">
           <h1 className="text-2xl my-5">Items</h1>
-          <p ><span className="font-bold">PR number:</span> {_data?.pr_no}</p> 
-          {data && data.data?.filter((item: itemType) => (
-            item.purchase_request === _data.pr_no
-          )).map((item) => (
-            <p key={item.item_no}>{item.item_description}</p>
-          ))}
+          <p>
+            <span className="font-bold">PR number:</span> {_data?.pr_no}
+          </p>
+          {data &&
+            data.data
+              ?.filter(
+                (item: itemType) => item.purchase_request === _data.pr_no
+              )
+              .map((item) => <p key={item.item_no}>{item.item_description}</p>)}
         </SheetContent>
       </Sheet>
 
