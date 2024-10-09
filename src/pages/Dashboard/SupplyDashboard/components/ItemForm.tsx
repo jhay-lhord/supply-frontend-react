@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Description } from "@radix-ui/react-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQueryClient, useMutation} from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AddItem } from "@/services/itemServices";
 
 interface ItemFormProps {
@@ -30,7 +30,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
   const {
     control,
     register,
-    handleSubmit,setValue,
+    handleSubmit,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(itemSchema),
@@ -50,15 +52,14 @@ const ItemForm: React.FC<ItemFormProps> = ({
     },
   });
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const addItemMutation = useMutation({
     mutationFn: AddItem,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['items']})
-      console.log('refetch and invalidated')
-    }
-
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      console.log("refetch and invalidated");
+    },
   });
 
   const {
@@ -83,42 +84,28 @@ const ItemForm: React.FC<ItemFormProps> = ({
       unit_cost: 0,
       total_cost: 0,
     });
-  
+
     items.forEach((_, index) => {
       setValue(`items.${index}.purchase_request`, pr_no);
     });
-  }
+  };
 
   const onSubmit = async (data: { items: ItemData[] }, pr_no: string) => {
-    console.log("submitted");
-    console.log(`Pr Number: ${pr_no}`);
-    console.log(pr_no);
-    console.log(data);
-
     try {
       const itemsWithPurchaseRequest = data.items.map((item) => ({
         ...item,
-        purchase_request: pr_no, 
+        purchase_request: pr_no,
       }));
 
-        console.log(itemsWithPurchaseRequest)
       itemsWithPurchaseRequest.forEach(async (item) => {
         console.log(item);
         const result = itemSchema.safeParse({ items: [item] });
         console.log(result);
 
-        if (!result.success) {
-          console.log("Validation failed:", result.error.flatten());
-          return;
+        if (result.success) {
+          addItemMutation.mutate(item);
+          setIsItemDialogOpen(false)
         }
-
-        console.log("submitted");
-        addItemMutation.mutate(item)
-        await AddItem(item)
-
-        // const response = await api.post("api/item/", item);
-
-        // console.log(response);
       });
     } catch (error) {
       console.log(error);
@@ -135,7 +122,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
         </DialogHeader>
         <Description>
           <form onSubmit={handleSubmit((data) => onSubmit(data, pr_no))}>
-            {/* Add Item Button */}
             <Button
               className="fixed right-10 top-20 z-50 hover:bg-orange-200"
               variant="secondary"
@@ -145,7 +131,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
               <PlusIcon className="mr-2" /> Add Item
             </Button>
 
-            {/* Items Fields */}
             <div className="">
               <div className="grid grid-cols-8 gap-2 mb-4 items-center sticky top-0 bg-white">
                 <Label>Item No</Label>
@@ -211,6 +196,17 @@ const ItemForm: React.FC<ItemFormProps> = ({
                       <Input
                         {...register(`items.${index}.quantity` as const, {
                           valueAsNumber: true,
+                          onChange: (e) => {
+                            const quantity = Number(e.target.value);
+                            const unitCost = getValues(
+                              `items.${index}.unit_cost`
+                            ); // Get the current unit cost
+                            setValue(`items.${index}.quantity`, quantity); // Set quantity
+                            setValue(
+                              `items.${index}.total_cost`,
+                              quantity * unitCost
+                            ); 
+                          },
                         })}
                         type="number"
                         defaultValue={item.quantity}
@@ -226,6 +222,17 @@ const ItemForm: React.FC<ItemFormProps> = ({
                       <Input
                         {...register(`items.${index}.unit_cost` as const, {
                           valueAsNumber: true,
+                          onChange: (e) => {
+                            const unitCost = Number(e.target.value);
+                            const quantity = getValues(
+                              `items.${index}.quantity`
+                            ); 
+                            setValue(`items.${index}.unit_cost`, unitCost);
+                            setValue(
+                              `items.${index}.total_cost`,
+                              quantity * unitCost
+                            ); 
+                          },
                         })}
                         type="number"
                         defaultValue={item.unit_cost}
@@ -242,6 +249,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
                         valueAsNumber: true,
                       })}
                       type="number"
+                      value={
+                        getValues(`items.${index}.quantity`) *
+                        getValues(`items.${index}.unit_cost`)
+                      }
+                      readOnly
                     />
 
                     <MinusCircledIcon
@@ -253,7 +265,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
               </ScrollArea>
             </div>
 
-            {/* Submit Button */}
             <div className="mt-6 fixed bottom-6 right-10">
               <Button
                 className="text-slate-950 bg-orange-200 hover:bg-orange-300"
