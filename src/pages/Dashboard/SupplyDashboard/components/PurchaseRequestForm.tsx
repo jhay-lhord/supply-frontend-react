@@ -89,7 +89,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
           </DialogHeader>
           <Description>
             <form onSubmit={handleSubmit(onSubmit)}>
-              {/* Purchase Request Fields */}
+
               <div className="grid gap-4">
                 <div>
                   <Input
