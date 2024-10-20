@@ -92,7 +92,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       const createdAt = row.getValue("created_at") as string | number;
       const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
       year: "numeric",
-      month: "short", // Shortened month name (e.g., Sep)
+      month: "short", 
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
