@@ -24,14 +24,12 @@ export const generateNextPrNo = (currentPurchaseNumber: string | undefined) => {
   const nextPurchaseNumber = parseInt(last4DigitPRNumber) + 1;
 
   if (!currentPurchaseNumber) {
-    console.log("kaniposd");
     return purchaseRequestNumberFormat(
       currentYear,
       currentMonthFormatted,
       nextPurchaseNumber
     );
   } else {
-    console.log("nigana");
     return purchaseRequestNumberFormat(
       currentYear,
       currentMonthFormatted,
