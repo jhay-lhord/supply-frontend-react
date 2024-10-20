@@ -92,7 +92,7 @@ const SupplyDashboard: React.FC = () => {
                 <Card className="hover:bg-orange-200 border-2 border-orange-200">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Qoutation
+                      Purchase Request in Progress
                     </CardTitle>
                     <svg
                       width="15"
