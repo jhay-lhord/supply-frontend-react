@@ -1,14 +1,6 @@
 import { useState } from "react";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {TrashIcon, PlusIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +11,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { deletePurchaseRequest } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
@@ -26,6 +24,8 @@ import ItemForm from "./ItemForm";
 import { useItem } from "@/services/itemServices";
 import { itemType } from "@/types/response/item";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 interface DataTableRowActionsProps {
   pr_no: string;
@@ -38,11 +38,11 @@ export const DataTableRowActions = ({
 }: DataTableRowActionsProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isItemDialogOpen, setIsItemDialogOpen] = useState<boolean>(false);
   const [prNo, setPrNo] = useState<string | undefined>("");
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const deletePurchasePurchaseMutation = useMutation({
     mutationFn: deletePurchaseRequest,
@@ -57,29 +57,29 @@ export const DataTableRowActions = ({
 
   if (error) return <div>Error Occured: {error.message}</div>;
 
-
-  const handleViewItemsClick = () => {
-    setIsSheetOpen(true);
-    setIsDropdownOpen(false);
+  const handleViewClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    navigate(`/purchase-request/${pr_no}`);
   };
 
-  const handleAddItemsClick = () => {
+  const handleAddItemsClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
     console.log(`The Pr No: ${pr_no}`);
     setIsItemDialogOpen(true);
-    setIsDropdownOpen(false);
     setPrNo(pr_no);
     console.log(`Final Pr Number: ${prNo}`);
   };
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (event: React.MouseEvent) => {
+    event.stopPropagation();
     setIsDialogOpen(true);
-    setIsDropdownOpen(false);
   };
 
-  const handleDeletePurchaseRequest = async () => {
+  const handleDeletePurchaseRequest = async (event: React.MouseEvent) => {
+    event.stopPropagation();
     const selectedPrNo = _data.pr_no;
     try {
-      deletePurchasePurchaseMutation.mutate(selectedPrNo)
+      deletePurchasePurchaseMutation.mutate(selectedPrNo);
     } catch (error) {
       console.log(error);
     }
@@ -87,33 +87,55 @@ export const DataTableRowActions = ({
 
   return (
     <>
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-          >
-            <DotsHorizontalIcon className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={handleViewItemsClick}>
-            View Items
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleAddItemsClick}>
-            Add Items
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleOpenDialog}>
-            Delete
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+        <div className="flex gap-4 ">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleViewClick}
+                variant="ghost"
+                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+              >
+                <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
+                <span className="sr-only">Open</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Open</TooltipContent>
+          </Tooltip>
+
+          <Separator className="h-8" orientation="vertical" decorative/>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleAddItemsClick}
+                variant="ghost"
+                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+              >
+                <PlusIcon className="h-4 w-4 text-orange-400" />
+                <span className="sr-only">Add Item</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Add Item</TooltipContent>
+          </Tooltip>
+
+          <Separator className="h-8" orientation="vertical"/>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleOpenDialog}
+                variant="ghost"
+                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+              >
+                <TrashIcon className="h-4 w-4" />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Delete</TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-[60rem] ">
