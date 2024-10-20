@@ -10,6 +10,7 @@ import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import RoleBaseRouting from "./components/Auth/RoleBaseRouting";
 import PurchaseRequest from "./pages/Dashboard/SupplyDashboard/PurchaseRequest";
+import PurchaseRequestList from "./pages/Dashboard/SupplyDashboard/PurchaseRequestList";
 import PurchaseOrder from "./pages/Dashboard/SupplyDashboard/PurchaseOrder";
 import Reports from "./pages/Dashboard/SupplyDashboard/Reports";
 import Inventory from "./pages/Dashboard/SupplyDashboard/Inventory";
@@ -54,6 +55,8 @@ const App = () => {
           <Route path="/purchase-order" element={<PurchaseOrder />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/inventory" element={<Inventory />} />
+
+          <Route path="/purchase-request/:pr_no" element={<PurchaseRequestList/>}/>
 
           {/* Pages in BAC Dashboard */}
           <Route
