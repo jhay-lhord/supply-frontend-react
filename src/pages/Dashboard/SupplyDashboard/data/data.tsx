@@ -12,13 +12,13 @@ export const statuses = [
     icon: QuestionMarkCircledIcon,
   },
   {
-    value: "accepted",
-    label: "Accepted",
+    value: "Ready for Canvassing",
+    label: "Ready for Canvassing",
     icon: CircleIcon,
   },
   {
-    value: "rejected",
-    label: "Rejected",
+    value: "Ready for Purchase Order",
+    label: "Ready for Purchase Order",
     icon: StopwatchIcon,
   },
 
