@@ -18,9 +18,28 @@ export const GetPurchaseRequest = async (): Promise<
   }
 };
 
+export const GetPurchaseRequestList = async (pr_no: string): Promise<ApiResponse<purchaseRequestType>> => {
+  try {
+    const response = await api.get<purchaseRequestType>(`api/purchase-request/${pr_no}`)
+    console.log(response)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 export const AddPurchaseRequest = async (data: {pr_no: string, res_center_code: string, purpose: string, pr_status: string, requested_by: string,approved_by: string }) => {
   try {
     const response = await api.post("api/purchase-request/", data)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+};
+
+export const UpdatePurchaseRequest = async (data: {pr_no: string, res_center_code: string, purpose: string, status: string, requested_by: string,approved_by: string }) => {
+  try {
+    const response = await api.put(`api/purchase-request/${data.pr_no}`, data)
     return handleSucess(response)
   } catch (error) {
     return handleError(error)
@@ -35,6 +54,13 @@ export const usePurchaseRequest = () => {
   });
 };
 
+export const usePurchaseRequestList = (pr_no: string) => {
+  return useQuery<ApiResponse<purchaseRequestType>, Error>({
+    queryKey: ["purchase_request", pr_no],
+    queryFn: () => GetPurchaseRequestList(pr_no!),
+    enabled: !!pr_no
+  });
+}
 export const GetPurchaseRequestItem = async (): Promise<
   ApiResponse<purchaseRequestType[]>
 > => {
@@ -47,6 +73,7 @@ export const GetPurchaseRequestItem = async (): Promise<
     return handleError(error);
   }
 };
+
 
 export const GetPurchaseRequestCount = async (): Promise<number> => {
   const purchasePurchase = await GetPurchaseRequest();
