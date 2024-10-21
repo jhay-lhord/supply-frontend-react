@@ -26,6 +26,7 @@ import { itemType } from "@/types/response/item";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 interface DataTableRowActionsProps {
   pr_no: string;
@@ -48,6 +49,9 @@ export const DataTableRowActions = ({
     mutationFn: deletePurchaseRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
+      toast.success("Successfully Deleted!", {
+        description: "The Purchase Request sucessfully deleted."
+      })
     },
   });
 
