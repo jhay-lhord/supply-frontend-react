@@ -14,6 +14,7 @@ export const GetItem = async ():Promise<ApiResponse<itemType[]>> => {
   }
 }
 
+
 export const AddItem = async (data: {
   purchase_request: string;
   items: {
@@ -31,6 +32,13 @@ export const AddItem = async (data: {
   } catch (error) {
     return handleError(error)
   }
+}
+
+export const FilteredItemInPurchaseRequest = (pr_no: string) => {
+  const {data} = useItem()
+
+  return data && data.data?.filter((item: itemType) => item.purchase_request === pr_no)
+
 }
 
 export const useItem = () => {
