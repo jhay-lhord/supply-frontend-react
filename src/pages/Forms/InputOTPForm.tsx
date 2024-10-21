@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import api from "../../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -54,6 +55,9 @@ export function InputOTPForm() {
         localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
         if (response.status === 200) {
           navigate("/dashboard");
+          toast("Login successful!",{
+            description: " Welcome back, CTU AC Supply Management System"
+          })
         } else {
           navigate("/login");
         }
