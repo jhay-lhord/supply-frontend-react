@@ -31,6 +31,7 @@ export const GetPurchaseRequestList = async (pr_no: string): Promise<ApiResponse
 export const AddPurchaseRequest = async (data: {pr_no: string, res_center_code: string, purpose: string, pr_status: string, requested_by: string,approved_by: string }) => {
   try {
     const response = await api.post("api/purchase-request/", data)
+    console.log(response)
     return handleSucess(response)
   } catch (error) {
     return handleError(error)
