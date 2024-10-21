@@ -10,6 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   purchaseRequestFormSchema,
   type PurchaseRequestData,
@@ -18,6 +20,7 @@ import { Description } from "@radix-ui/react-dialog";
 import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateNextPrNo } from "@/services/generateNextPrNo";
+import { toast } from "sonner";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -34,6 +37,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm<PurchaseRequestData>({
     resolver: zodResolver(purchaseRequestFormSchema),
   });
@@ -44,13 +48,17 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     mutationFn: AddPurchaseRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
-      console.log("refetch and invalidated");
+      toast.success("Added Successfully", {
+        description: "Purchase Request Added Successfully"
+      })
+      reset()
     },
   });
 
   const currentPurchaseNumber = lastPrNo && lastPrNo;
 
   console.log(generateNextPrNo(currentPurchaseNumber));
+  console.log(errors)
 
   const onSubmit = async (data: PurchaseRequestData) => {
     try {
@@ -82,16 +90,16 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[30rem]">
-        <ScrollArea className="h-[25rem] mb-8">
+      <DialogContent className="max-w-full w-[40rem]">
+        <ScrollArea className="h-[35rem] mb-8">
           <DialogHeader>
             <DialogTitle className="py-6">Create Purchase Request</DialogTitle>
           </DialogHeader>
           <Description>
-            <form onSubmit={handleSubmit(onSubmit)}>
-
+            <form className="" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-4">
                 <div>
+                  <Label>Pr No</Label>
                   <Input
                     placeholder="PR No"
                     {...register("pr_no")}
@@ -105,6 +113,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                 </div>
 
                 <div>
+                  <Label>Res Center Code</Label>
                   <Input
                     placeholder="Res Center Code"
                     {...register("res_center_code")}
@@ -117,8 +126,8 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                 </div>
 
                 <div>
-                  {" "}
-                  <Input placeholder="Purpose" {...register("purpose")} />
+                  <Label>Purpose</Label>
+                  <Textarea placeholder="Purpose" {...register("purpose")} />
                   {errors.purpose && (
                     <span className="text-red-400 text-xs">
                       {errors.purpose.message}
@@ -127,6 +136,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                 </div>
 
                 <div>
+                  <Label>Requested By</Label>
                   <Input
                     placeholder="Requested By"
                     {...register("requested_by")}
@@ -139,6 +149,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                 </div>
 
                 <div>
+                  <Label>Approved By</Label>
                   <Input
                     placeholder="Approved By"
                     {...register("approved_by")}
