@@ -76,7 +76,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
   const onAddItem = () => {
     append({
       purchase_request: pr_no,
-      item_no: "",
+      item_no: (items.length + 1).toString(),
       item_property: "",
       unit: "",
       item_description: "",
@@ -104,7 +104,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
 
         if (result.success) {
           addItemMutation.mutate(item);
-          setIsItemDialogOpen(false)
+          setIsItemDialogOpen(false);
         }
       });
     } catch (error) {
@@ -205,7 +205,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
                             setValue(
                               `items.${index}.total_cost`,
                               quantity * unitCost
-                            ); 
+                            );
                           },
                         })}
                         type="number"
@@ -226,12 +226,12 @@ const ItemForm: React.FC<ItemFormProps> = ({
                             const unitCost = Number(e.target.value);
                             const quantity = getValues(
                               `items.${index}.quantity`
-                            ); 
+                            );
                             setValue(`items.${index}.unit_cost`, unitCost);
                             setValue(
                               `items.${index}.total_cost`,
                               quantity * unitCost
-                            ); 
+                            );
                           },
                         })}
                         type="number"
