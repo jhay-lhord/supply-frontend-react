@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { itemType } from "@/types/response/item";
 import { useEffect } from "react";
+import ItemForm from "./ItemForm";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -122,13 +123,13 @@ export default function PurchaseRequestItemList() {
 
   return (
     <div className="m-8">
-      <div className="flex place-content-between items-center py-2 border-b-2">
+      <div className="flex place-content-between items-center py-2">
         <div>
           <p>
             <span className="font-bold text-lg">PR Number:</span> {pr_no}
           </p>
           <p>
-            <span className="font-bold text-lg">Status:</span>{" "}
+            <span className="font-bold text-lg">Status:</span>
             {purchase_request?.data?.status}
           </p>
         </div>
@@ -139,7 +140,10 @@ export default function PurchaseRequestItemList() {
           Print PR
         </Button>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="border-2 border-orange-200 rounded p-2"
+      >
         <div className="flex gap-4 py-2">
           <InputField
             label="Res Center Code"
@@ -281,67 +285,71 @@ const SelectField = ({
   </div>
 );
 
-const ItemList = ({ items }: { items: itemType[] }) => (
-  <div>
-    <p className="font-bold pt-5 text-xl">Items</p>
-    <div className="grid grid-cols-8 gap-2 mb-4 items-center border-b-2">
-      <Label className="text-base">Item No</Label>
-      <Label className="text-base">Item Property</Label>
-      <Label className="text-base">Unit</Label>
-      <Label className="text-base">Description</Label>
-      <Label className="text-base">Quantity</Label>
-      <Label className="text-base">Unit Cost</Label>
-      <Label className="text-base">Total Cost</Label>
-      <Label className="text-base">Actions</Label>
-    </div>
-    {items?.length ? (
-      items.map((item) => (
-        <div
-          key={item.item_no}
-          className="grid grid-cols-8 gap-2 mb-4 items-center p-2  border-b-2"
-        >
-          <Label>{item.item_no}</Label>
-          <Label>{item.item_property}</Label>
-          <Label>{item.unit}</Label>
-          <Label>{item.item_description}</Label>
-          <Label>{item.quantity}</Label>
-          <Label>{item.unit_cost}</Label>
-          <Label>{item.total_cost}</Label>
-          <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-            <div className="flex gap-4 ">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
-                  >
-                    <Pencil1Icon className="h-4 w-4 text-orange-400" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Edit</TooltipContent>
-              </Tooltip>
+const ItemList = ({ items }: { items: itemType[] }) => {
+  const { pr_no } = useParams();
+  return (
+    <div className="border-2 border-orange-200 rounded mt-4 p-2">
+      <ItemForm pr_no={pr_no!} />
+      <p className="font-bold pt-5">Items</p>
+      <div className="grid grid-cols-7 gap-2 mb-4 items-center border-b-2 py-4">
+        <Label>Stock Property Number</Label>
+        <Label>Unit</Label>
+        <Label>Description</Label>
+        <Label>Quantity</Label>
+        <Label>Unit Cost</Label>
+        <Label>Total Cost</Label>
+        <Label>Actions</Label>
+      </div>
+      {items?.length ? (
+        items.map((item) => (
+          <div
+            key={item.item_no}
+            className="grid grid-cols-7 gap-2 mb-4 items-center p-2  border-b-2"
+          >
+            <Label>{item.stock_property_no}</Label>
+            <Label>{item.unit}</Label>
+            <Label>{item.item_description}</Label>
+            <Label>{item.quantity}</Label>
+            <Label>{item.unit_cost}</Label>
+            <Label>{item.total_cost}</Label>
+            <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+              <div className="flex gap-4 ">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+                    >
+                      <Pencil1Icon className="h-4 w-4 text-orange-400" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Edit</TooltipContent>
+                </Tooltip>
 
-              <Separator className="h-8" orientation="vertical" decorative />
+                <Separator className="h-8" orientation="vertical" decorative />
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Delete</TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Delete</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+          </div>
+        ))
+      ) : (
+        <div className="text-center bg-slate-200 p-1 rounded">
+          <p>It looks a bit empty here! Start by adding a new item.</p>{" "}
         </div>
-      ))
-    ) : (
-      <div className="text-center bg-slate-200 p-1 rounded">No Items</div>
-    )}
-  </div>
-);
+      )}
+    </div>
+  );
+};
