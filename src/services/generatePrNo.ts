@@ -11,7 +11,7 @@ const purchaseRequestNumberFormat = (
     : `${currentYear}-${currentMonthFormatted}-${nextPurchaseNumber.toString()}`;
 };
 
-export const generateNextPrNo = (currentPurchaseNumber: string | undefined) => {
+export const generatePrNo = (currentPurchaseNumber: string | undefined) => {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
   const currentMonthFormatted =
