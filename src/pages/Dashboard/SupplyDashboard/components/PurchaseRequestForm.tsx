@@ -19,7 +19,7 @@ import {
 import { Description } from "@radix-ui/react-dialog";
 import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { generateNextPrNo } from "@/services/generateNextPrNo";
+import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
 
 interface PurchaseRequestFormProps {
@@ -56,9 +56,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
   });
 
   const currentPurchaseNumber = lastPrNo && lastPrNo;
-
-  console.log(generateNextPrNo(currentPurchaseNumber));
-  console.log(errors)
 
   const onSubmit = async (data: PurchaseRequestData) => {
     try {
@@ -103,7 +100,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   <Input
                     placeholder="PR No"
                     {...register("pr_no")}
-                    value={generateNextPrNo(currentPurchaseNumber)}
+                    value={generatePrNo(currentPurchaseNumber)}
                   />
                   {errors.pr_no && (
                     <span className="text-red-400 text-xs">
