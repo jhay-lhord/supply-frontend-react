@@ -1,282 +1,167 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { PlusIcon, MinusCircledIcon } from "@radix-ui/react-icons";
-import { useForm, useFieldArray } from "react-hook-form";
-import { ItemData, itemSchema } from "@/types/request/item";
+import { useForm } from "react-hook-form";
+import { ItemType, itemSchema } from "@/types/request/item";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Description } from "@radix-ui/react-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { AddItem } from "@/services/itemServices";
+import { useAddItem } from "@/services/itemServices";
+import { generateStockPropertyNo } from "@/services/generateStockPropertyNo";
+import { Loader2 } from "lucide-react";
+import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
+
 
 interface ItemFormProps {
-  isItemDialogOpen: boolean;
-  setIsItemDialogOpen: (open: boolean) => void;
   pr_no: string;
 }
 
-const ItemForm: React.FC<ItemFormProps> = ({
-  isItemDialogOpen,
-  setIsItemDialogOpen,
-  pr_no,
-}) => {
+const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
+  const items = FilteredItemInPurchaseRequest(pr_no)
+  const stockPropertyNo = generateStockPropertyNo(items!).toString()
   const {
-    control,
     register,
     handleSubmit,
     setValue,
     getValues,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(itemSchema),
     defaultValues: {
-      items: [
-        {
-          purchase_request: pr_no,
-          item_no: "",
-          item_property: "",
-          unit: "",
-          item_description: "",
-          quantity: 0,
-          unit_cost: 0,
-          total_cost: 0,
-        },
-      ],
-    },
-  });
-
-  const queryClient = useQueryClient();
-
-  const addItemMutation = useMutation({
-    mutationFn: AddItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      console.log("refetch and invalidated");
-    },
-  });
-
-  const {
-    fields: items,
-    append,
-    remove,
-  } = useFieldArray({
-    control,
-    name: "items",
-  });
-  console.log(errors);
-  console.log(pr_no);
-
-  const onAddItem = () => {
-    append({
       purchase_request: pr_no,
-      item_no: (items.length + 1).toString(),
-      item_property: "",
+      item_no: generateStockPropertyNo(items!).toString(),
+      stock_property_no: generateStockPropertyNo(items!).toString(),
       unit: "",
       item_description: "",
       quantity: 0,
       unit_cost: 0,
       total_cost: 0,
-    });
+    },
+  });
 
-    items.forEach((_, index) => {
-      setValue(`items.${index}.purchase_request`, pr_no);
-    });
-  };
 
-  const onSubmit = async (data: { items: ItemData[] }, pr_no: string) => {
+  console.log(generateStockPropertyNo(items!))
+  console.log(errors)
+
+  useEffect(() => {
+    setValue("item_no", stockPropertyNo);
+    setValue("stock_property_no", stockPropertyNo);
+  }, [stockPropertyNo, setValue]);
+
+
+  const {mutate, isPending} = useAddItem()
+
+  const onSubmit = async (data: ItemType) => {
     try {
-      const itemsWithPurchaseRequest = data.items.map((item) => ({
-        ...item,
-        purchase_request: pr_no,
-      }));
-
-      itemsWithPurchaseRequest.forEach(async (item) => {
-        console.log(item);
-        const result = itemSchema.safeParse({ items: [item] });
-        console.log(result);
-
-        if (result.success) {
-          addItemMutation.mutate(item);
-          setIsItemDialogOpen(false);
-        }
+  
+      const result = itemSchema.safeParse({
+        ...data,
+        item_no: stockPropertyNo,
+        stock_property_no: stockPropertyNo
       });
+
+
+      if (result.success) {
+        mutate(data);
+
+        reset();
+      }
     } catch (error) {
       console.log(error);
     }
   };
   return (
-    <Dialog open={isItemDialogOpen} onOpenChange={setIsItemDialogOpen}>
-      <DialogContent className="max-w-full w-[60rem]">
-        <DialogHeader>
-          <DialogTitle className="py-6">
-            Add Item In Purchase Request
-          </DialogTitle>
-          <p>Purchase Number: {pr_no}</p>
-        </DialogHeader>
-        <Description>
-          <form onSubmit={handleSubmit((data) => onSubmit(data, pr_no))}>
-            <Button
-              className="fixed right-10 top-20 z-50 hover:bg-orange-200"
-              variant="secondary"
-              onClick={onAddItem}
-              type="button"
-            >
-              <PlusIcon className="mr-2" /> Add Item
-            </Button>
+   
+    <form onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <div className="">
+        <div className="grid grid-cols-7 gap-2 mb-4 items-center bg-white">
+          <Label>Unit</Label>
+          <Label>Description</Label>
+          <Label>Quantity</Label>
+          <Label>UnitCost</Label>
+          <Label>TotalCost</Label>
+        </div>
+      
+        <div className="grid grid-cols-7 gap-2 mb-4 items-center">
 
-            <div className="">
-              <div className="grid grid-cols-8 gap-2 mb-4 items-center sticky top-0 bg-white">
-                <Label>Item No</Label>
-                <Label>Item Property</Label>
-                <Label>Unit</Label>
-                <Label>Description</Label>
-                <Label>Quantity</Label>
-                <Label>UnitCost</Label>
-                <Label>TotalCost</Label>
-              </div>
-              <ScrollArea className="h-[30rem]">
-                {items.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="grid grid-cols-8 gap-2 mb-4 items-center"
-                  >
-                    <div>
-                      <Input
-                        {...register(`items.${index}.item_no` as const)}
-                        defaultValue={index + 1}
-                      />
-                      {errors.items?.[index]?.item_no && (
-                        <span className="text-xs text-red-500">
-                          {errors.items[index].item_no?.message}
-                        </span>
-                      )}
-                    </div>
+          <div>
+            <Input {...register("unit")} />
+            {errors?.unit && (
+              <span className="text-xs text-red-500">
+                {errors?.unit?.message}
+              </span>
+            )}
+          </div>
 
-                    <div>
-                      <Input
-                        {...register(`items.${index}.item_property` as const)}
-                      />
-                      {errors.items?.[index]?.item_property && (
-                        <span className="text-xs text-red-500">
-                          {errors.items[index].item_property?.message}
-                        </span>
-                      )}
-                    </div>
+          <div>
+            <Input {...register("item_description")} />
+            {errors?.item_description && (
+              <span className="text-xs text-red-500">
+                {errors?.item_description?.message}
+              </span>
+            )}
+          </div>
 
-                    <div>
-                      <Input {...register(`items.${index}.unit` as const)} />
-                      {errors.items?.[index]?.unit && (
-                        <span className="text-xs text-red-500">
-                          {errors.items[index].unit?.message}
-                        </span>
-                      )}
-                    </div>
+          <div>
+            <Input
+              {...register("quantity", {
+                valueAsNumber: true,
+                onChange: (e) => {
+                  const quantity = Number(e.target.value);
+                  const unitCost = getValues("unit_cost");
+                  setValue("quantity", quantity);
+                  setValue("total_cost", quantity * unitCost);
+                },
+              })}
+              type="number"
+              defaultValue={getValues("quantity")}
+            />
+            {errors?.quantity && (
+              <span className="text-xs text-red-500">
+                {errors?.quantity?.message}
+              </span>
+            )}
+          </div>
 
-                    <div>
-                      <Input
-                        {...register(
-                          `items.${index}.item_description` as const
-                        )}
-                      />
-                      {errors.items?.[index]?.item_description && (
-                        <span className="text-xs text-red-500">
-                          {errors.items[index].item_description?.message}
-                        </span>
-                      )}
-                    </div>
+          <div>
+            <Input
+              {...register("unit_cost", {
+                valueAsNumber: true,
+                onChange: (e) => {
+                  const unitCost = Number(e.target.value);
+                  const quantity = getValues("quantity");
+                  setValue("unit_cost", unitCost);
+                  setValue("total_cost", quantity * unitCost);
+                },
+              })}
+              type="number"
+              defaultValue={getValues("unit_cost")}
+            />
+            {errors?.unit_cost && (
+                  <span className="text-xs text-red-500">
+                    {errors?.unit_cost?.message}
+                  </span>
+                )}
+          </div>
 
-                    <div>
-                      <Input
-                        {...register(`items.${index}.quantity` as const, {
-                          valueAsNumber: true,
-                          onChange: (e) => {
-                            const quantity = Number(e.target.value);
-                            const unitCost = getValues(
-                              `items.${index}.unit_cost`
-                            ); // Get the current unit cost
-                            setValue(`items.${index}.quantity`, quantity); // Set quantity
-                            setValue(
-                              `items.${index}.total_cost`,
-                              quantity * unitCost
-                            );
-                          },
-                        })}
-                        type="number"
-                        defaultValue={item.quantity}
-                      />
-                      {errors.items?.[index]?.quantity && (
-                        <span className="text-xs text-red-500">
-                          {errors.items[index].quantity?.message}
-                        </span>
-                      )}
-                    </div>
+          <Input
+            {...register("total_cost", {
+              valueAsNumber: true,
+            })}
+            type="number"
+            value={getValues("quantity") * getValues("unit_cost")}
+            readOnly
+          />
 
-                    <div>
-                      <Input
-                        {...register(`items.${index}.unit_cost` as const, {
-                          valueAsNumber: true,
-                          onChange: (e) => {
-                            const unitCost = Number(e.target.value);
-                            const quantity = getValues(
-                              `items.${index}.quantity`
-                            );
-                            setValue(`items.${index}.unit_cost`, unitCost);
-                            setValue(
-                              `items.${index}.total_cost`,
-                              quantity * unitCost
-                            );
-                          },
-                        })}
-                        type="number"
-                        defaultValue={item.unit_cost}
-                      />
-                      {errors.items?.[index]?.unit_cost && (
-                        <span className="text-xs text-red-500">
-                          {errors.items[index].unit_cost?.message}
-                        </span>
-                      )}
-                    </div>
-
-                    <Input
-                      {...register(`items.${index}.total_cost` as const, {
-                        valueAsNumber: true,
-                      })}
-                      type="number"
-                      value={
-                        getValues(`items.${index}.quantity`) *
-                        getValues(`items.${index}.unit_cost`)
-                      }
-                      readOnly
-                    />
-
-                    <MinusCircledIcon
-                      className="ml-5 text-lg w-8 h-8 text-red-200 hover:text-red-300"
-                      onClick={() => remove(index)}
-                    />
-                  </div>
-                ))}
-              </ScrollArea>
-            </div>
-
-            <div className="mt-6 fixed bottom-6 right-10">
-              <Button
-                className="text-slate-950 bg-orange-200 hover:bg-orange-300"
-                type="submit"
-              >
-                Submit Item
-              </Button>
-            </div>
-          </form>
-        </Description>
-      </DialogContent>
-    </Dialog>
+          <Button
+            className="text-slate-950 bg-orange-200 hover:bg-orange-300"
+            type="submit"
+          >
+            {isPending ? <Loader2 className="animate-spin" /> : "Add Item"}
+          </Button>
+        </div>
+      </div>
+    </form>
   );
 };
 

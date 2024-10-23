@@ -1,10 +1,10 @@
 export type itemType = {
   purchase_request: string,
   item_no: string,
-  item_property: string,
+  stock_property_no: string,
   unit: string,
   item_description: string,
-  quantity: string,
-  unit_cost?: string,
-  total_cost?: string,
+  quantity: number,
+  unit_cost: number,
+  total_cost: number,
 }
