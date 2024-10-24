@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
+import { deleteItem, FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import {
   UpdatePurchaseRequest,
   usePurchaseRequestList,
@@ -36,6 +36,7 @@ import {
 import { itemType } from "@/types/response/item";
 import { useEffect } from "react";
 import ItemForm from "./ItemForm";
+import { toast } from "sonner";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -287,6 +288,27 @@ const SelectField = ({
 
 const ItemList = ({ items }: { items: itemType[] }) => {
   const { pr_no } = useParams();
+  const queryClient = useQueryClient();
+
+  const deleteItemMutation = useMutation({
+    mutationFn: deleteItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      toast.success("Successfully Deleted!", {
+        description: "The Purchase Request sucessfully deleted."
+      })
+    },
+  });
+
+
+  const handleItemDelete = (item: string) => {
+    console.log(item)
+    try {
+      deleteItemMutation.mutate(item)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <div className="border-2 border-orange-200 rounded mt-4 p-2">
       <ItemForm pr_no={pr_no!} />
@@ -332,6 +354,7 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
+                      onClick={() => handleItemDelete(item.id)}
                       variant="ghost"
                       className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
                     >
