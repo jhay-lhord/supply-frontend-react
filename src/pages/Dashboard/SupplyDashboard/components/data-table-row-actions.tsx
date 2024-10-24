@@ -1,16 +1,7 @@
 import { useState } from "react";
-import {TrashIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
+import { TrashIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DeleteDialog } from "./DeleteDialog";
 import {
   Tooltip,
   TooltipProvider,
@@ -43,8 +34,8 @@ export const DataTableRowActions = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
       toast.success("Successfully Deleted!", {
-        description: "The Purchase Request sucessfully deleted."
-      })
+        description: "The Purchase Request sucessfully deleted.",
+      });
     },
   });
 
@@ -58,8 +49,7 @@ export const DataTableRowActions = ({
     setIsDialogOpen(true);
   };
 
-  const handleDeletePurchaseRequest = async (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleDeletePurchaseRequest = async () => {
     const selectedPrNo = _data.pr_no;
     try {
       deletePurchasePurchaseMutation.mutate(selectedPrNo);
@@ -86,7 +76,7 @@ export const DataTableRowActions = ({
             <TooltipContent side="top">Open</TooltipContent>
           </Tooltip>
 
-          <Separator className="h-8" orientation="vertical" decorative/>
+          <Separator className="h-8" orientation="vertical" decorative />
 
           <Tooltip>
             <TooltipTrigger asChild>
@@ -104,29 +94,12 @@ export const DataTableRowActions = ({
         </div>
       </TooltipProvider>
 
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete
-              Purchase Request
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-none outline-none bg-slate-300 hover:bg-slate-400">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-400 hover:bg-red-500"
-              onClick={handleDeletePurchaseRequest}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
+      <DeleteDialog
+        onDeleteClick={handleDeletePurchaseRequest}
+        message="Purchase Request"
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+      />
     </>
   );
 };

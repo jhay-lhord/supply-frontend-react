@@ -1,5 +1,8 @@
 import { useParams } from "react-router-dom";
-import { deleteItem, FilteredItemInPurchaseRequest } from "@/services/itemServices";
+import {
+  deleteItem,
+  FilteredItemInPurchaseRequest,
+} from "@/services/itemServices";
 import {
   UpdatePurchaseRequest,
   usePurchaseRequestList,
@@ -23,8 +26,6 @@ import {
 } from "@/components/ui/tooltip";
 import { TrashIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ExcelJS from "exceljs";
-import { saveAs } from "file-saver";
 import PurchaseRequestForm from "./PurchaseRequestForm";
 import {
   Select,
@@ -37,6 +38,7 @@ import { itemType } from "@/types/response/item";
 import { useEffect } from "react";
 import ItemForm from "./ItemForm";
 import { toast } from "sonner";
+import { DeleteDialog } from "./DeleteDialog";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -93,32 +95,6 @@ export default function PurchaseRequestItemList() {
   const handleEditClick = () => setIsEditMode(true);
   const handleCancelClick = () => setIsEditMode(false);
 
-  const ExcelExport = async () => {
-    try {
-      const response = await fetch("/Appendix%2060%20-%20PR.xlsx");
-      const data = await response.arrayBuffer();
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(data);
-      const worksheet = workbook.getWorksheet(1);
-
-      worksheet.getCell(
-        "C8:E8"
-      ).value = `PR No.: ${purchase_request?.data?.pr_no}`;
-      worksheet.getCell(
-        "F8:G8"
-      ).value = `Date: ${purchase_request?.data?.created_at}`;
-      worksheet.getCell(
-        "C9:E9"
-      ).value = `Responsibility Center Code: ${purchase_request?.data?.res_center_code}`;
-      worksheet.getCell("B39:G39").value = purchase_request?.data?.purpose;
-
-      const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), "updated-final-Appendix-60-PR.xlsx");
-    } catch (error) {
-      console.error("Error generating Excel file:", error);
-    }
-  };
-
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
@@ -136,7 +112,6 @@ export default function PurchaseRequestItemList() {
         </div>
         <Button
           className="px-7 bg-orange-200 hover:bg-orange-300 text-slate-950"
-          onClick={ExcelExport}
         >
           Print PR
         </Button>
@@ -287,6 +262,7 @@ const SelectField = ({
 );
 
 const ItemList = ({ items }: { items: itemType[] }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const { pr_no } = useParams();
   const queryClient = useQueryClient();
 
@@ -295,20 +271,19 @@ const ItemList = ({ items }: { items: itemType[] }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
       toast.success("Successfully Deleted!", {
-        description: "The Purchase Request sucessfully deleted."
-      })
+        description: "The Purchase Request sucessfully deleted.",
+      });
     },
   });
 
-
   const handleItemDelete = (item: string) => {
-    console.log(item)
+    console.log(item);
     try {
-      deleteItemMutation.mutate(item)
+      deleteItemMutation.mutate(item);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   return (
     <div className="border-2 border-orange-200 rounded mt-4 p-2">
       <ItemForm pr_no={pr_no!} />
@@ -354,7 +329,7 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      onClick={() => handleItemDelete(item.id)}
+                      onClick={() => setIsDialogOpen(true)}
                       variant="ghost"
                       className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
                     >
@@ -366,6 +341,12 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                 </Tooltip>
               </div>
             </TooltipProvider>
+            <DeleteDialog
+              onDeleteClick={() => handleItemDelete(item.id)}
+              message="Item"
+              isDialogOpen={isDialogOpen}
+              setIsDialogOpen={setIsDialogOpen}
+            />
           </div>
         ))
       ) : (
