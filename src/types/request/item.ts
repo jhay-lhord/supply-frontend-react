@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const itemSchema = z.object({
+  id: z.string().optional(),
   purchase_request: z.string(),
   item_no: z.string().min(1, { message: "Item No is required" }),
   stock_property_no: z.string().min(1, { message: "Item property is required" }),

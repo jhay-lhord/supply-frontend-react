@@ -24,6 +24,15 @@ export const AddItem = async (data: ItemType) => {
   }
 };
 
+export const deleteItem = async (id: string) => {
+   try {
+      const response = await api.delete(`api/item/${id}`)
+      return handleSucess(response)
+   } catch (error) {
+      return handleError(error)
+   }
+}
+
 export const useAddItem = () => {
   const queryClient = useQueryClient()
   return useMutation<ApiResponse<ItemType>, Error, ItemType>({
