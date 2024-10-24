@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import BACDashboard from "@/pages/Dashboard/BACDashboard/BACDashboard";
 import SupplyDashboard from "@/pages/Dashboard/SupplyDashboard/Dashboard";
-import BudgetDashboard from "@/pages/Dashboard/BudgetDashboard/BudgetDashboard";
+import AdminDashboard from "@/pages/Dashboard/AdminDashboard/Dashboard";
 
 const RoleBaseRouting = () => {
   const { role } = useAuth();
@@ -13,8 +13,8 @@ const RoleBaseRouting = () => {
   switch (role) {
     case "Supply Officer":
       return <SupplyDashboard />;
-    case "Budget Officer":
-      return <BudgetDashboard />;
+    case "Admin":
+      return <AdminDashboard />;
     case "BAC Officer":
       return <BACDashboard />;
     default:

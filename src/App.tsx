@@ -18,13 +18,12 @@ import RequestForQuotation from "./pages/Dashboard/BACDashboard/RequestForQuotat
 import AbstractOfQuotation from "./pages/Dashboard/BACDashboard/AbstractOfQuotation";
 import BACReports from "./pages/Dashboard/BACDashboard/BACReports";
 import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
-import Budget from "./pages/Dashboard/BudgetDashboard/Budget";
-import BudgetReports from "./pages/Dashboard/BudgetDashboard/BudgetReports";
-import BudgetTransaction from "./pages/Dashboard/BudgetDashboard/BudgetTransaction";
+import AdminDashboard from "./pages/Dashboard/AdminDashboard/Dashboard";
+import Users from "./pages/Dashboard/AdminDashboard/Users";
 
 const Logout = () => {
   localStorage.clear();
-  return <Navigate to="/login" />;
+  return <Navigate to="/" />;
 };
 
 const RegisterAndLogout = () => {
@@ -70,10 +69,9 @@ const App = () => {
           <Route path="/bac-reports" element={<BACReports />} />
           <Route path="/bac-transaction" element={<BACTransaction />} />
 
-          {/* Pages in Budget Dashboard */}
-          <Route path="/budget" element={<Budget />} />
-          <Route path="/budget-reports" element={<BudgetReports />} />
-          <Route path="/budget-transaction" element={<BudgetTransaction />} />
+          {/* Pages in Admin */}
+          <Route path="/dashboard" element={<AdminDashboard/>}/>
+          <Route path="/users" element={<Users/>}/>
         </Routes>
       </Router>
     </>
