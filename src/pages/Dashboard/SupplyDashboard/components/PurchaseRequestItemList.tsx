@@ -342,7 +342,7 @@ const ItemList = ({ items }: { items: itemType[] }) => {
               </div>
             </TooltipProvider>
             <DeleteDialog
-              onDeleteClick={() => handleItemDelete(item.id)}
+              onDeleteClick={() => handleItemDelete(item.id!)}
               message="Item"
               isDialogOpen={isDialogOpen}
               setIsDialogOpen={setIsDialogOpen}
