@@ -1,5 +1,5 @@
 export type itemType = {
-  id: string,
+  id?: string | undefined,
   purchase_request: string,
   item_no: string,
   stock_property_no: string,
