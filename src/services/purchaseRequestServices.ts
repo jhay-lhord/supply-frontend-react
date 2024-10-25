@@ -88,6 +88,19 @@ export const usePurchaseRequestInProgressCount = () => {
   const inProgressCount = purchase_request_in_progress?.length
   return {inProgressCount, isLoading}
 }
+
+export const usePurchaseRequestInProgress = () => {
+  const {data, isLoading} = usePurchaseRequest()
+
+  const purchaseRequestInProgress = data?.data?.map(data => {
+    return data
+  }).filter(data => {
+    return data.status === "Ready for Canvassing"
+  })
+
+  return {purchaseRequestInProgress, isLoading}
+
+}
 export const usePurchaseRequestList = (pr_no: string) => {
   return useQuery<ApiResponse<purchaseRequestType>, Error>({
     queryKey: ["purchase_request", pr_no],
