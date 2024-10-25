@@ -73,18 +73,20 @@ export const usePurchaseRequest = () => {
 };
 
 export const usePurchaseRequestCount = () => {
-  const purchase_request = usePurchaseRequest();
-  return purchase_request?.data?.data?.length;
+  const {data, isLoading} = usePurchaseRequest();
+  const purchaseRequestCount = data?.data?.length
+  return {purchaseRequestCount, isLoading}
 };
 
 export const usePurchaseRequestInProgressCount = () => {
-  const purchase_request = usePurchaseRequest();
-  const purchase_request_in_progress = purchase_request.data?.data?.map(data => {
+  const {data, isLoading} = usePurchaseRequest();
+  const purchase_request_in_progress = data?.data?.map(data => {
     return data
   }).filter(data => {
     return data.status === "Ready for Canvassing"
   })
-  return purchase_request_in_progress?.length
+  const inProgressCount = purchase_request_in_progress?.length
+  return {inProgressCount, isLoading}
 }
 export const usePurchaseRequestList = (pr_no: string) => {
   return useQuery<ApiResponse<purchaseRequestType>, Error>({

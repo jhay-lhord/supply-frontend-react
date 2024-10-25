@@ -7,38 +7,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
 import {
-  GetPurchaseRequestCount,
+  usePurchaseRequestCount,
+  usePurchaseRequestInProgressCount,
 } from "@/services/purchaseRequestServices";
 import SupplySidebar from "./components/SupplySidebar";
+import { usePurchaseOrderCount } from "@/services/puchaseOrderServices";
+import { Loader2 } from "lucide-react";
 
 const SupplyDashboard: React.FC = () => {
-  const [purchaseRequestCount, setPurchaseRequestCount] = useState<
-    number | null
-  >(null);
-  const [error, setError] = useState<string | null>(null);
+  const {purchase_order_count, isLoading: isPurchaseOrderLoading} = usePurchaseOrderCount()
+  const {purchaseRequestCount, isLoading: isPurchaseRequestLoading} = usePurchaseRequestCount()
+  const {inProgressCount, isLoading: isInProgressLoading} = usePurchaseRequestInProgressCount()
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPurchaseRequestCount = async () => {
-      try {
-        const count = await GetPurchaseRequestCount();
-        setPurchaseRequestCount(count);
-      } catch (err) {
-        setError("something went wrong");
-        console.error(err, error);
-      }
-    };
-
-    fetchPurchaseRequestCount();
-  }, []);
   return (
     <DashboardLayout>
       <SupplySidebar />
@@ -85,7 +73,7 @@ const SupplyDashboard: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {purchaseRequestCount}
+                      {isPurchaseRequestLoading ? <Loader2 className="animate-spin" /> : purchaseRequestCount}
                     </div>
                   </CardContent>
                 </Card>
@@ -110,10 +98,12 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">comming soon</div>
+                    <div className="text-2xl font-bold">{isInProgressLoading ? <Loader2 className="animate-spin" /> : inProgressCount}</div>
                   </CardContent>
                 </Card>
-                <Card className="hover:bg-orange-200 border-2 border-orange-200">
+                <Card  onClick={() => {
+                    navigate("/purchase-order");
+                  }} className="hover:bg-orange-200 border-2 border-orange-200">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Order in Progress
@@ -134,7 +124,7 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">comming soon...</div>
+                    <div className="text-2xl font-bold">{isPurchaseOrderLoading ? <Loader2 className="animate-spin" /> : purchase_order_count}</div>
                   </CardContent>
                 </Card>
               </div>
