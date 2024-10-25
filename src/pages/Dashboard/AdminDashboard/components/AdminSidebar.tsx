@@ -19,7 +19,7 @@ const AdminSidebar = () => {
             {
               title: "Users",
               label: "",
-              link_to: "/users",
+              link_to: "/admin/users",
               icon: User2Icon,
               variant: "default",
             },

@@ -20,6 +20,7 @@ import BACReports from "./pages/Dashboard/BACDashboard/BACReports";
 import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard/Dashboard";
 import Users from "./pages/Dashboard/AdminDashboard/Users";
+import PurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/PurchaseRequestInProgress";
 
 const Logout = () => {
   localStorage.clear();
@@ -50,28 +51,31 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
 
           {/* Pages in Supply Dashboard*/}
-          <Route path="/purchase-request" element={<PurchaseRequest />} />
-          <Route path="/purchase-order" element={<PurchaseOrder />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/inventory" element={<Inventory />} />
-
-          <Route path="/purchase-request/:pr_no" element={<PurchaseRequestList/>}/>
+          <Route path="/supply/purchase-request" element={<PurchaseRequest />} />
+          <Route path="/supply/purchase-request/:pr_no" element={<PurchaseRequestList/>}/>
+          <Route path="/supply/purchase-order" element={<PurchaseOrder />} />
+          <Route path="/supply/reports" element={<Reports />} />
+          <Route path="/supply/inventory" element={<Inventory />} />
 
           {/* Pages in BAC Dashboard */}
           <Route
-            path="/request-for-quotation"
+            path="/bac/purchase-request"
+            element={<PurchaseRequestInProgress />}
+          />
+          <Route
+            path="/bac/request-for-quotation"
             element={<RequestForQuotation />}
           />
           <Route
-            path="/abstract-of-quotation"
+            path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
           />
-          <Route path="/bac-reports" element={<BACReports />} />
-          <Route path="/bac-transaction" element={<BACTransaction />} />
+          <Route path="/bac/bac-reports" element={<BACReports />} />
+          <Route path="/bac/bac-transaction" element={<BACTransaction />} />
 
           {/* Pages in Admin */}
-          <Route path="/dashboard" element={<AdminDashboard/>}/>
-          <Route path="/users" element={<Users/>}/>
+          <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+          <Route path="/admin/users" element={<Users/>}/>
         </Routes>
       </Router>
     </>
