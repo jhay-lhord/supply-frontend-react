@@ -38,21 +38,28 @@ const App = () => {
       <Router>
         <Routes>
           <Route
-            path="/dashboard"
+            path="/"
             element={
               <ProtectedRoutes>
                 <RoleBaseRouting />
               </ProtectedRoutes>
             }
           />
-          <Route path="/" element={<Login />} />
+
+          <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="*" element={<NotFound />} />
 
           {/* Pages in Supply Dashboard*/}
-          <Route path="/supply/purchase-request" element={<PurchaseRequest />} />
-          <Route path="/supply/purchase-request/:pr_no" element={<PurchaseRequestList/>}/>
+          <Route
+            path="/supply/purchase-request"
+            element={<PurchaseRequest />}
+          />
+          <Route
+            path="/supply/purchase-request/:pr_no"
+            element={<PurchaseRequestList />}
+          />
           <Route path="/supply/purchase-order" element={<PurchaseOrder />} />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />
@@ -74,8 +81,8 @@ const App = () => {
           <Route path="/bac/bac-transaction" element={<BACTransaction />} />
 
           {/* Pages in Admin */}
-          <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
-          <Route path="/admin/users" element={<Users/>}/>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<Users />} />
         </Routes>
       </Router>
     </>

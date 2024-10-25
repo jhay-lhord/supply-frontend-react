@@ -2,6 +2,8 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 import api from "../../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../constants";
 import { useState, useEffect } from "react";
+import Loading from "@/pages/Dashboard/shared/components/Loading";
+import Login from "@/pages/Forms/Login";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,8 +12,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [isLoading, setIsloading] = useState<boolean>(true);
-
-  console.log('from protected route')
 
   useEffect(() => {
     const checkAuth = () => {
@@ -65,10 +65,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading/>
   }
 
-  return isAuthorized && children 
+  return isAuthorized ?  children : <Login/>
 };
 
 export default ProtectedRoute;
