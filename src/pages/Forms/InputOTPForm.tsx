@@ -54,7 +54,7 @@ export function InputOTPForm() {
         localStorage.setItem(ACCESS_TOKEN, response.data.access);
         localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
         if (response.status === 200) {
-          navigate("/dashboard");
+          navigate("/");
           toast("Login successful!",{
             description: " Welcome back, CTU AC Supply Management System"
           })
@@ -98,7 +98,7 @@ export function InputOTPForm() {
                   </InputOTP>
                 </FormControl>
                 <FormDescription className="text-xs">
-                  Please enter the one-time password sent to your phone.
+                  Please enter the one-time password sent to your email.
                 </FormDescription>
                 <FormMessage />
                 {otpError && <p className="text-red-500 text-sm">{otpError}</p>}
