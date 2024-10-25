@@ -77,6 +77,15 @@ export const usePurchaseRequestCount = () => {
   return purchase_request?.data?.data?.length;
 };
 
+export const usePurchaseRequestInProgressCount = () => {
+  const purchase_request = usePurchaseRequest();
+  const purchase_request_in_progress = purchase_request.data?.data?.map(data => {
+    return data
+  }).filter(data => {
+    return data.status === "Ready for Canvassing"
+  })
+  return purchase_request_in_progress?.length
+}
 export const usePurchaseRequestList = (pr_no: string) => {
   return useQuery<ApiResponse<purchaseRequestType>, Error>({
     queryKey: ["purchase_request", pr_no],
