@@ -6,14 +6,15 @@ import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 import PurchaseRequestForm from "./PurchaseRequestForm";
+import Loading from "../../shared/components/Loading";
 
 export default function PurchaseRequestDataTable() {
   const { isLoading, error, data } = usePurchaseRequest();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  if (isLoading) return "Loading...";
+  if (isLoading) return <Loading/>
 
-  if (error) return console.log(error);
+  if (error) return <div>{error.message}</div>;
 
   const purchaseRequestData: purchaseRequestType[] =
     data?.status === "success" ? data.data || [] : [];

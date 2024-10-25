@@ -2,13 +2,14 @@ import { useGetUsers } from "@/services/userServices";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { UsersType } from "@/types/response/users";
+import Loading from "../../shared/components/Loading";
 
 export default function UsersDataTable() {
   const { isLoading, error, data } = useGetUsers()
 
   console.log(data)
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading/>
 
   if (error) return <div>{error.message}</div>
   const usersData: UsersType[] =

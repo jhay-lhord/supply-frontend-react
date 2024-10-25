@@ -39,6 +39,7 @@ import { useEffect } from "react";
 import ItemForm from "./ItemForm";
 import { toast } from "sonner";
 import { DeleteDialog } from "./DeleteDialog";
+import Loading from "../../shared/components/Loading";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -95,7 +96,7 @@ export default function PurchaseRequestItemList() {
   const handleEditClick = () => setIsEditMode(true);
   const handleCancelClick = () => setIsEditMode(false);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading/>
   if (error) return <div>{error.message}</div>;
 
   return (
