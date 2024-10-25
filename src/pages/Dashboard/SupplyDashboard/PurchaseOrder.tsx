@@ -1,12 +1,16 @@
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import SupplySidebar from "./components/SupplySidebar";
-
+import { useGetPurchaseOrder } from "@/services/puchaseOrderServices";
+import PurchaseOrderDataTable from "./components/PurchaseOrderDataTable";
 
 const PurchaseOrder: React.FC = () => {
+  useGetPurchaseOrder();
   return (
     <DashboardLayout>
       <SupplySidebar />
-      <h1 className="pt-16 text-3xl">Purchase Order</h1>
+      <div className="pt-16 w-full">
+        <PurchaseOrderDataTable />
+      </div>
     </DashboardLayout>
   );
 };
