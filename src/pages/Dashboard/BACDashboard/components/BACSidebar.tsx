@@ -19,7 +19,7 @@ const BACSidebar = () => {
           {
             title: "Dashboard",
             label: "",
-            link_to: "/dashboard",
+            link_to: "/",
             icon: LayoutDashboard,
             variant: "default",
           },
