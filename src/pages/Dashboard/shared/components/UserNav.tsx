@@ -26,9 +26,9 @@ export const UserNav = () => {
     .join("");
 
   const navigate = useNavigate();
-  const handleClick = () => {
+  const handleLogoutClick = () => {
     localStorage.clear();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
@@ -55,7 +55,7 @@ export const UserNav = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleClick}>
+        <DropdownMenuItem onClick={handleLogoutClick}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
