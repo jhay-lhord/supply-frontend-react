@@ -75,4 +75,20 @@ export const useGetItem = (id: string) => {
     queryFn: () => GetItem(id!)
   })
 }
-
+export const UpdateItem = async (data: {
+  purchase_request: string;
+  item_no: string;
+  stock_property_no: string;
+  unit: string;
+  item_description: string;
+  quantity: number;
+  unit_cost: number;
+  total_cost: number;
+}) => {
+  try {
+    const response = await api.put<ItemType[]>(`api/item/${data.item_no}`,data);
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
