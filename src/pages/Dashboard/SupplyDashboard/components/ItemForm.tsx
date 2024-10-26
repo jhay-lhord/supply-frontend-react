@@ -9,6 +9,8 @@ import { useAddItem } from "@/services/itemServices";
 import { generateStockPropertyNo } from "@/services/generateStockPropertyNo";
 import { Loader2 } from "lucide-react";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
+import { v4 as uuidv4 } from 'uuid';
+uuidv4(); 
 
 
 interface ItemFormProps {
@@ -18,6 +20,7 @@ interface ItemFormProps {
 const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   const items = FilteredItemInPurchaseRequest(pr_no)
   const stockPropertyNo = generateStockPropertyNo(items!).toString()
+  const item_no = uuidv4()
   const {
     register,
     handleSubmit,
@@ -29,7 +32,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     resolver: zodResolver(itemSchema),
     defaultValues: {
       purchase_request: pr_no,
-      item_no: generateStockPropertyNo(items!).toString(),
+      item_no: item_no,
       stock_property_no: generateStockPropertyNo(items!).toString(),
       unit: "",
       item_description: "",
@@ -44,9 +47,9 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   console.log(errors)
 
   useEffect(() => {
-    setValue("item_no", stockPropertyNo);
+    setValue("item_no", item_no);
     setValue("stock_property_no", stockPropertyNo);
-  }, [stockPropertyNo, setValue]);
+  }, [stockPropertyNo,item_no, setValue]);
 
 
   const {mutate, isPending} = useAddItem()
@@ -76,13 +79,13 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
       <div className="">
         <div className="grid grid-cols-7 gap-2 mb-4 items-center bg-white">
           <Label>Unit</Label>
-          <Label>Description</Label>
+          <Label className="col-span-2">Description</Label>
           <Label>Quantity</Label>
           <Label>UnitCost</Label>
           <Label>TotalCost</Label>
         </div>
       
-        <div className="grid grid-cols-7 gap-2 mb-4 items-center">
+        <div className="grid grid-cols-7 gap-2 mb-4">
 
           <div>
             <Input {...register("unit")} />
@@ -93,7 +96,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
             )}
           </div>
 
-          <div>
+          <div className="col-span-2">
             <Input {...register("item_description")} />
             {errors?.item_description && (
               <span className="text-xs text-red-500">

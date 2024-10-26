@@ -40,6 +40,7 @@ import ItemForm from "./ItemForm";
 import { toast } from "sonner";
 import { DeleteDialog } from "./DeleteDialog";
 import Loading from "../../shared/components/Loading";
+import EditItemForm from "./EditItemForm";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -96,7 +97,7 @@ export default function PurchaseRequestItemList() {
   const handleEditClick = () => setIsEditMode(true);
   const handleCancelClick = () => setIsEditMode(false);
 
-  if (isLoading) return <Loading/>
+  if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
   return (
@@ -104,16 +105,14 @@ export default function PurchaseRequestItemList() {
       <div className="flex place-content-between items-center py-2">
         <div>
           <p>
-            <span className="font-bold text-lg">PR Number:</span> {pr_no}
+            <span className="font-bold text-lg">PR Number: </span> {pr_no}
           </p>
           <p>
-            <span className="font-bold text-lg">Status:</span>
+            <span className="font-bold text-lg">Status: </span>
             {purchase_request?.data?.status}
           </p>
         </div>
-        <Button
-          className="px-7 bg-orange-200 hover:bg-orange-300 text-slate-950"
-        >
+        <Button className="px-7 bg-orange-200 hover:bg-orange-300 text-slate-950">
           Print PR
         </Button>
       </div>
@@ -264,6 +263,8 @@ const SelectField = ({
 
 const ItemList = ({ items }: { items: itemType[] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedItemNo, setSelectedItemNo] = useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
   const { pr_no } = useParams();
   const queryClient = useQueryClient();
 
@@ -277,13 +278,8 @@ const ItemList = ({ items }: { items: itemType[] }) => {
     },
   });
 
-  const handleItemDelete = (item: string) => {
-    console.log(item);
-    try {
-      deleteItemMutation.mutate(item);
-    } catch (error) {
-      console.log(error);
-    }
+  const handleItemDelete = () => {
+    deleteItemMutation.mutate(selectedItemNo!);
   };
   return (
     <div className="border-2 border-orange-200 rounded mt-4 p-2">
@@ -315,6 +311,10 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
+                      onClick={() => {
+                        setSelectedItemNo(item.item_no)
+                        setIsEditDialogOpen(true)
+                      }}
                       variant="ghost"
                       className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
                     >
@@ -330,7 +330,10 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      onClick={() => setIsDialogOpen(true)}
+                      onClick={() => {
+                        setIsDialogOpen(true);
+                        setSelectedItemNo(item.item_no);
+                      }}
                       variant="ghost"
                       className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
                     >
@@ -342,19 +345,25 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                 </Tooltip>
               </div>
             </TooltipProvider>
-            <DeleteDialog
-              onDeleteClick={() => handleItemDelete(item.id!)}
-              message="Item"
-              isDialogOpen={isDialogOpen}
-              setIsDialogOpen={setIsDialogOpen}
-            />
           </div>
         ))
       ) : (
-        <div className="text-center bg-slate-200 p-1 rounded">
-          <p>It looks a bit empty here! Start by adding a new item.</p>{" "}
+        <div className="w-full flex items-center flex-col">
+          <img src="/empty-box.svg" className="w-80 h-80" alt="Empty box" />
+          <p>It looks a bit empty here! Start by adding a new item.</p>
         </div>
       )}
+      <DeleteDialog
+        onDeleteClick={handleItemDelete}
+        message="Item"
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+      />
+      <EditItemForm
+        isEditDialogOpen={isEditDialogOpen}
+        setIsEditDialogOpen={setIsEditDialogOpen}
+        item_no={selectedItemNo!}
+      />
     </div>
   );
 };
