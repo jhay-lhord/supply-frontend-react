@@ -9,18 +9,17 @@ import { useAddItem } from "@/services/itemServices";
 import { generateStockPropertyNo } from "@/services/generateStockPropertyNo";
 import { Loader2 } from "lucide-react";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
-import { v4 as uuidv4 } from 'uuid';
-uuidv4(); 
-
+import { v4 as uuidv4 } from "uuid";
+uuidv4();
 
 interface ItemFormProps {
   pr_no: string;
 }
 
 const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
-  const items = FilteredItemInPurchaseRequest(pr_no)
-  const stockPropertyNo = generateStockPropertyNo(items!).toString()
-  const item_no = uuidv4()
+  const items = FilteredItemInPurchaseRequest(pr_no);
+  const stockPropertyNo = generateStockPropertyNo(items!).toString();
+  const item_no = uuidv4();
   const {
     register,
     handleSubmit,
@@ -42,27 +41,22 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     },
   });
 
-
-  console.log(generateStockPropertyNo(items!))
-  console.log(errors)
+  console.log(generateStockPropertyNo(items!));
 
   useEffect(() => {
     setValue("item_no", item_no);
     setValue("stock_property_no", stockPropertyNo);
-  }, [stockPropertyNo,item_no, setValue]);
+  }, [stockPropertyNo, item_no, setValue]);
 
-
-  const {mutate, isPending} = useAddItem()
+  const { mutate, isPending } = useAddItem();
 
   const onSubmit = async (data: ItemType) => {
     try {
-  
       const result = itemSchema.safeParse({
         ...data,
-        item_no: stockPropertyNo,
-        stock_property_no: stockPropertyNo
+        item_no: item_no,
+        stock_property_no: stockPropertyNo,
       });
-
 
       if (result.success) {
         mutate(data);
@@ -74,7 +68,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     }
   };
   return (
-   
     <form onSubmit={handleSubmit((data) => onSubmit(data))}>
       <div className="">
         <div className="grid grid-cols-7 gap-2 mb-4 items-center bg-white">
@@ -84,9 +77,8 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
           <Label>UnitCost</Label>
           <Label>TotalCost</Label>
         </div>
-      
-        <div className="grid grid-cols-7 gap-2 mb-4">
 
+        <div className="grid grid-cols-7 gap-2 mb-4">
           <div>
             <Input {...register("unit")} />
             {errors?.unit && (
@@ -141,10 +133,10 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
               defaultValue={getValues("unit_cost")}
             />
             {errors?.unit_cost && (
-                  <span className="text-xs text-red-500">
-                    {errors?.unit_cost?.message}
-                  </span>
-                )}
+              <span className="text-xs text-red-500">
+                {errors?.unit_cost?.message}
+              </span>
+            )}
           </div>
 
           <Input

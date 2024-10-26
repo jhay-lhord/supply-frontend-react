@@ -3,11 +3,11 @@ import { ApiResponse } from "@/types/response/api-response";
 import { ItemType } from "@/types/request/item";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const GetItems = async (): Promise<ApiResponse<ItemType[]>> => {
   try {
     const response = await api.get<ItemType[]>("api/item/");
-    console.log(response);
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
@@ -16,9 +16,7 @@ export const GetItems = async (): Promise<ApiResponse<ItemType[]>> => {
 
 export const AddItem = async (data: ItemType) => {
   try {
-    console.log(data)
     const response = await api.post("api/item/", data);
-    console.log(response);
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
@@ -72,23 +70,30 @@ export const GetItem = async (id: string): Promise<ApiResponse<ItemType>> => {
 export const useGetItem = (id: string) => {
   return useQuery<ApiResponse<ItemType>, Error>({
     queryKey: ["items", id],
-    queryFn: () => GetItem(id!)
-  })
-}
-export const UpdateItem = async (data: {
-  purchase_request: string;
-  item_no: string;
-  stock_property_no: string;
-  unit: string;
-  item_description: string;
-  quantity: number;
-  unit_cost: number;
-  total_cost: number;
-}) => {
+    queryFn: () => GetItem(id!),
+  });
+};
+export const UpdateItem = async (data: ItemType) => {
   try {
-    const response = await api.put<ItemType[]>(`api/item/${data.item_no}`,data);
+    const response = await api.put<ItemType>(
+      `api/item/${data.item_no}`,
+      data
+    );
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
   }
+};
+
+export const useUpdateItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation<ApiResponse<ItemType>, Error, ItemType>({
+    mutationFn: (data) => UpdateItem(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      toast.success("Edit Successfully", {
+        description: "Item Edit Successfully",
+      });
+    },
+  });
 };

@@ -13,11 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Description } from "@radix-ui/react-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { itemSchema, ItemType } from "@/types/request/item";
-import { UpdateItem, useGetItem } from "@/services/itemServices";
+import { useGetItem, useUpdateItem } from "@/services/itemServices";
 import Loading from "../../shared/components/Loading";
+import { Loader2 } from "lucide-react";
 
 interface EditItemFormProps {
   isEditDialogOpen: boolean;
@@ -31,6 +30,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
   item_no,
 }) => {
   const { isLoading, data: item } = useGetItem(item_no!);
+  const { mutate, isPending } = useUpdateItem();
   const {
     register,
     handleSubmit,
@@ -63,25 +63,19 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       setValue("total_cost", item?.data?.total_cost);
     }
   }, [item, setValue]);
-  const queryClient = useQueryClient();
-  console.log(item);
 
-  const updateItemMutation = useMutation({
-    mutationFn: UpdateItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      toast.success("Edit Successfully", {
-        description: "Item Edit Successfully",
-      });
-      setIsEditDialogOpen(false);
-      // reset();
-    },
-  });
 
-  console.log(errors);
+  const onSubmit = async (data: ItemType) => {
+    try {
+      const result = itemSchema.safeParse(data);
 
-  const onSubmit = (item: ItemType) => {
-    updateItemMutation.mutate(item);
+      if (result.success) {
+        mutate(data);
+        setIsEditDialogOpen(false)
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -95,7 +89,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
             {isLoading ? (
               <Loading />
             ) : (
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={handleSubmit((item) => onSubmit(item))}>
                 <div className="">
                   <div className="grid grid-cols-7 gap-2 mb-4 items-center bg-white"></div>
 
@@ -176,10 +170,14 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
 
                     <div className="mt-6 fixed bottom-6 right-10">
                       <Button
-                        className="text-slate-950 bg-orange-200 hover:bg-orange-300"
+                        className="text-slate-950 bg-orange-200 hover:bg-orange-300 px-10"
                         type="submit"
                       >
-                        Save Changes
+                        {isPending ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          "Save Changes"
+                        )}
                       </Button>
                     </div>
                   </div>
