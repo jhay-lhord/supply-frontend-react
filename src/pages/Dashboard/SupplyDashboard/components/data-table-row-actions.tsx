@@ -41,7 +41,7 @@ export const DataTableRowActions = ({
 
   const handleViewClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    navigate(`/purchase-request/${pr_no}`);
+    navigate(`/supply/purchase-request/${pr_no}`);
   };
 
   const handleOpenDialog = (event: React.MouseEvent) => {
