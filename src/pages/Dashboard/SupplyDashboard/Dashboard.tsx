@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,7 +8,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
 import {
@@ -21,9 +19,12 @@ import { usePurchaseOrderCount } from "@/services/puchaseOrderServices";
 import { Loader2 } from "lucide-react";
 
 const SupplyDashboard: React.FC = () => {
-  const {purchase_order_count, isLoading: isPurchaseOrderLoading} = usePurchaseOrderCount()
-  const {purchaseRequestCount, isLoading: isPurchaseRequestLoading} = usePurchaseRequestCount()
-  const {inProgressCount, isLoading: isInProgressLoading} = usePurchaseRequestInProgressCount()
+  const { purchase_order_count, isLoading: isPurchaseOrderLoading } =
+    usePurchaseOrderCount();
+  const { purchaseRequestCount, isLoading: isPurchaseRequestLoading } =
+    usePurchaseRequestCount();
+  const { inProgressCount, isLoading: isInProgressLoading } =
+    usePurchaseRequestInProgressCount();
 
   const navigate = useNavigate();
 
@@ -38,18 +39,18 @@ const SupplyDashboard: React.FC = () => {
             <div className=" space-y-4 p-8 pt-6">
               <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <CalendarDateRangePicker className="border-1 rounded border-orange-200" />
                   <Button className="bg-orange-200 text-black hover:bg-orange-300">
                     Download
                   </Button>
-                </div>
+                </div> */}
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <Card
                   className="hover:bg-orange-200 border-2 border-orange-200"
                   onClick={() => {
-                    navigate("/purchase-request");
+                    navigate("/supply/purchase-request");
                   }}
                 >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -73,11 +74,20 @@ const SupplyDashboard: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {isPurchaseRequestLoading ? <Loader2 className="animate-spin" /> : purchaseRequestCount}
+                      {isPurchaseRequestLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        purchaseRequestCount
+                      )}
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="hover:bg-orange-200 border-2 border-orange-200">
+                <Card
+                  onClick={() => {
+                    navigate("/supply/in-progress");
+                  }}
+                  className="hover:bg-orange-200 border-2 border-orange-200"
+                >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Purchase Request in Progress
@@ -98,12 +108,21 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{isInProgressLoading ? <Loader2 className="animate-spin" /> : inProgressCount}</div>
+                    <div className="text-2xl font-bold">
+                      {isInProgressLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        inProgressCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
-                <Card  onClick={() => {
-                    navigate("/purchase-order");
-                  }} className="hover:bg-orange-200 border-2 border-orange-200">
+                <Card
+                  onClick={() => {
+                    navigate("/supply/purchase-order");
+                  }}
+                  className="hover:bg-orange-200 border-2 border-orange-200"
+                >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Order in Progress
@@ -124,7 +143,13 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{isPurchaseOrderLoading ? <Loader2 className="animate-spin" /> : purchase_order_count}</div>
+                    <div className="text-2xl font-bold">
+                      {isPurchaseOrderLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        purchase_order_count
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
