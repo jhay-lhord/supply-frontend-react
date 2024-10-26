@@ -20,7 +20,7 @@ import BACReports from "./pages/Dashboard/BACDashboard/BACReports";
 import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard/Dashboard";
 import Users from "./pages/Dashboard/AdminDashboard/Users";
-import PurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/PurchaseRequestInProgress";
+import PurchaseRequestInProgress from "./pages/Dashboard/SupplyDashboard/PurchaseRequestInProgress";
 
 const Logout = () => {
   localStorage.clear();
@@ -61,6 +61,7 @@ const App = () => {
             element={<PurchaseRequestList />}
           />
           <Route path="/supply/purchase-order" element={<PurchaseOrder />} />
+          <Route path="/supply/in-progress" element={<PurchaseRequestInProgress />} />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />
 
