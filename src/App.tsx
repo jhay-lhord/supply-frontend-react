@@ -2,10 +2,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Login from "@/pages/Forms/Login";
-import Register from "@/pages/Forms/Register";
 import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import RoleBaseRouting from "./components/Auth/RoleBaseRouting";
@@ -21,16 +19,7 @@ import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard/Dashboard";
 import Users from "./pages/Dashboard/AdminDashboard/Users";
 import PurchaseRequestInProgress from "./pages/Dashboard/SupplyDashboard/PurchaseRequestInProgress";
-
-const Logout = () => {
-  localStorage.clear();
-  return <Navigate to="/" />;
-};
-
-const RegisterAndLogout = () => {
-  localStorage.clear();
-  return <Register />;
-};
+import { Logout, RegisterAndLogout } from "./components/Auth/auth";
 
 const App = () => {
   return (
