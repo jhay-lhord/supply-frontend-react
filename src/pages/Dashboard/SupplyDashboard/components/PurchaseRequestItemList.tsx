@@ -2,11 +2,9 @@ import { useParams } from "react-router-dom";
 import {
   deleteItem,
   FilteredItemInPurchaseRequest,
+  sortItemBaseOnPropertyNo,
 } from "@/services/itemServices";
-import {
-  UpdatePurchaseRequest,
-  usePurchaseRequestList,
-} from "@/services/purchaseRequestServices";
+import { usePurchaseRequestList } from "@/services/purchaseRequestServices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,12 +39,14 @@ import { toast } from "sonner";
 import { DeleteDialog } from "./DeleteDialog";
 import Loading from "../../shared/components/Loading";
 import EditItemForm from "./EditItemForm";
+import { purchaseRequestType } from "@/types/response/puchase-request";
+import { useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
+import { Loader2 } from "lucide-react";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const { pr_no } = useParams();
-  const queryClient = useQueryClient();
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const {
     isLoading,
@@ -71,6 +71,8 @@ export default function PurchaseRequestItemList() {
     },
   });
 
+  const { mutate, isPending } = useUpdatePurchaseRequest();
+
   useEffect(() => {
     if (purchase_request?.data) {
       setValue("purpose", purchase_request.data.purpose || "");
@@ -81,17 +83,22 @@ export default function PurchaseRequestItemList() {
     }
   }, [purchase_request, setValue]);
 
-  const updatePurchaseRequestMutation = useMutation({
-    mutationFn: UpdatePurchaseRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["purchase_request"] });
-      setIsEditMode(false);
-    },
-  });
+  let sortedItems;
+  if (!isLoading) {
+    sortedItems = sortItemBaseOnPropertyNo(items!);
+    console.log(sortedItems);
+  }
 
-  const onSubmit = (data: PurchaseRequestData) => {
-    updatePurchaseRequestMutation.mutate(data);
+  const onSubmit = (data: purchaseRequestType) => {
+    const result = purchaseRequestFormSchema.safeParse(data);
+
+    if (result.success) {
+      mutate(data);
+      setIsDialogOpen(false);
+      setIsEditMode(false);
+    }
     setIsDialogOpen(false);
+    if (!isPending) setIsEditMode(false);
   };
 
   const handleEditClick = () => setIsEditMode(true);
@@ -117,7 +124,7 @@ export default function PurchaseRequestItemList() {
         </Button>
       </div>
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit((data) => onSubmit(data))}
         className="border-2 border-orange-200 rounded p-2"
       >
         <div className="flex gap-4 py-2">
@@ -174,8 +181,15 @@ export default function PurchaseRequestItemList() {
             >
               Cancel
             </Button>
-            <Button type="submit" className="bg-green-500">
-              Save Changes
+            <Button
+              type="submit"
+              className={`bg-green-500 ${isPending && "px-14"}`}
+            >
+              {isPending ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </div>
         ) : (
@@ -189,7 +203,7 @@ export default function PurchaseRequestItemList() {
         )}
       </form>
 
-      <ItemList items={items!} />
+      <ItemList sortedItems={sortedItems!} />
 
       <PurchaseRequestForm
         isDialogOpen={isDialogOpen}
@@ -261,7 +275,7 @@ const SelectField = ({
   </div>
 );
 
-const ItemList = ({ items }: { items: itemType[] }) => {
+const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedItemNo, setSelectedItemNo] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
@@ -286,7 +300,7 @@ const ItemList = ({ items }: { items: itemType[] }) => {
       <ItemForm pr_no={pr_no!} />
       <p className="font-bold pt-5">Items</p>
       <div className="grid grid-cols-7 gap-2 mb-4 items-center border-b-2 py-4">
-        <Label>Stock Property Number</Label>
+        <Label>Stock Property No.</Label>
         <Label>Unit</Label>
         <Label>Description</Label>
         <Label>Quantity</Label>
@@ -294,8 +308,8 @@ const ItemList = ({ items }: { items: itemType[] }) => {
         <Label>Total Cost</Label>
         <Label>Actions</Label>
       </div>
-      {items?.length ? (
-        items.map((item) => (
+      {sortedItems?.length ? (
+        sortedItems.map((item) => (
           <div
             key={item.item_no}
             className="grid grid-cols-7 gap-2 mb-4 items-center p-2  border-b-2"
@@ -312,8 +326,8 @@ const ItemList = ({ items }: { items: itemType[] }) => {
                   <TooltipTrigger asChild>
                     <Button
                       onClick={() => {
-                        setSelectedItemNo(item.item_no)
-                        setIsEditDialogOpen(true)
+                        setSelectedItemNo(item.item_no);
+                        setIsEditDialogOpen(true);
                       }}
                       variant="ghost"
                       className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"

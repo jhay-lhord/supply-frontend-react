@@ -1,8 +1,10 @@
 import api from "@/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "@/types/response/api-response";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { handleError, handleSucess } from "@/utils/apiHelper";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const GetPurchaseRequest = async (): Promise<
   ApiResponse<purchaseRequestType[]>
@@ -49,14 +51,7 @@ export const AddPurchaseRequest = async (data: {
   }
 };
 
-export const UpdatePurchaseRequest = async (data: {
-  pr_no: string;
-  res_center_code: string;
-  purpose: string;
-  status: string;
-  requested_by: string;
-  approved_by: string;
-}) => {
+export const UpdatePurchaseRequest = async (data: purchaseRequestType) => {
   try {
     const response = await api.put(`api/purchase-request/${data.pr_no}`, data);
     return handleSucess(response);
@@ -64,6 +59,19 @@ export const UpdatePurchaseRequest = async (data: {
     return handleError(error);
   }
 };
+
+export const useUpdatePurchaseRequest = () => {
+  const queryClient = useQueryClient()
+  return useMutation<ApiResponse<purchaseRequestType>, Error, purchaseRequestType>({
+    mutationFn: UpdatePurchaseRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchase_request"] });
+      toast.success("Edit Successfully", {
+        description: "Item Purchase Request Successfully",
+      });
+    },
+  });
+}
 
 export const usePurchaseRequest = () => {
   return useQuery<ApiResponse<purchaseRequestType[]>, Error>({
