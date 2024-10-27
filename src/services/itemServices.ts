@@ -75,10 +75,7 @@ export const useGetItem = (id: string) => {
 };
 export const UpdateItem = async (data: ItemType) => {
   try {
-    const response = await api.put<ItemType>(
-      `api/item/${data.item_no}`,
-      data
-    );
+    const response = await api.put<ItemType>(`api/item/${data.item_no}`, data);
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
@@ -95,5 +92,15 @@ export const useUpdateItem = () => {
         description: "Item Edit Successfully",
       });
     },
+  });
+};
+
+export const sortItemBaseOnPropertyNo = (items: ItemType[]) => {
+  const key = "stock_property_no";
+  console.log(items);
+  return [...items].sort((a, b) => {
+    if (a[key] < b[key]) return -1;
+    if (a[key] > b[key]) return 1;
+    return 0;
   });
 };

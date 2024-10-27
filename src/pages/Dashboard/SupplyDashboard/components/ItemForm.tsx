@@ -9,16 +9,17 @@ import { useAddItem } from "@/services/itemServices";
 import { generateStockPropertyNo } from "@/services/generateStockPropertyNo";
 import { Loader2 } from "lucide-react";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
+import { sortItemBaseOnPropertyNo } from "@/services/itemServices";
 import { v4 as uuidv4 } from "uuid";
-uuidv4();
-
 interface ItemFormProps {
   pr_no: string;
 }
 
 const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   const items = FilteredItemInPurchaseRequest(pr_no);
-  const stockPropertyNo = generateStockPropertyNo(items!).toString();
+  const sortedItems = sortItemBaseOnPropertyNo(items!);
+  const nextStockNo = generateStockPropertyNo(sortedItems).toString();
+  console.log(nextStockNo);
   const item_no = uuidv4();
   const {
     register,
@@ -32,7 +33,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     defaultValues: {
       purchase_request: pr_no,
       item_no: item_no,
-      stock_property_no: generateStockPropertyNo(items!).toString(),
+      stock_property_no: nextStockNo,
       unit: "",
       item_description: "",
       quantity: 0,
@@ -41,12 +42,11 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     },
   });
 
-  console.log(generateStockPropertyNo(items!));
 
   useEffect(() => {
     setValue("item_no", item_no);
-    setValue("stock_property_no", stockPropertyNo);
-  }, [stockPropertyNo, item_no, setValue]);
+    setValue("stock_property_no", nextStockNo);
+  }, [nextStockNo, item_no, setValue]);
 
   const { mutate, isPending } = useAddItem();
 
@@ -55,18 +55,19 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
       const result = itemSchema.safeParse({
         ...data,
         item_no: item_no,
-        stock_property_no: stockPropertyNo,
+        stock_property_no: nextStockNo,
       });
 
       if (result.success) {
+        console.log('submitting')
         mutate(data);
-
         reset();
       }
     } catch (error) {
       console.log(error);
     }
   };
+  console.log(errors)
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data))}>
       <div className="">
