@@ -55,6 +55,7 @@ export const useItem = () => {
   return useQuery<ApiResponse<ItemType[]>, Error>({
     queryKey: ["items"],
     queryFn: GetItems,
+    refetchInterval: 5000,
   });
 };
 
@@ -97,9 +98,11 @@ export const useUpdateItem = () => {
 
 export const sortItemBaseOnPropertyNo = (items: ItemType[]) => {
   const key = "stock_property_no";
-  return [...items].sort((a, b) => {
-    if (a[key] < b[key]) return -1;
-    if (a[key] > b[key]) return 1;
-    return 0;
-  });
+  return items
+    ? [...items].sort((a, b) => {
+        if (a[key] < b[key]) return -1;
+        if (a[key] > b[key]) return 1;
+        return 0;
+      })
+    : [];
 };
