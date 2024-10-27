@@ -90,9 +90,6 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
               <Loading />
             ) : (
               <form onSubmit={handleSubmit((item) => onSubmit(item))}>
-                <div className="">
-                  <div className="grid grid-cols-7 gap-2 mb-4 items-center bg-white"></div>
-
                   <div className=" gap-2 mb-4">
                     <div>
                       <Label>Unit</Label>
@@ -168,7 +165,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                       readOnly
                     />
 
-                    <div className="mt-6 fixed bottom-6 right-10">
+                    <div className="mt-6 fixed bottom-6 right-6">
                       <Button
                         className="text-slate-950 bg-orange-200 hover:bg-orange-300 px-10"
                         type="submit"
@@ -181,7 +178,6 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                       </Button>
                     </div>
                   </div>
-                </div>
               </form>
             )}
           </Description>
