@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { ACCESS_TOKEN } from "@/constants";
 import {
   getRoleFromToken,
   getEmailFromToken,
@@ -17,7 +17,8 @@ import {
 } from "@/utils/jwtHelper";
 
 export const UserNav = () => {
-  const userRole = getRoleFromToken();
+  const access_token = localStorage.getItem(ACCESS_TOKEN) 
+  const userRole = getRoleFromToken(access_token!);
   const userEmail = getEmailFromToken();
   const userFullname = getFullnameFromToken();
   const trimmedUserRole = userRole
