@@ -4,6 +4,7 @@ import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../constants";
 import { useState, useEffect } from "react";
 import Loading from "@/pages/Dashboard/shared/components/Loading";
 import Login from "@/pages/Forms/Login";
+import { useNavigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,6 +13,8 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [isLoading, setIsloading] = useState<boolean>(true);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const checkAuth = () => {
@@ -64,8 +67,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    if (!isLoading && !isAuthorized) {
+      navigate("/login");
+    }
+  }, [isLoading, isAuthorized, navigate]);
+
   if (isLoading) {
-    return <Loading/>
+    return <Loading />;
   }
 
   return isAuthorized ?  children : <Login/>
