@@ -36,7 +36,7 @@ import { itemType } from "@/types/response/item";
 import { useEffect } from "react";
 import ItemForm from "./ItemForm";
 import { toast } from "sonner";
-import { DeleteDialog } from "./DeleteDialog";
+import { DeleteDialog } from "../../shared/components/DeleteDialog";
 import Loading from "../../shared/components/Loading";
 import EditItemForm from "./EditItemForm";
 import { purchaseRequestType } from "@/types/response/puchase-request";
@@ -86,7 +86,6 @@ export default function PurchaseRequestItemList() {
   let sortedItems;
   if (!isLoading) {
     sortedItems = sortItemBaseOnPropertyNo(items!);
-    console.log(sortedItems);
   }
 
   const onSubmit = (data: purchaseRequestType) => {

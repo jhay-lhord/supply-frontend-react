@@ -19,7 +19,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   const items = FilteredItemInPurchaseRequest(pr_no);
   const sortedItems = sortItemBaseOnPropertyNo(items!);
   const nextStockNo = generateStockPropertyNo(sortedItems).toString();
-  console.log(nextStockNo);
   const item_no = uuidv4();
   const {
     register,
@@ -59,7 +58,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
       });
 
       if (result.success) {
-        console.log('submitting')
         mutate(data);
         reset();
       }
@@ -67,7 +65,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
       console.log(error);
     }
   };
-  console.log(errors)
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data))}>
       <div className="">

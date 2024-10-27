@@ -27,7 +27,6 @@ export const GetPurchaseRequestList = async (
     const response = await api.get<purchaseRequestType>(
       `api/purchase-request/${pr_no}`
     );
-    console.log(response);
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
