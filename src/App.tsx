@@ -21,6 +21,7 @@ import Users from "./pages/Dashboard/AdminDashboard/Users";
 import PurchaseRequestInProgress from "./pages/Dashboard/SupplyDashboard/PurchaseRequestInProgress";
 import BACPurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/BACPurchaseRequestInProgress";
 import { Logout, RegisterAndLogout } from "./components/Auth/auth";
+import BACPurchaseRequestList from "./pages/Dashboard/BACDashboard/BACPurchaseRequestList";
 
 const App = () => {
   return (
@@ -59,6 +60,10 @@ const App = () => {
           <Route
             path="/bac/purchase-request"
             element={<BACPurchaseRequestInProgress />}
+          />
+          <Route
+            path="/bac/purchase-request/:pr_no"
+            element={<BACPurchaseRequestList />}
           />
           <Route
             path="/bac/request-for-quotation"
