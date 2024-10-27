@@ -24,7 +24,7 @@ export function SideNav({ links, isCollapsed }: NavProps) {
   return (
     <div
       data-collapsed={isCollapsed}
-      className="group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2"
+      className="group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2 border-r-slate-500 border-2 h-screen"
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         {links.map((link, index) =>
@@ -47,7 +47,7 @@ export function SideNav({ links, isCollapsed }: NavProps) {
               <TooltipContent side="right" className="flex items-center gap-4">
                 {link.title}
                 {link.label && (
-                  <span className="ml-auto text-muted-foreground">
+                  <span className="ml-auto text-muted-foreground ">
                     {link.label}
                   </span>
                 )}
@@ -60,7 +60,7 @@ export function SideNav({ links, isCollapsed }: NavProps) {
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" &&
-                  "dark:bg-orange-300 dark:text-white dark:hover:bg-orange-100 dark:hover:text-white bg-white text-slate-900 hover:bg-orange-200",
+                  "dark:bg-orange-300 dark:text-white dark:hover:bg-orange-100 dark:hover:text-white bg-slate-200 text-slate-900 bg-slate-100 hover:bg-orange-200",
                 "justify-start m-2 px-7 py-5 "
               )}
             >

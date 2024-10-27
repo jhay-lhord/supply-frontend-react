@@ -11,7 +11,7 @@ import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
 const SupplySidebar = () => {
   return (
     <TooltipProvider>
-        <aside className="hidden md:flex flex-col w-auto h-screen p-2 border-r border-gray-200 sticky top-0 pt-16">
+        <aside className="hidden md:flex flex-col w-auto h-screen  sticky top-0 pt-16">
           <SideNav
             isCollapsed={false}
             links={[

@@ -48,18 +48,18 @@ const SupplyDashboard: React.FC = () => {
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <Card
-                  className="hover:bg-orange-200 border-2 border-orange-200"
+                  className="bg-slate-100 border-none hover:cursor-pointer"
                   onClick={() => {
                     navigate("/supply/purchase-request");
                   }}
                 >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-md font-medium">
                       Active Request
                     </CardTitle>
                     <svg
-                      width="15"
-                      height="15"
+                      width="20"
+                      height="20"
                       viewBox="0 0 15 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +73,7 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl text-orange-300">
                       {isPurchaseRequestLoading ? (
                         <Loader2 className="animate-spin" />
                       ) : (
@@ -86,15 +86,15 @@ const SupplyDashboard: React.FC = () => {
                   onClick={() => {
                     navigate("/supply/in-progress");
                   }}
-                  className="hover:bg-orange-200 border-2 border-orange-200"
+                  className="bg-slate-100 border-none hover:cursor-pointer"
                 >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-md font-medium">
                       Purchase Request in Progress
                     </CardTitle>
                     <svg
-                      width="15"
-                      height="15"
+                      width="20"
+                      height="20"
                       viewBox="0 0 15 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl text-orange-300">
                       {isInProgressLoading ? (
                         <Loader2 className="animate-spin" />
                       ) : (
@@ -121,15 +121,15 @@ const SupplyDashboard: React.FC = () => {
                   onClick={() => {
                     navigate("/supply/purchase-order");
                   }}
-                  className="hover:bg-orange-200 border-2 border-orange-200"
+                  className="bg-slate-100 border-none hover:cursor-pointer"
                 >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-md font-medium">
                       Order in Progress
                     </CardTitle>
                     <svg
-                      width="15"
-                      height="15"
+                      width="20"
+                      height="20"
                       viewBox="0 0 15 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +143,7 @@ const SupplyDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-3xl text-orange-300">
                       {isPurchaseOrderLoading ? (
                         <Loader2 className="animate-spin" />
                       ) : (
@@ -154,7 +154,7 @@ const SupplyDashboard: React.FC = () => {
                 </Card>
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 ">
-                <Card className="col-span-4 border-orange-200 rounded border-2">
+                <Card className="col-span-4 bg-slate-100 border-none">
                   <CardHeader className="flex">
                     <CardTitle>Purchase Request</CardTitle>
                   </CardHeader>
@@ -163,8 +163,8 @@ const SupplyDashboard: React.FC = () => {
                     <DataTable />
                   </CardContent>
                 </Card>
-                <Card className="col-span-3 border-2 border-orange-200">
-                  <CardHeader className="sticky top-0 rounded-md bg-white z-50">
+                <Card className="col-span-3 bg-slate-100 border-none">
+                  <CardHeader className="sticky top-0 rounded-m z-50">
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>History as of this month</CardDescription>
                   </CardHeader>

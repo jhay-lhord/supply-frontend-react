@@ -36,7 +36,7 @@ import { itemType } from "@/types/response/item";
 import { useEffect } from "react";
 import ItemForm from "./ItemForm";
 import { toast } from "sonner";
-import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { DeleteDialog } from "./DeleteDialog";
 import Loading from "../../shared/components/Loading";
 import EditItemForm from "./EditItemForm";
 import { purchaseRequestType } from "@/types/response/puchase-request";
@@ -108,7 +108,7 @@ export default function PurchaseRequestItemList() {
 
   return (
     <div className="m-8">
-      <div className="flex place-content-between items-center py-2">
+      <div className="flex place-content-between items-center py-2 ">
         <div>
           <p>
             <span className="font-bold text-lg">PR Number: </span> {pr_no}
@@ -124,7 +124,7 @@ export default function PurchaseRequestItemList() {
       </div>
       <form
         onSubmit={handleSubmit((data) => onSubmit(data))}
-        className="border-2 border-orange-200 rounded p-2"
+        className="border-none bg-slate-100 rounded p-2"
       >
         <div className="flex gap-4 py-2">
           <InputField
@@ -295,17 +295,17 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
     deleteItemMutation.mutate(selectedItemNo!);
   };
   return (
-    <div className="border-2 border-orange-200 rounded mt-4 p-2">
+    <div className="border-none bg-slate-100 rounded mt-4 p-2">
       <ItemForm pr_no={pr_no!} />
       <p className="font-bold pt-5">Items</p>
       <div className="grid grid-cols-7 gap-2 mb-4 items-center border-b-2 py-4">
-        <Label>Stock Property No.</Label>
-        <Label>Unit</Label>
-        <Label>Description</Label>
-        <Label>Quantity</Label>
-        <Label>Unit Cost</Label>
-        <Label>Total Cost</Label>
-        <Label>Actions</Label>
+        <Label className="text-base">Stock Property No.</Label>
+        <Label className="text-base">Unit</Label>
+        <Label className="text-base">Description</Label>
+        <Label className="text-base">Quantity</Label>
+        <Label className="text-base">Unit Cost</Label>
+        <Label className="text-base">Total Cost</Label>
+        <Label className="text-base">Actions</Label>
       </div>
       {sortedItems?.length ? (
         sortedItems.map((item) => (

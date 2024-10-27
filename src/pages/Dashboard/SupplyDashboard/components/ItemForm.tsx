@@ -68,12 +68,12 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data))}>
       <div className="">
-        <div className="grid grid-cols-7 gap-2 mb-4 items-center bg-white">
-          <Label>Unit</Label>
-          <Label className="col-span-2">Description</Label>
-          <Label>Quantity</Label>
-          <Label>UnitCost</Label>
-          <Label>TotalCost</Label>
+        <div className="grid grid-cols-7 gap-2 mb-4 items-center">
+          <Label className="text-base" >Unit</Label>
+          <Label className="col-span-2 text-base">Description</Label>
+          <Label className="text-base">Quantity</Label>
+          <Label className="text-base">UnitCost</Label>
+          <Label className="text-base">TotalCost</Label>
         </div>
 
         <div className="grid grid-cols-7 gap-2 mb-4">
