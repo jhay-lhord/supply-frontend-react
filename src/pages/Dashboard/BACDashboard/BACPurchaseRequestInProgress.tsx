@@ -2,7 +2,7 @@ import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import BACSidebar from "./components/BACSidebar";
 import PurchaseRequestInProgressDataTable from "./components/PurchaseRequestInProgressDataTable";
 
-const PurchaseRequestInProgress: React.FC = () => {
+const BACPurchaseRequestInProgress: React.FC = () => {
   return (
     <DashboardLayout>
       <BACSidebar />
@@ -13,4 +13,4 @@ const PurchaseRequestInProgress: React.FC = () => {
   );
 };
 
-export default PurchaseRequestInProgress;
+export default BACPurchaseRequestInProgress;

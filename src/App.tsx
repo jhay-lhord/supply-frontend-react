@@ -19,6 +19,7 @@ import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard/Dashboard";
 import Users from "./pages/Dashboard/AdminDashboard/Users";
 import PurchaseRequestInProgress from "./pages/Dashboard/SupplyDashboard/PurchaseRequestInProgress";
+import BACPurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/BACPurchaseRequestInProgress";
 import { Logout, RegisterAndLogout } from "./components/Auth/auth";
 
 const App = () => {
@@ -57,7 +58,7 @@ const App = () => {
           {/* Pages in BAC Dashboard */}
           <Route
             path="/bac/purchase-request"
-            element={<PurchaseRequestInProgress />}
+            element={<BACPurchaseRequestInProgress />}
           />
           <Route
             path="/bac/request-for-quotation"
