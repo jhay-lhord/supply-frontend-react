@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TrashIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { DeleteDialog } from "./DeleteDialog";
 import {
   Tooltip,
   TooltipProvider,
