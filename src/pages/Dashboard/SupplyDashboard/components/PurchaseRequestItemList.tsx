@@ -231,7 +231,7 @@ const InputField = ({
 }) => (
   <div>
     <Label className="text-base">{label}</Label>
-    <Input {...register(name)} placeholder={label} disabled={disabled} />
+    <Input className="mt-4" {...register(name)} placeholder={label} disabled={disabled} />
     <ErrorMessage message={error?.message} />
   </div>
 );
@@ -259,7 +259,7 @@ const SelectField = ({
       disabled={disabled}
       onValueChange={(value) => setValue(name, value)}
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-[250px] mt-4">
         <SelectValue placeholder={defaultValue} />
       </SelectTrigger>
       <SelectContent defaultValue={defaultValue}>
