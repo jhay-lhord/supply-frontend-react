@@ -5,8 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";   
-
+import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
 import { RecentActivity } from "../shared/components/RecentActivity";
@@ -14,12 +13,9 @@ import { DataTable } from "../shared/components/DataTable";
 import BACSidebar from "./components/BACSidebar";
 
 const BACDashboard: React.FC = () => {
-  
   return (
     <DashboardLayout>
-
-      <BACSidebar/> 
-      
+      <BACSidebar />
 
       {/* Main Content */}
       <ScrollArea className="w-full mt-14">
@@ -28,24 +24,22 @@ const BACDashboard: React.FC = () => {
           <div className="hidden flex-col md:flex">
             <div className=" space-y-4 p-8 pt-6">
               <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight"> BAC Dashboard</h2> 
+                <h2 className="text-3xl font-bold tracking-tight">
+                  BAC Dashboard
+                </h2>
 
                 <div className="flex items-center space-x-2">
-                  <CalendarDateRangePicker 
-                   className="border-1 rounded border-orange-200" />
-                  {/* <Button className="bg-orange-100 text-black hover:bg-orange-200">
-                    Download
-                  </Button> */}
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-                <Card className="hover:bg-orange-100 border-2 border-orange-100">
+                <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium"> 
-
+                    <CardTitle className="text-md font-medium">
                       Active Bids
                     </CardTitle>
                     <svg
+                      width="20"
+                      height="20"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       fill="none"
@@ -53,26 +47,27 @@ const BACDashboard: React.FC = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
+                      className=" text-muted-foreground"
                     >
                       <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">453</div> 
+                    <div className="text-2xl font-bold">453</div>
 
                     <p className="text-xs text-muted-foreground">
                       +20.1% from last month
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="hover:bg-orange-100 border-2 border-orange-100">
+                <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">   
-
+                    <CardTitle className="text-md font-medium">
                       Bids for Evaluation
                     </CardTitle>
                     <svg
+                      width="20"
+                      height="20"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       fill="none"
@@ -80,7 +75,7 @@ const BACDashboard: React.FC = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
+                      className="text-muted-foreground"
                     >
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                       <circle cx="9" cy="7" r="4" />
@@ -89,19 +84,19 @@ const BACDashboard: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">50</div>
-                    <p className="text-xs text-muted-foreground"> 
-
+                    <p className="text-xs text-muted-foreground">
                       +180.1% from last month
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="hover:bg-orange-100 border-2 border-orange-100">
+                <Card className="border-none bg-slate-100">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium"> 
-
+                    <CardTitle className="text-md font-medium">
                       Bids Awards
                     </CardTitle>
                     <svg
+                      width="20"
+                      height="20"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       fill="none"
@@ -109,14 +104,14 @@ const BACDashboard: React.FC = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
+                      className=" text-muted-foreground"
                     >
                       <rect width="20" height="14" x="2" y="5" rx="2" />
                       <path d="M2 10h20" />
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">4</div> 
+                    <div className="text-2xl font-bold">4</div>
 
                     <p className="text-xs text-muted-foreground">
                       +19% from last month
@@ -125,9 +120,8 @@ const BACDashboard: React.FC = () => {
                 </Card>
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                  <CardHeader
-                   className="">
+                <Card className="col-span-4  bg-slate-100">
+                  <CardHeader className=" border-none">
                     <CardTitle>Active Bids</CardTitle>
                   </CardHeader>
                   <CardContent className="pl-2">
@@ -135,9 +129,9 @@ const BACDashboard: React.FC = () => {
                     <DataTable />
                   </CardContent>
                 </Card>
-                
-                <Card className="col-span-3">
-                  <CardHeader className="sticky top-0 rounded-md bg-white z-50">
+
+                <Card className="col-span-3 bg-slate-100">
+                  <CardHeader className="sticky top-0 rounded-md z-50">
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
                       You made 265 sales this month.
@@ -149,8 +143,6 @@ const BACDashboard: React.FC = () => {
                     </CardContent>
                   </ScrollArea>
                 </Card>
-
-                
               </div>
             </div>
           </div>

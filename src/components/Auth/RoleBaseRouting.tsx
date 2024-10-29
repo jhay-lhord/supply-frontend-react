@@ -1,20 +1,18 @@
-import { useAuth } from "@/hooks/useAuth";
 import BACDashboard from "@/pages/Dashboard/BACDashboard/BACDashboard";
 import SupplyDashboard from "@/pages/Dashboard/SupplyDashboard/Dashboard";
-import BudgetDashboard from "@/pages/Dashboard/BudgetDashboard/BudgetDashboard";
+import AdminDashboard from "@/pages/Dashboard/AdminDashboard/Dashboard";
+import { getRoleFromToken } from "@/utils/jwtHelper";
+import { ACCESS_TOKEN } from "@/constants";
 
 const RoleBaseRouting = () => {
-  const { role } = useAuth();
-
-  if (!role) {
-    return <div> Loading...</div>;
-  }
+  const access_token = localStorage.getItem(ACCESS_TOKEN)
+  const role = getRoleFromToken(access_token!)
 
   switch (role) {
     case "Supply Officer":
       return <SupplyDashboard />;
-    case "Budget Officer":
-      return <BudgetDashboard />;
+    case "Admin":
+      return <AdminDashboard />;
     case "BAC Officer":
       return <BACDashboard />;
     default:

@@ -7,7 +7,7 @@ const PurchaseRequest: React.FC = () => {
   return (
     <DashboardLayout>
       <SupplySidebar />
-      <div className="pt-16 w-full">
+      <div className="pt-16 w-full bg-slate-100">
         <PurchaseRequestDataTable />
       </div>
     </DashboardLayout>

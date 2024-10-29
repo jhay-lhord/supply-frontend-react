@@ -5,7 +5,9 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import api from "../../api";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN, ROLE } from "@/constants";
+import { toast } from "sonner";
+import { getRoleFromToken } from "@/utils/jwtHelper";
 
 import {
   Form,
@@ -52,8 +54,12 @@ export function InputOTPForm() {
       .then((response) => {
         localStorage.setItem(ACCESS_TOKEN, response.data.access);
         localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
+        localStorage.setItem(ROLE, getRoleFromToken(response.data.access))
         if (response.status === 200) {
-          navigate("/dashboard");
+          navigate("/");
+          toast("Login successful!",{
+            description: " Welcome back, CTU AC Supply Management System"
+          })
         } else {
           navigate("/login");
         }
@@ -94,7 +100,7 @@ export function InputOTPForm() {
                   </InputOTP>
                 </FormControl>
                 <FormDescription className="text-xs">
-                  Please enter the one-time password sent to your phone.
+                  Please enter the one-time password sent to your email.
                 </FormDescription>
                 <FormMessage />
                 {otpError && <p className="text-red-500 text-sm">{otpError}</p>}

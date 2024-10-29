@@ -2,14 +2,13 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Login from "@/pages/Forms/Login";
-import Register from "@/pages/Forms/Register";
 import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import RoleBaseRouting from "./components/Auth/RoleBaseRouting";
 import PurchaseRequest from "./pages/Dashboard/SupplyDashboard/PurchaseRequest";
+import PurchaseRequestList from "./pages/Dashboard/SupplyDashboard/PurchaseRequestList";
 import PurchaseOrder from "./pages/Dashboard/SupplyDashboard/PurchaseOrder";
 import Reports from "./pages/Dashboard/SupplyDashboard/Reports";
 import Inventory from "./pages/Dashboard/SupplyDashboard/Inventory";
@@ -17,19 +16,12 @@ import RequestForQuotation from "./pages/Dashboard/BACDashboard/RequestForQuotat
 import AbstractOfQuotation from "./pages/Dashboard/BACDashboard/AbstractOfQuotation";
 import BACReports from "./pages/Dashboard/BACDashboard/BACReports";
 import BACTransaction from "./pages/Dashboard/BACDashboard/BACTransaction";
-import Budget from "./pages/Dashboard/BudgetDashboard/Budget";
-import BudgetReports from "./pages/Dashboard/BudgetDashboard/BudgetReports";
-import BudgetTransaction from "./pages/Dashboard/BudgetDashboard/BudgetTransaction";
-
-const Logout = () => {
-  localStorage.clear();
-  return <Navigate to="/login" />;
-};
-
-const RegisterAndLogout = () => {
-  localStorage.clear();
-  return <Register />;
-};
+import AdminDashboard from "./pages/Dashboard/AdminDashboard/Dashboard";
+import Users from "./pages/Dashboard/AdminDashboard/Users";
+import PurchaseRequestInProgress from "./pages/Dashboard/SupplyDashboard/PurchaseRequestInProgress";
+import BACPurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/BACPurchaseRequestInProgress";
+import { Logout, RegisterAndLogout } from "./components/Auth/auth";
+import BACPurchaseRequestList from "./pages/Dashboard/BACDashboard/BACPurchaseRequestList";
 
 const App = () => {
   return (
@@ -37,40 +29,56 @@ const App = () => {
       <Router>
         <Routes>
           <Route
-            path="/dashboard"
+            path="/"
             element={
               <ProtectedRoutes>
                 <RoleBaseRouting />
               </ProtectedRoutes>
             }
           />
-          <Route path="/" element={<Login />} />
+
+          <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="*" element={<NotFound />} />
 
           {/* Pages in Supply Dashboard*/}
-          <Route path="/purchase-request" element={<PurchaseRequest />} />
-          <Route path="/purchase-order" element={<PurchaseOrder />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/inventory" element={<Inventory />} />
+          <Route
+            path="/supply/purchase-request"
+            element={<PurchaseRequest />}
+          />
+          <Route
+            path="/supply/purchase-request/:pr_no"
+            element={<PurchaseRequestList />}
+          />
+          <Route path="/supply/purchase-order" element={<PurchaseOrder />} />
+          <Route path="/supply/in-progress" element={<PurchaseRequestInProgress />} />
+          <Route path="/supply/reports" element={<Reports />} />
+          <Route path="/supply/inventory" element={<Inventory />} />
 
           {/* Pages in BAC Dashboard */}
           <Route
-            path="/request-for-quotation"
+            path="/bac/purchase-request"
+            element={<BACPurchaseRequestInProgress />}
+          />
+          <Route
+            path="/bac/purchase-request/:pr_no"
+            element={<BACPurchaseRequestList />}
+          />
+          <Route
+            path="/bac/request-for-quotation"
             element={<RequestForQuotation />}
           />
           <Route
-            path="/abstract-of-quotation"
+            path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
           />
-          <Route path="/bac-reports" element={<BACReports />} />
-          <Route path="/bac-transaction" element={<BACTransaction />} />
+          <Route path="/bac/bac-reports" element={<BACReports />} />
+          <Route path="/bac/bac-transaction" element={<BACTransaction />} />
 
-          {/* Pages in Budget Dashboard */}
-          <Route path="/budget" element={<Budget />} />
-          <Route path="/budget-reports" element={<BudgetReports />} />
-          <Route path="/budget-transaction" element={<BudgetTransaction />} />
+          {/* Pages in Admin */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<Users />} />
         </Routes>
       </Router>
     </>

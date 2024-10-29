@@ -1,24 +1,19 @@
-import api from "@/api"
-import { ApiResponse } from "@/types/response/api-response"
-import { purchaseOrderType } from "@/types/response/purchase-order"
-import { handleError, handleSucess } from "@/utils/apiHelper"
+import { usePurchaseRequest } from "./purchaseRequestServices";
 
-export const getPurchaseOrder = async (): Promise<ApiResponse<purchaseOrderType[]>> => {
-  try {
-    const response = await api.get<purchaseOrderType[]>('/api/purchase-request/');
-    return handleSucess(response);
-  } catch (error) {
-    return handleError(error)
-  }
-}
+export const useGetPurchaseOrder = () => {
+  const { data: purchase_request, isLoading } = usePurchaseRequest();
 
-export const getPurchaseOrderCount = async (): Promise<number> => {
-  const purchaseOrder = await getPurchaseOrder()
+  const purchase_order = purchase_request?.data?.map(data => {
+    return data
+  }).filter(data => {
+    return data.status === "Ready for Purchase Order"
+  })
+  console.log(purchase_order)
+  return {purchase_order, isLoading}
+};
 
-  if(purchaseOrder.status === "success"){
-    console.log(purchaseOrder)
-    return purchaseOrder.data?.length || 0;
-
-  }
-  return 0
+export const usePurchaseOrderCount = () => {
+  const { purchase_order, isLoading} = useGetPurchaseOrder();
+  const purchase_order_count = purchase_order?.length
+  return {purchase_order_count, isLoading}
 }

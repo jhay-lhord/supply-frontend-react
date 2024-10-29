@@ -5,7 +5,6 @@ import { GetPurchaseRequest } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useState, useEffect } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
-import RequestForQuotationForm from "@/components/forms/RequestForQuotation/RequestForQuotationForm";
 import AbstractOfQuotationForm from "./AbstractOfQuotationForm";
 
 
@@ -14,7 +13,6 @@ export default function AbstractOfQuotationDataTable() {
     []
   );
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [lastPrNo, setLastPrNo] = useState<string | null>(null)
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -26,21 +24,18 @@ export default function AbstractOfQuotationDataTable() {
     const fetchPurchaseRequest = async () => {
       const response = await GetPurchaseRequest();
 
-      const lastPrNo = Array.isArray(response.data) && response.data[response.data.length - 1]
-      setLastPrNo(lastPrNo.pr_no)
 
 
       if (response.status === "success") {
         const responseInArray = Array.isArray(response.data)
           ? response.data
           : [];
-        setPurchaseRequest(responseInArray);
+        setAbstractOfQuotation(responseInArray);
       }
     };
     fetchPurchaseRequest();
   }, []);
 
-  console.log(lastPrNo)
 
   return (
     <>

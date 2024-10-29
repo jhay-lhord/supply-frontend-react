@@ -12,15 +12,20 @@ import {
 import { Loader2, Eye, EyeOff } from "lucide-react"; // Import eye icons
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerFormSchema, type RegisterInputData } from "@/types/request/input";
+import {
+  registerFormSchema,
+  type RegisterInputData,
+} from "@/types/request/input";
 import api from "@/api";
+import { toast } from "sonner";
 
 const Register = () => {
   const [loading, setIsloading] = useState<boolean>(false);
   const [role, setRole] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false); // State for password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); // State for confirm password visibility
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false); // State for confirm password visibility
 
   const navigate = useNavigate();
 
@@ -49,6 +54,10 @@ const Register = () => {
       .then((response) => {
         console.log(response);
         navigate("/");
+        toast("Account created successfully!", {
+          description:
+            "Your account is pending activation by an administrator. You’ll be notified once it’s activated.",
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -138,10 +147,10 @@ const Register = () => {
                     <SelectValue placeholder="Select Role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Supply Officer">Supply Officer</SelectItem>
-                    <SelectItem value="Budget Officer">Budget Officer</SelectItem>
+                    <SelectItem value="Supply Officer">
+                      Supply Officer
+                    </SelectItem>
                     <SelectItem value="BAC Officer">BAC Officer</SelectItem>
-                    <SelectItem value="Admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.role && (
@@ -167,7 +176,11 @@ const Register = () => {
                   onClick={togglePasswordVisibility}
                   aria-label="Toggle password visibility"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
               <div className="relative w-full">
@@ -185,7 +198,11 @@ const Register = () => {
                   onClick={toggleConfirmPasswordVisibility}
                   aria-label="Toggle confirm password visibility"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>

@@ -21,7 +21,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </header>
 
-      <div className="flex">{children}</div>
+      <div className="flex bg-slate-200">{children}</div>
     </div>
   );
 };

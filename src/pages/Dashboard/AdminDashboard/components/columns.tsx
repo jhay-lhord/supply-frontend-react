@@ -1,10 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { purchaseRequestType } from "@/types/response/puchase-request";
 import { DataTableColumnHeader } from "../components/data-table-column-header";
 import { DataTableRowActions } from "../components/data-table-row-actions";
+import { UsersType } from "@/types/response/users";
 
-export const columns: ColumnDef<purchaseRequestType>[] = [
+//Step 4: define the columns
+
+export const columns: ColumnDef<UsersType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -30,69 +32,103 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "pr_no",
+    accessorKey: "id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Purchase Number" />
+      <DataTableColumnHeader column={column} title="Id" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pr_no")}
+            {row.getValue("id")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "full_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Full Name" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("status")}</div>,
-    enableSorting: false,
-    enableHiding: false,
+    cell: ({ row }) => {
+      const firstName = row.original.first_name
+      const lastName = row.original.last_name
+  
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {`${firstName} ${lastName}`}
+          </span>
+        </div>
+      );
+    },
   },
+  
   {
-    accessorKey: "purpose",
+    accessorKey: "email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Purpose" />
+      <DataTableColumnHeader column={column} title="Email" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("purpose")}
+            {row.getValue("email")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "requested_by",
+    accessorKey: "role",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Requested By" />
+      <DataTableColumnHeader column={column} title="Role" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("requested_by")}
+            {row.getValue("role")}
           </span>
         </div>
       );
     },
   },
+
   {
-    accessorKey: "created_at",
+    accessorKey: "date_joined",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created At" />
+      <DataTableColumnHeader column={column} title="Date Joined" />
     ),
     cell: ({ row }) => {
-      const createdAt = row.getValue("created_at") as string | number;
-      const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
+      const dateJoined = row.getValue("date_joined") as string | number;
+      const formattedDate = new Date(dateJoined).toLocaleDateString("en-US", {
       year: "numeric",
-      month: "short", // Shortened month name (e.g., Sep)
+      month: "short", 
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {formattedDate}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "last_login",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Login" />
+    ),
+    cell: ({ row }) => {
+      const lastLogin = row.getValue("last_login") as string | number;
+      const formattedDate = new Date(lastLogin  ).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short", 
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -108,6 +144,11 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
   },
   {
     id: "actions",
-    cell: () => <DataTableRowActions />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Actions" />
+    ),
+    cell: ({row}) => (
+      <DataTableRowActions id={row.getValue("id")} _data={row.original} />
+    ),
   },
 ];

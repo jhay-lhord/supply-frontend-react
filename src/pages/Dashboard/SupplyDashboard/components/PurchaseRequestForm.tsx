@@ -17,7 +17,8 @@ import {
 import { Description } from "@radix-ui/react-dialog";
 import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { generateNextPrNo } from "@/services/generateNextPrNo";
+import { generatePrNo } from "@/services/generatePrNo";
+import { toast } from "sonner";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -34,6 +35,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm<PurchaseRequestData>({
     resolver: zodResolver(purchaseRequestFormSchema),
   });
@@ -44,13 +46,14 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     mutationFn: AddPurchaseRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
-      console.log("refetch and invalidated");
+      toast.success("Added Successfully", {
+        description: "Purchase Request Added Successfully"
+      })
+      reset()
     },
   });
 
   const currentPurchaseNumber = lastPrNo && lastPrNo;
-
-  console.log(generateNextPrNo(currentPurchaseNumber));
 
   const onSubmit = async (data: PurchaseRequestData) => {
     try {
@@ -82,96 +85,84 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[40rem]">
+      <DialogContent className="max-w-full w-[30rem]">
         <ScrollArea className="h-[25rem] mb-8">
           <DialogHeader>
             <DialogTitle className="py-6">Create Purchase Request</DialogTitle>
           </DialogHeader>
+          <Description>
+            <form onSubmit={handleSubmit(onSubmit)}>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* PR No and Res Center Code */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="grid gap-2">
-                <label htmlFor="pr_no" className="text-sm font-medium">PR No</label>
-                <Input
-                  id="pr_no"
-                  placeholder="PR No"
-                  {...register("pr_no")}
-                  value={generateNextPrNo(currentPurchaseNumber)}
-                  className="p-2 border border-gray-300 rounded"
-                />
-                {errors.pr_no && (
-                  <span className="text-red-400 text-xs">{errors.pr_no.message}</span>
-                )}
+              <div className="grid gap-4">
+                <div>
+                  <Input
+                    placeholder="PR No"
+                    {...register("pr_no")}
+                    value={generatePrNo(currentPurchaseNumber)}
+                  />
+                  {errors.pr_no && (
+                    <span className="text-red-400 text-xs">
+                      {errors.pr_no.message}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <Input
+                    placeholder="Res Center Code"
+                    {...register("res_center_code")}
+                  />
+                  {errors.res_center_code && (
+                    <span className="text-red-400 text-xs">
+                      {errors.res_center_code.message}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  {" "}
+                  <Input placeholder="Purpose" {...register("purpose")} />
+                  {errors.purpose && (
+                    <span className="text-red-400 text-xs">
+                      {errors.purpose.message}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <Input
+                    placeholder="Requested By"
+                    {...register("requested_by")}
+                  />
+                  {errors.requested_by && (
+                    <span className="text-red-400 text-xs">
+                      {errors.requested_by.message}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <Input
+                    placeholder="Approved By"
+                    {...register("approved_by")}
+                  />
+                  {errors.approved_by && (
+                    <span className="text-red-400 text-xs">
+                      {errors.approved_by.message}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-6 fixed bottom-6 right-10">
+                  <Button
+                    className="text-slate-950 bg-orange-200 hover:bg-orange-300"
+                    type="submit"
+                  >
+                    Submit Purchase Request
+                  </Button>
+                </div>
               </div>
-
-              <div className="grid gap-2">
-                <label htmlFor="res_center_code" className="text-sm font-medium">Res Center Code</label>
-                <Input
-                  id="res_center_code"
-                  placeholder="Res Center Code"
-                  {...register("res_center_code")}
-                  className="p-2 border border-gray-300 rounded"
-                />
-                {errors.res_center_code && (
-                  <span className="text-red-400 text-xs">{errors.res_center_code.message}</span>
-                )}
-              </div>
-            </div>
-
-            {/* Purpose (Full Width) */}
-            <div className="grid gap-2">
-              <label htmlFor="purpose" className="text-sm font-medium">Purpose</label>
-              <Input
-                id="purpose"
-                placeholder=""
-                {...register("purpose")}
-                className="p-2 border border-gray-300 rounded w-full h-20"
-              />
-              {errors.purpose && (
-                <span className="text-red-400 text-xs">{errors.purpose.message}</span>
-              )}
-            </div>
-
-            {/* Requested By and Approved By */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="grid gap-2">
-                <label htmlFor="requested_by" className="text-sm font-medium">Requested By</label>
-                <Input
-                  id="requested_by"
-                  placeholder="Requested By"
-                  {...register("requested_by")}
-                  className="p-2 border border-gray-300 rounded"
-                />
-                {errors.requested_by && (
-                  <span className="text-red-400 text-xs">{errors.requested_by.message}</span>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <label htmlFor="approved_by" className="text-sm font-medium">Approved By</label>
-                <Input
-                  id="approved_by"
-                  placeholder="Approved By"
-                  {...register("approved_by")}
-                  className="p-2 border border-gray-300 rounded"
-                />
-                {errors.approved_by && (
-                  <span className="text-red-400 text-xs">{errors.approved_by.message}</span>
-                )}
-              </div>
-            </div>
-
-            {/* Submit Button (Centered) */}
-            <div className="flex justify-center mt-6">
-              <Button
-                className="bg-orange-200 text-slate-950 hover:bg-orange-300 px-4 py-2 rounded-md"
-                type="submit"
-              >
-                Submit Purchase Request
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Description>
         </ScrollArea>
       </DialogContent>
     </Dialog>

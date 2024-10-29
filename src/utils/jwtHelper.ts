@@ -1,27 +1,27 @@
 import { jwtDecode } from "jwt-decode";
 
-export const getRoleFromToken = (): string => {
-  const token = localStorage.getItem("access");
-  console.log(`Tokrn ni siya: ${token}`)
+const token = localStorage.getItem("access");
 
-  if (token) {
-    const decodedToken = jwtDecode<any>(token);
-    console.log(decodedToken)
-    console.log(decodedToken.role);
-    return decodedToken.role ;
+export const getRoleFromToken = (access_token: string): string => {
+  if (access_token) {
+    const decodedToken = jwtDecode<any>(access_token);
+    return decodedToken.role;
   }
-  return '';
+  return "";
 };
 
 export const getEmailFromToken = (): string => {
-  const token = localStorage.getItem("access");
-  console.log(`Tokrn ni siya: ${token}`)
-
   if (token) {
     const decodedToken = jwtDecode<any>(token);
-    console.log(decodedToken)
-    console.log(decodedToken.email);
-    return decodedToken.email ;
+    return decodedToken.email;
   }
-  return '';
+  return "";
+};
+
+export const getFullnameFromToken = (): string => {
+  if (token) {
+    const decodedToken = jwtDecode<any>(token);
+    return decodedToken.fullname;
+  }
+  return "";
 };
