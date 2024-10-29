@@ -36,7 +36,7 @@ export default function PurchaseRequestDataTable() {
           className="px-6 bg-orange-200 w-40 flex-1 hover:bg-orange-300 hover:scale-110 ease-in-out transition duration-300 hover:ease-in text-black"
           onClick={handleOpenDialog}
         >
-          <PlusIcon className="mr-2"></PlusIcon>Add
+          <PlusIcon className="mr-2"></PlusIcon>ADD
         </Button>
         <PurchaseRequestForm
           isDialogOpen={isDialogOpen}
