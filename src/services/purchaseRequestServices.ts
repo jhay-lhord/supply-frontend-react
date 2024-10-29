@@ -643,7 +643,7 @@ export const generatePDF = async (
     y: 663,
     size: 11,
     font: timesBoldFont,
-    color: rgb(0, 1, 0)
+    color: rgb(0, .8, 0)
   });
   page.drawText(purchase_request.res_center_code, {
     x: 265,
@@ -651,8 +651,8 @@ export const generatePDF = async (
     size: 11,
     font: timesBoldFont,
   });
-  page.drawText(formattedDate, { x: 450, y: 663, size: 11, font: timesBoldFont, color: rgb(1, 0, 0) });
-  page.drawText(purchase_request.purpose, { x: 100, y: 130, size: 10, font: timesBoldFont });
+  page.drawText(formattedDate, { x: 450, y: 663, size: 11, font: timesBoldFont, color: rgb(.8, 0, 0) });
+  page.drawText(purchase_request.purpose, { x: 100, y: 125, size: 10, font: timesBoldFont });
   page.drawText(purchase_request.requested_by!, {
     x: 200,
     y: 70,
