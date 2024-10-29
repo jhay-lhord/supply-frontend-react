@@ -42,6 +42,8 @@ import EditItemForm from "./EditItemForm";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
 import { Loader2 } from "lucide-react";
+import { generatePDFWithValue } from "@/services/purchaseRequestServices";
+
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -70,6 +72,8 @@ export default function PurchaseRequestItemList() {
       approved_by: purchase_request?.data?.approved_by,
     },
   });
+
+  //setPdfUrl(generateEditablePDF())
 
   const { mutate, isPending } = useUpdatePurchaseRequest();
 
@@ -103,6 +107,11 @@ export default function PurchaseRequestItemList() {
   const handleEditClick = () => setIsEditMode(true);
   const handleCancelClick = () => setIsEditMode(false);
 
+  const handleGeneratePDF = async () => {
+    const pdfURL = await generatePDFWithValue(items!);
+    window.open(pdfURL!, "_blank")
+  };
+
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
@@ -118,8 +127,11 @@ export default function PurchaseRequestItemList() {
             {purchase_request?.data?.status}
           </p>
         </div>
-        <Button className="px-7 bg-orange-200 hover:bg-orange-300 text-slate-950">
-          Print PR
+        <Button
+          onClick={handleGeneratePDF}
+          className="px-7 bg-orange-200 hover:bg-orange-300 text-slate-950"
+        >
+          Generate PR
         </Button>
       </div>
       <form
@@ -231,7 +243,12 @@ const InputField = ({
 }) => (
   <div>
     <Label className="text-base">{label}</Label>
-    <Input className="mt-4" {...register(name)} placeholder={label} disabled={disabled} />
+    <Input
+      className="mt-4"
+      {...register(name)}
+      placeholder={label}
+      disabled={disabled}
+    />
     <ErrorMessage message={error?.message} />
   </div>
 );
