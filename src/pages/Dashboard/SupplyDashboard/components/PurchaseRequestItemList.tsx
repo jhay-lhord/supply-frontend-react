@@ -42,7 +42,7 @@ import EditItemForm from "./EditItemForm";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
 import { Loader2 } from "lucide-react";
-import { generatePDFWithValue } from "@/services/purchaseRequestServices";
+import { generatePDF } from "@/services/purchaseRequestServices";
 
 
 export default function PurchaseRequestItemList() {
@@ -72,8 +72,6 @@ export default function PurchaseRequestItemList() {
       approved_by: purchase_request?.data?.approved_by,
     },
   });
-
-  //setPdfUrl(generateEditablePDF())
 
   const { mutate, isPending } = useUpdatePurchaseRequest();
 
@@ -108,7 +106,7 @@ export default function PurchaseRequestItemList() {
   const handleCancelClick = () => setIsEditMode(false);
 
   const handleGeneratePDF = async () => {
-    const pdfURL = await generatePDFWithValue(items!);
+    const pdfURL = await generatePDF(items!, purchase_request?.data);
     window.open(pdfURL!, "_blank")
   };
 
