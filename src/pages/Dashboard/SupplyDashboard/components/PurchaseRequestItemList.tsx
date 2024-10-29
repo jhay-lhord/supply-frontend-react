@@ -43,6 +43,7 @@ import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
 import { Loader2 } from "lucide-react";
 import { generatePDF } from "@/services/purchaseRequestServices";
+import { useNavigate } from "react-router-dom";
 
 
 export default function PurchaseRequestItemList() {
@@ -55,6 +56,8 @@ export default function PurchaseRequestItemList() {
     data: purchase_request,
     error,
   } = usePurchaseRequestList(pr_no!);
+
+  const navigate = useNavigate()
 
   const {
     register,
@@ -106,8 +109,11 @@ export default function PurchaseRequestItemList() {
   const handleCancelClick = () => setIsEditMode(false);
 
   const handleGeneratePDF = async () => {
-    const pdfURL = await generatePDF(items!, purchase_request?.data);
-    window.open(pdfURL!, "_blank")
+    const purchaseRequestData = purchase_request?.data
+    const itemsData = items ? items : []
+    const pdfURL = await generatePDF(itemsData, purchaseRequestData!);
+    return itemsData.length != 0 ? window.open(pdfURL!, "_blank") : navigate("/supply/not-found")
+    
   };
 
   if (isLoading) return <Loading />;

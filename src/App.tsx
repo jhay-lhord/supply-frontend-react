@@ -22,6 +22,7 @@ import PurchaseRequestInProgress from "./pages/Dashboard/SupplyDashboard/Purchas
 import BACPurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/BACPurchaseRequestInProgress";
 import { Logout, RegisterAndLogout } from "./components/Auth/auth";
 import BACPurchaseRequestList from "./pages/Dashboard/BACDashboard/BACPurchaseRequestList";
+import ItemNotFound from "./pages/Dashboard/SupplyDashboard/components/ItemNotFound";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="/supply/in-progress" element={<PurchaseRequestInProgress />} />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />
+          <Route path="/supply/not-found" element={<ItemNotFound/>} />
 
           {/* Pages in BAC Dashboard */}
           <Route

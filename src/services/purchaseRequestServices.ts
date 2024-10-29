@@ -380,7 +380,6 @@ export const generatePDF = async (
   console.log(items);
   if (!items || !Array.isArray(items) || items.length === 0) {
     console.error("No data available to generate the PDF");
-    return null;
   }
 
   const pdfDoc = await PDFDocument.create();
@@ -401,9 +400,9 @@ export const generatePDF = async (
     font: timesBoldFont,
   });
   page.drawText("Appendix 60", {
-    x: 490,
+    x: 510,
     y: 760,
-    size: 14,
+    size: 10,
     font: timesRomanItalicFont,
   });
   page.drawText("Entity Name:", {
@@ -633,7 +632,9 @@ export const generatePDF = async (
   });
 
   //Add the Purchase Request Information
-  const formattedDate = new Date(purchase_request.created_at).toLocaleDateString("en-US", {
+  const formattedDate = new Date(
+    purchase_request.created_at
+  ).toLocaleDateString("en-US", {
     year: "2-digit",
     month: "2-digit",
     day: "2-digit",
@@ -643,7 +644,13 @@ export const generatePDF = async (
     y: 663,
     size: 11,
     font: timesBoldFont,
-    color: rgb(0, .8, 0)
+    color: rgb(0, 0.8, 0),
+  });
+  page.drawText("_______________________", {
+    x: 170,
+    y: 663,
+    size: 11,
+    font: timesBoldFont,
   });
   page.drawText(purchase_request.res_center_code, {
     x: 265,
@@ -651,8 +658,31 @@ export const generatePDF = async (
     size: 11,
     font: timesBoldFont,
   });
-  page.drawText(formattedDate, { x: 450, y: 663, size: 11, font: timesBoldFont, color: rgb(.8, 0, 0) });
-  page.drawText(purchase_request.purpose, { x: 100, y: 125, size: 10, font: timesBoldFont });
+  page.drawText("_________________", {
+    x: 265,
+    y: 645,
+    size: 11,
+    font: timesBoldFont,
+  });
+  page.drawText(formattedDate, {
+    x: 450,
+    y: 663,
+    size: 11,
+    font: timesBoldFont,
+    color: rgb(0.8, 0, 0),
+  });
+  page.drawText("___________________", {
+    x: 450,
+    y: 663,
+    size: 11,
+    font: timesBoldFont,
+  });
+  page.drawText(purchase_request.purpose, {
+    x: 100,
+    y: 125,
+    size: 10,
+    font: timesBoldFont,
+  });
   page.drawText(purchase_request.requested_by!, {
     x: 200,
     y: 70,
