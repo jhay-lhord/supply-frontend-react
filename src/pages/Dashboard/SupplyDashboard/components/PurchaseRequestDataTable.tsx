@@ -7,6 +7,7 @@ import { useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 import PurchaseRequestForm from "./PurchaseRequestForm";
 import Loading from "../../shared/components/Loading";
+import { arraySort } from "@/services/itemServices";
 
 export default function PurchaseRequestDataTable() {
   const { isLoading, error, data } = usePurchaseRequest();
@@ -18,6 +19,8 @@ export default function PurchaseRequestDataTable() {
 
   const purchaseRequestData: purchaseRequestType[] =
     data?.status === "success" ? data.data || [] : [];
+
+  const sortedPurchaseRequestData = arraySort(purchaseRequestData, "pr_no")
 
   console.log(purchaseRequestData)
   const handleOpenDialog = () => {
@@ -44,7 +47,7 @@ export default function PurchaseRequestDataTable() {
           setIsDialogOpen={setIsDialogOpen}
           lastPrNo={lastPrNo?.toString()}
         />
-        <DataTable data={purchaseRequestData} columns={columns} />
+        <DataTable data={sortedPurchaseRequestData} columns={columns} />
       </div>
     </>
   );

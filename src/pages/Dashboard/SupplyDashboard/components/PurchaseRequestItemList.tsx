@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import {
   deleteItem,
   FilteredItemInPurchaseRequest,
-  sortItemBaseOnPropertyNo,
+  arraySort,
 } from "@/services/itemServices";
 import { usePurchaseRequestList } from "@/services/purchaseRequestServices";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,7 @@ export default function PurchaseRequestItemList() {
 
   let sortedItems;
   if (!isLoading) {
-    sortedItems = sortItemBaseOnPropertyNo(items!);
+    sortedItems = arraySort(items!, "stock_property_no");
   }
 
   const onSubmit = (data: purchaseRequestType) => {
