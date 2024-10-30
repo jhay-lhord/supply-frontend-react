@@ -9,7 +9,7 @@ import { useAddItem } from "@/services/itemServices";
 import { generateStockPropertyNo } from "@/services/generateStockPropertyNo";
 import { Loader2 } from "lucide-react";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
-import { sortItemBaseOnPropertyNo } from "@/services/itemServices";
+import { arraySort } from "@/services/itemServices";
 import { v4 as uuidv4 } from "uuid";
 interface ItemFormProps {
   pr_no: string;
@@ -17,7 +17,7 @@ interface ItemFormProps {
 
 const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   const items = FilteredItemInPurchaseRequest(pr_no);
-  const sortedItems = sortItemBaseOnPropertyNo(items!);
+  const sortedItems = arraySort(items!, "stock_property_no");
   const nextStockNo = generateStockPropertyNo(sortedItems).toString();
   const item_no = uuidv4();
   const {

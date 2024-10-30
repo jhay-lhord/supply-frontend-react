@@ -96,10 +96,9 @@ export const useUpdateItem = () => {
   });
 };
 
-export const sortItemBaseOnPropertyNo = (items: ItemType[]) => {
-  const key = "stock_property_no";
-  return items
-    ? [...items].sort((a, b) => {
+export const arraySort = <T>(array: T[], key: keyof T): T[] => {
+  return array
+    ? [...array].sort((a, b) => {
         if (a[key] < b[key]) return -1;
         if (a[key] > b[key]) return 1;
         return 0;
