@@ -12,8 +12,7 @@ export const GetPurchaseRequest = async (): Promise<
   try {
     const response = await api.get<purchaseRequestType[]>(
       "/api/purchase-request/"
-    );
-    console.log(response);
+    )
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
