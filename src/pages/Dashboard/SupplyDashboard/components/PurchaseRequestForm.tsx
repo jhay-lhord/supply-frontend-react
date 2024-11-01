@@ -21,7 +21,6 @@ import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
-import { chairmans } from "../data/list-of-chairman";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
@@ -33,6 +32,8 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { chairmans } from "../data/list-of-chairman";
+import { campusDirector } from "../data/campus-director";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -72,6 +73,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
       addPurchaseRequestMutation.mutate({
         ...data,
         pr_status: "pending",
+        approved_by: campusDirector.name
       });
     }
   };
@@ -137,7 +139,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   </PopoverContent>
                 </Popover>
               ))}
-              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} />)}
+              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} defaultValue={campusDirector.name} />)}
               <div className="mt-6 fixed bottom-6 right-10">
                 <Button className="text-slate-950 bg-orange-200 hover:bg-orange-300" type="submit">
                   Submit Purchase Request

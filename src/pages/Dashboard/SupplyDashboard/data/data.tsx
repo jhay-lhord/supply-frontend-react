@@ -12,6 +12,11 @@ export const statuses = [
     icon: QuestionMarkCircledIcon,
   },
   {
+    value: "Forwarded to Procurement",
+    label: "Forwarded to Procurement",
+    icon: CircleIcon,
+  },
+  {
     value: "Ready for Canvassing",
     label: "Ready for Canvassing",
     icon: CircleIcon,
