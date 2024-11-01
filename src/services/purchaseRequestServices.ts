@@ -112,7 +112,7 @@ export const usePurchaseRequestInProgress = () => {
       return data;
     })
     .filter((data) => {
-      return data.status === "Ready for Canvassing";
+      return data.status === "Forwarded to Procurement";
     });
 
   return { purchaseRequestInProgress, isLoading };
