@@ -7,19 +7,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input, } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 import {
   purchaseRequestFormSchema,
   type PurchaseRequestData,
 } from "@/types/request/purchase-request";
-import { Description } from "@radix-ui/react-dialog";
 import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
+import { chairmans } from "../data/list-of-chairman";
+import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,  
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -32,15 +45,12 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
   setIsDialogOpen,
   lastPrNo,
 }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset
-  } = useForm<PurchaseRequestData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<PurchaseRequestData>({
     resolver: zodResolver(purchaseRequestFormSchema),
   });
 
+  const [open, setOpen] = React.useState(false);
+  const [selectedChairman, setSelectedChairman] = React.useState("");
   const queryClient = useQueryClient();
 
   const addPurchaseRequestMutation = useMutation({
@@ -48,121 +58,93 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
       toast.success("Added Successfully", {
-        description: "Purchase Request Added Successfully"
-      })
-      reset()
+        description: "Purchase Request Added Successfully",
+      });
+      reset();
     },
   });
 
   const currentPurchaseNumber = lastPrNo && lastPrNo;
 
   const onSubmit = async (data: PurchaseRequestData) => {
-    try {
-      console.log("submitting");
-      const result = purchaseRequestFormSchema.safeParse(data);
-      console.log(result);
-
-      if (result.success) {
-        console.log("no errors");
-        setIsDialogOpen(false);
-
-        const defaultPrStatus = "pending";
-
-        addPurchaseRequestMutation.mutate({
-          pr_no: data.pr_no,
-          res_center_code: data.res_center_code,
-          purpose: data.purpose,
-          pr_status: defaultPrStatus,
-          requested_by: data.requested_by,
-          approved_by: data.approved_by,
-        });
-
-        console.log("Purchase request saved successfully.");
-      }
-    } catch (error) {
-      console.error("Error saving purchase request and items:", error);
+    if (purchaseRequestFormSchema.safeParse(data).success) {
+      setIsDialogOpen(false);
+      addPurchaseRequestMutation.mutate({
+        ...data,
+        pr_status: "pending",
+      });
     }
   };
 
+  const renderField = (label: string, name: keyof PurchaseRequestData, component: React.ReactNode) => (
+    <div>
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">
+          {errors[name]?.message}
+        </span>
+      )}
+    </div>
+  );
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[40rem]">
-        <ScrollArea className="h-[25rem] mb-8">
+      <DialogContent className="max-w-full w-[45rem]">
+        <ScrollArea className="h-[32rem] mb-8">
           <DialogHeader>
             <DialogTitle className="py-6">Create Purchase Request</DialogTitle>
           </DialogHeader>
-          <Description>
-            <form onSubmit={handleSubmit(onSubmit)}>
-
-              <div className="grid gap-4">
-                <div>
-                  <Input
-                    placeholder="PR No"
-                    {...register("pr_no")}
-                    value={generatePrNo(currentPurchaseNumber)}
-                  />
-                  {errors.pr_no && (
-                    <span className="text-red-400 text-xs">
-                      {errors.pr_no.message}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <Input
-                    placeholder="Res Center Code"
-                    {...register("res_center_code")}
-                  />
-                  {errors.res_center_code && (
-                    <span className="text-red-400 text-xs">
-                      {errors.res_center_code.message}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <Textarea placeholder="Purpose" {...register("purpose")} />
-                  {errors.purpose && (
-                    <span className="text-red-400 text-xs">
-                      {errors.purpose.message}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <Input
-                    placeholder="Requested By"
-                    {...register("requested_by")}
-                  />
-                  {errors.requested_by && (
-                    <span className="text-red-400 text-xs">
-                      {errors.requested_by.message}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <Input
-                    placeholder="Approved By"
-                    {...register("approved_by")}
-                  />
-                  {errors.approved_by && (
-                    <span className="text-red-400 text-xs">
-                      {errors.approved_by.message}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-6 fixed bottom-6 right-10">
-                  <Button
-                    className="text-slate-950 bg-orange-200 hover:bg-orange-300"
-                    type="submit"
-                  >
-                    Submit Purchase Request
-                  </Button>
-                </div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid gap-4">
+              {renderField("PR No.", "pr_no", (
+                <Input {...register("pr_no")} value={generatePrNo(currentPurchaseNumber)} readOnly />
+              ))}
+              {renderField("Res Center Code", "res_center_code", <Input {...register("res_center_code")} />)}
+              {renderField("Purpose", "purpose", <Textarea {...register("purpose")} />)}
+              {renderField("Requested By", "requested_by", (
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
+                      {selectedChairman || "Select Chairman"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search chairman..." />
+                      <CommandList>
+                        <CommandEmpty>No chairman found.</CommandEmpty>
+                        <CommandGroup>
+                          {chairmans.map((chairman) => (
+                            <CommandItem
+                              key={chairman.name}
+                              value={chairman.name}
+                              onSelect={(currentValue: string) => {
+                                setSelectedChairman(currentValue === selectedChairman ? "" : currentValue);
+                                setValue("requested_by", currentValue);
+                                setOpen(false);
+                              }}
+                              {...register("requested_by")}
+                            >
+                              <Check className={cn("mr-2 h-4 w-4", selectedChairman === chairman.name ? "opacity-100" : "opacity-0")} />
+                              {chairman.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              ))}
+              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} />)}
+              <div className="mt-6 fixed bottom-6 right-10">
+                <Button className="text-slate-950 bg-orange-200 hover:bg-orange-300" type="submit">
+                  Submit Purchase Request
+                </Button>
               </div>
-            </form>
-          </Description>
+            </div>
+          </form>
         </ScrollArea>
       </DialogContent>
     </Dialog>
