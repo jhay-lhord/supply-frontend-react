@@ -76,7 +76,7 @@ export default function PurchaseRequestItemList() {
           Print PR
         </Button>
       </div>
-      <form className="border-none rounded p-2 bg-slate-100">
+      <form className="border-none rounded bg-slate-100 p-8">
         <div className="grid grid-cols-5 gap-4 py-2">
           <div className="flex flex-col">
             <Label className="text-base ">Res Center Code</Label>
@@ -126,7 +126,7 @@ export default function PurchaseRequestItemList() {
 
 const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   return (
-    <div className="border-none rounded mt-4 p-2 bg-slate-100">
+    <div className="border-none rounded mt-4 p-8 bg-slate-100">
       <p className="font-bold pt-5">Items</p>
       <div className="grid grid-cols-6 gap-2 mb-4 items-center border-b-2 py-4">
         <Label className="text-base">Stock Property No.</Label>
