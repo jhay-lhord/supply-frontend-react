@@ -19,6 +19,7 @@ import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -85,7 +86,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[30rem]">
+      <DialogContent className="max-w-full w-[40rem]">
         <ScrollArea className="h-[25rem] mb-8">
           <DialogHeader>
             <DialogTitle className="py-6">Create Purchase Request</DialogTitle>
@@ -120,8 +121,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                 </div>
 
                 <div>
-                  {" "}
-                  <Input placeholder="Purpose" {...register("purpose")} />
+                  <Textarea placeholder="Purpose" {...register("purpose")} />
                   {errors.purpose && (
                     <span className="text-red-400 text-xs">
                       {errors.purpose.message}
