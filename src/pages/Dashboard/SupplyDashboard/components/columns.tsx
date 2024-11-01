@@ -32,7 +32,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     accessorKey: "pr_no",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Purchase Number" />
+      <DataTableColumnHeader column={column} title="PR No." />
     ),
     cell: ({ row }) => {
       return (
