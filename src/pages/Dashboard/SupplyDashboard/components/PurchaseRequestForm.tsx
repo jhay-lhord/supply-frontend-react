@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input, } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -20,13 +21,19 @@ import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
+import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,  
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-import { CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "cmdk";
-import { ChevronsUpDown, Command, Check } from "lucide-react";
-import { campusDirector } from "../data/campus-director";
 import { chairmans } from "../data/list-of-chairman";
+import { campusDirector } from "../data/campus-director";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
