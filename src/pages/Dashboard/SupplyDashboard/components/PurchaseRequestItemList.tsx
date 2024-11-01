@@ -180,6 +180,10 @@ export default function PurchaseRequestItemList() {
                 value: "Ready for Purchase Order",
                 label: "Ready for Purchase Order",
               },
+              {
+                value: "Forwarded to Procurement",
+                label: "Forwarded to Procurement",
+              },
             ]}
             disabled={!isEditMode}
             defaultValue={purchase_request?.data?.status}

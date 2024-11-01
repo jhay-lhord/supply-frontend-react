@@ -28,8 +28,8 @@ export default function PurchaseRequestDataTable() {
   };
 
   const lastPrNo =
-    data?.status === "success" && data.data?.length
-      ? data.data[data.data.length - 1].pr_no
+    sortedPurchaseRequestData?.length
+      ? sortedPurchaseRequestData[sortedPurchaseRequestData.length - 1].pr_no
       : undefined;
   console.log(lastPrNo);
 

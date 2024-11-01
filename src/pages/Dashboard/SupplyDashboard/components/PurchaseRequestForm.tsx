@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input, } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -21,18 +20,13 @@ import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
-import { chairmans } from "../data/list-of-chairman";
-import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,  
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
+import { CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "cmdk";
+import { ChevronsUpDown, Command, Check } from "lucide-react";
+import { campusDirector } from "../data/campus-director";
+import { chairmans } from "../data/list-of-chairman";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -72,6 +66,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
       addPurchaseRequestMutation.mutate({
         ...data,
         pr_status: "pending",
+        approved_by: campusDirector.name
       });
     }
   };
@@ -137,7 +132,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   </PopoverContent>
                 </Popover>
               ))}
-              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} />)}
+              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} defaultValue={campusDirector.name} />)}
               <div className="mt-6 fixed bottom-6 right-10">
                 <Button className="text-slate-950 bg-orange-200 hover:bg-orange-300" type="submit">
                   Submit Purchase Request
