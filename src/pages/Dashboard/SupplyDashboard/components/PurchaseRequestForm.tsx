@@ -139,7 +139,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   </PopoverContent>
                 </Popover>
               ))}
-              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} defaultValue={campusDirector.name} />)}
+              {renderField("Approved By", "approved_by", <Input {...register("approved_by")} defaultValue={campusDirector.name} readOnly/>)}
               <div className="mt-6 fixed bottom-6 right-10">
                 <Button className="text-slate-950 bg-orange-200 hover:bg-orange-300" type="submit">
                   Submit Purchase Request
