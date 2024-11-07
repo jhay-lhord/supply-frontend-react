@@ -23,6 +23,7 @@ import {
   FilteredItemInPurchaseRequest,
 } from "@/services/itemServices";
 import {
+  useAddItemQuotation,
   useAddRequestForQoutation,
 } from "@/services/requestForQoutationServices";
 import {
@@ -30,10 +31,11 @@ import {
   requestForQoutationType,
 } from "@/types/request/request_for_qoutation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { FieldErrors, useFieldArray, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import Loading from "../../shared/components/Loading";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 interface TwoStepRFQFormProps {
   isDialogOpen: boolean;
@@ -46,17 +48,12 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
 }) => {
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
-  // const {data, isLoading} = useGetItemInPurchaseRequest(pr_no!)
-  // const items: ItemType = Array.isArray(data?.data) ? data.data : []
-
-  // const sortedItems = arraySort(items!, "stock_property_no");
-  // const items = Array.isArray(data?.data) ? data.data : []
-  console.log(items)
   const sortedItems = arraySort(items!, "stock_property_no");
-  const { mutate, isPending } = useAddRequestForQoutation();
   const rfq_no = `${pr_no}(${generateRandomString()})`;
-  // const { data } = useRequestForQoutation();
-  const [rfqCount, setRFQCount] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { mutate: addRFQMutation } = useAddRequestForQoutation();
+  const { mutate: addItemMutation } = useAddItemQuotation();
 
   const {
     control,
@@ -68,19 +65,19 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
     resolver: zodResolver(requestForQoutationSchema),
     defaultValues: {
       rfq_no: rfq_no,
-      rfq_count: rfqCount.toString(),
       purchase_request: pr_no,
       supplier_name: "",
       supplier_address: "",
       tin: "",
+      isVAT: true,
       items: sortedItems?.map((item) => ({
+        rfq: rfq_no,
         item: item.item_no,
-        unit_price: "",
+        unit_price: 0,
         brand_model: "",
       })),
     },
   });
-  
 
   const { fields } = useFieldArray({ control, name: "items" });
 
@@ -112,46 +109,61 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
     </div>
   );
 
-
   const onSubmit = async (data: requestForQoutationType) => {
-    setRFQCount((prevCount) => prevCount + 1);
+    setIsLoading(true);
     try {
       const result = requestForQoutationSchema.safeParse(data);
+      if (!result.success) {
+        console.error("Validation failed:", result.error);
+        return;
+      }
 
-      const itemRequests = data.items.map((item) => {
-        const itemData = {
-          rfq_no: rfq_no,
-          rfq_count: rfqCount.toString(),
-          purchase_request: data.purchase_request,
-          supplier_name: data.supplier_name,
-          supplier_address: data.supplier_address,
-          tin: data.tin,
-          item: item.item,
-          unit_price: item.unit_price,
-          brand_model: item.brand_model,
-        };
-        return result.success && !isPending && mutate(itemData);
+      const quotationData = {
+        rfq_no: data.rfq_no,
+        purchase_request: data.purchase_request,
+        supplier_name: data.supplier_name,
+        supplier_address: data.supplier_address,
+        tin: data.tin,
+        isVAT: data.isVAT,
+      };
+
+      addRFQMutation(quotationData, {
+        onSuccess: async (rfqResponse) => {
+          const rfqNo = rfqResponse.data?.rfq_no;
+
+          // Map over the items and perform addItemMutation with rfqNo from the response
+          await Promise.all(
+            data.items.map((item) => {
+              const itemData = {
+                rfq: rfqNo,
+                item: item.item,
+                unit_price: item.unit_price,
+                brand_model: item.brand_model,
+              };
+              return addItemMutation(itemData);
+            })
+          );
+          setIsLoading(false) 
+          setIsDialogOpen(false);
+          reset();
+        },
+        onError: (error) => {
+          console.error("Error saving RFQ:", error);
+        },
       });
-
-      // Wait for all items to be saved
-      await Promise.all(itemRequests);
-      setIsDialogOpen(false);
-      reset();
     } catch (error) {
       console.error("Error saving items:", error);
     }
   };
-
-  console.log(errors);
-  console.log(fields)
-  console.log(sortedItems)
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-full w-[70rem]">
         <ScrollArea className="h-[32rem] mb-8">
           <DialogHeader>
-            <DialogTitle>Create Request of Qoutation</DialogTitle>
+            <DialogTitle className="text-2xl">
+              Create Request of Qoutation
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Tabs defaultValue="supplier">
@@ -166,7 +178,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
               <TabsContent value="supplier" className="">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Supplier</CardTitle>
+                    <CardTitle className="text-xl">Supplier</CardTitle>
                     <CardDescription>
                       Please fill up the supplier information
                     </CardDescription>
@@ -260,7 +272,8 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                               </div>
                               <div className="flex flex-col">
                                 <Input
-                                  {...register(`items.${index}.unit_price`)}
+                                  {...register(`items.${index}.unit_price`, {valueAsNumber:true})}
+                                  type="number"
                                 />
                                 {errors.items?.[index]?.unit_price && (
                                   <span className="text-xs text-red-500">
@@ -271,14 +284,16 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                             </div>
                           )
                       )
-                    ) : <Loading/>}
+                    ) : (
+                      <Loading />
+                    )}
 
                     <div className="mt-6 fixed bottom-6 right-10">
                       <Button
-                        className="text-slate-950 bg-orange-200 hover:bg-orange-300"
+                        className={`text-slate-950 bg-orange-200 hover:bg-orange-300 ${isLoading && "px-16"}`}
                         type="submit"
                       >
-                        Submit Quotattion
+                        {isLoading ? <Loader2 className="animate-spin"/> : "Submit Quotattion"}
                       </Button>
                     </div>
                   </CardContent>

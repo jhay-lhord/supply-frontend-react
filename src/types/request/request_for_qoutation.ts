@@ -1,32 +1,26 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const itemSchema = z.object({
-  item: z.string().min(1, "Required"),
-  unit_price: z.string().min(1, "Required"),
-  brand_model: z.string().min(1, "Required"),
-})
-export const requestForQoutationSchema = z.object({
-  rfq_no: z.string().min(1, 'Required'),
-  rfq_count: z.string().min(1, 'Required'),
+export const itemQuotationSchema = z.object({
+  items: z.array(
+    z.object({
+      rfq: z.string().min(1, "Required"),
+      item: z.string().min(1, "Required"),
+      unit_price: z.number().min(1, "Must be atleast 1"),
+      brand_model: z.string().min(1, "Required"),
+    })
+  ),
+});
+export const quotationSchema = z.object({
+  rfq_no: z.string().min(1, "Required"),
   purchase_request: z.string().min(1, "Required"),
-  items: z.array(itemSchema),
   supplier_name: z.string().min(1, "Required"),
   supplier_address: z.string().min(1, "Required"),
-  tin: z.string().min(1, "Required")
+  tin: z.string().min(1, "Required"),
+  isVAT: z.boolean(),
 });
-export type requestForQoutationItemType = z.infer<typeof itemSchema>
+
+export const requestForQoutationSchema = z.intersection(quotationSchema, itemQuotationSchema)
+
+export type itemQuotationType = z.infer<typeof itemQuotationSchema>;
 export type requestForQoutationType = z.infer<typeof requestForQoutationSchema>;
-
-export const requestForQuotationItemDataSchema = z.object({
-  rfq_no: z.string(),
-  rfq_count: z.string().min(1, 'Required'),
-  purchase_request: z.string(),
-  supplier_name: z.string(),
-  supplier_address: z.string(),
-  tin: z.string(),
-  item: z.string(),
-  unit_price: z.string(),
-  brand_model: z.string(),
-})
-
-export type requestForQuotationItemDataType = z.infer<typeof requestForQuotationItemDataSchema>
+export type qoutationType = z.infer<typeof quotationSchema>

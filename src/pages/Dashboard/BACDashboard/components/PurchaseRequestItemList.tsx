@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import {
-  FilterRequestOfQoutationByPR,
   useRequestForQoutationCount,
 } from "@/services/requestForQoutationServices";
 import { Separator } from "@/components/ui/separator";
@@ -65,14 +64,11 @@ export default function PurchaseRequestItemList() {
       setValue("status", purchase_request.data.status);
     }
   }, [purchase_request, setValue]);
-  const rfqs = FilterRequestOfQoutationByPR();
-  console.log(rfqs);
 
   const sortedItems = arraySort(items!, "stock_property_no");
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
-  console.log(isLoading);
 
   const handleAddRFQ = () => {
     setIsDialogOpen(true);
