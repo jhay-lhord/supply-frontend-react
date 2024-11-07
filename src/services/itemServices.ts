@@ -42,6 +42,25 @@ export const useAddItem = () => {
   });
 };
 
+export const GetItemInPurchaseRequest = async (pr_no:string):Promise<ApiResponse<ItemType>> => {
+  try {
+    const response = await api.get(`api/item/purchase_request/${pr_no}`)
+    console.log(response)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+// Use this if rendering the latet items in the Purchase request
+export const useGetItemInPurchaseRequest = (pr_no:string) => {
+  return useQuery({
+    queryKey: ["items"],
+    queryFn: () => GetItemInPurchaseRequest(pr_no)
+  })
+} 
+
+// Use This if only rendering the data for better performance
 export const FilteredItemInPurchaseRequest = (pr_no: string) => {
   const { data } = useItem();
 

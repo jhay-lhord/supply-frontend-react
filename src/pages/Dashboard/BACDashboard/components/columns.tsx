@@ -3,6 +3,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { DataTableColumnHeader } from "../components/data-table-column-header";
 import { DataTableRowActions } from "../components/data-table-row-actions";
+import { Badge } from "@/components/ui/badge";
+import { useRequestForQoutationCount } from "@/services/requestForQoutationServices";
+import { useNavigate } from "react-router-dom";
+
+
 
 export const columns: ColumnDef<purchaseRequestType>[] = [
   {
@@ -35,11 +40,17 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="Purchase Number" />
     ),
     cell: ({ row }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const rfqCount = useRequestForQoutationCount(row.getValue("pr_no"))
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const navigate = useNavigate()
+      const pr_no = row.getValue("pr_no")
       return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+        <div className="flex space-x-2 items-center">
+          <span className="max-w-[500px] truncate font-medium hover:underline" onClick={()=> navigate(`/bac/purchase-request/${pr_no}`)}>
             {row.getValue("pr_no")}
           </span>
+            <Badge className="m-2 bg-orange-100 border-2 border-orange-300 text-slate-950">{rfqCount}</Badge>
         </div>
       );
     },

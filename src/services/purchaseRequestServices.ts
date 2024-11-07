@@ -98,7 +98,7 @@ export const usePurchaseRequestInProgressCount = () => {
       return data;
     })
     .filter((data) => {
-      return data.status === "Ready for Canvassing";
+      return data.status === "Forwarded to Procurement";
     });
   const inProgressCount = purchase_request_in_progress?.length;
   return { inProgressCount, isLoading };
