@@ -49,7 +49,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const sortedItems = arraySort(items!, "stock_property_no");
-  const rfq_no = `${pr_no}(${generateRandomString()})`;
+  const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit it have a random Letter 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { mutate: addRFQMutation } = useAddRequestForQoutation();
@@ -119,7 +119,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       }
 
       const quotationData = {
-        rfq_no: data.rfq_no,
+        rfq_no: `rfq_no(${generateRandomString()})`,
         purchase_request: data.purchase_request,
         supplier_name: data.supplier_name,
         supplier_address: data.supplier_address,
