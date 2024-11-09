@@ -10,10 +10,9 @@ export const handleSucess = <T>(response: { data: T }): ApiResponse<T> => {
 };
 
 export const handleError = (error: unknown): ApiResponse<never> => {
-  const message = (error as AxiosError).response?.data?.message || (error as Error).message
   return {
     status: 'error',
-    message,
+    error: error as AxiosError,
     statusCode: (error as AxiosError).response?.status,
   }
 };
