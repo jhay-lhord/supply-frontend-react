@@ -23,6 +23,7 @@ import BACPurchaseRequestInProgress from "./pages/Dashboard/BACDashboard/BACPurc
 import { Logout, RegisterAndLogout } from "./components/Auth/auth";
 import BACPurchaseRequestList from "./pages/Dashboard/BACDashboard/BACPurchaseRequestList";
 import ItemNotFound from "./pages/Dashboard/SupplyDashboard/components/ItemNotFound";
+import { QuotationList } from "./pages/Dashboard/BACDashboard/QuotationList";
 
 const App = () => {
   return (
@@ -70,6 +71,10 @@ const App = () => {
           <Route
             path="/bac/request-for-quotation"
             element={<RequestForQuotation />}
+          />
+           <Route
+            path="/bac/request-for-quotation/:pr_no"
+            element={<QuotationList />}
           />
           <Route
             path="/bac/abstract-of-quotation"

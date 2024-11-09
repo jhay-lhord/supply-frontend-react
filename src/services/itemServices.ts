@@ -52,7 +52,7 @@ export const GetItemInPurchaseRequest = async (pr_no:string):Promise<ApiResponse
   }
 }
 
-// Use this if rendering the latet items in the Purchase request
+// Use this if rendering the latet items in the Purchase request or need to access the loading state
 export const useGetItemInPurchaseRequest = (pr_no:string) => {
   return useQuery({
     queryKey: ["items"],

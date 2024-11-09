@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FilteredItemInPurchaseRequest,
   arraySort,
@@ -25,23 +25,22 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
-import {
-  useRequestForQoutationCount,
-} from "@/services/requestForQoutationServices";
 import { Separator } from "@/components/ui/separator";
 import { TwoStepRFQForm } from "./TwoStepRFQForm";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
+  console.log(items)
   const {
     isLoading,
     data: purchase_request,
     error,
   } = usePurchaseRequestList(pr_no!);
 
-  const rfqCount = useRequestForQoutationCount(pr_no!);
+  const navigate = useNavigate()
 
   const { setValue } = useForm<PurchaseRequestData>({
     resolver: zodResolver(purchaseRequestFormSchema),
@@ -101,11 +100,10 @@ export default function PurchaseRequestItemList() {
           </p>
           <p className="flex items-center gap-2">
             <div className="relative">
-              <span className="font-medium text-lg">Request of Qoutation:</span>
-              <Button className="mx-2" variant="outline">
-                View
-              </Button>
-              <Badge className="absolute -top-2 -right-2">{rfqCount}</Badge>
+              <div className="font-medium text-lg hover:cursor-pointer flex gap-2 items-center">
+                <p>Request of Qoutations:</p> 
+                <OpenInNewWindowIcon width="25" height="25" onClick={() => navigate(`/bac/request-for-quotation/${pr_no}`)}/>
+              </div>
             </div>
           </p>
         </div>
@@ -162,8 +160,8 @@ export default function PurchaseRequestItemList() {
 const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   return (
     <div className="border-none  mt-4 px-8">
-      <p className="font-bold">Items</p>
-      <div className="grid grid-cols-6 gap-2 mb-4 items-center border-b-2 py-4">
+      <p className="text-2xl">Items</p>
+      <div className="grid grid-cols-6 gap-2 items-center border-b-2 py-4">
         <Label className="text-base">Stock Property No.</Label>
         <Label className="text-base">Unit</Label>
         <Label className="text-base">Description</Label>
@@ -175,14 +173,14 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
         sortedItems.map((item) => (
           <div
             key={item.item_no}
-            className="grid grid-cols-6 gap-2 mb-4 items-center p-2  border-b-2"
+            className="grid grid-cols-6 gap-2 items-center py-6 border-b-2 font-thin"
           >
-            <Label className="text-gray-500">{item.stock_property_no}</Label>
-            <Label className="text-gray-500">{item.unit}</Label>
-            <Label className="text-gray-500">{item.item_description}</Label>
-            <Label className="text-gray-500">{item.quantity}</Label>
-            <Label className="text-gray-500">{item.unit_cost}</Label>
-            <Label className="text-gray-500">{item.total_cost}</Label>
+            <Label className="text-gray-700">{item.stock_property_no}</Label>
+            <Label className="text-gray-700">{item.unit}</Label>
+            <Label className="text-gray-700">{item.item_description}</Label>
+            <Label className="text-gray-700">{item.quantity}</Label>
+            <Label className="text-gray-700">{item.unit_cost}</Label>
+            <Label className="text-gray-700">{item.total_cost}</Label>
           </div>
         ))
       ) : (

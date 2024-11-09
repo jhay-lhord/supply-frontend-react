@@ -36,6 +36,7 @@ import { useParams } from "react-router-dom";
 import Loading from "../../shared/components/Loading";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TwoStepRFQFormProps {
   isDialogOpen: boolean;
@@ -49,7 +50,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const sortedItems = arraySort(items!, "stock_property_no");
-  const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit it have a random Letter 
+  const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit handler it have a random Letter
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { mutate: addRFQMutation } = useAddRequestForQoutation();
@@ -69,12 +70,14 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       supplier_name: "",
       supplier_address: "",
       tin: "",
-      isVAT: true,
+      is_VAT: true,
       items: sortedItems?.map((item) => ({
+        purchase_request: pr_no,
         rfq: rfq_no,
         item: item.item_no,
         unit_price: 0,
         brand_model: "",
+        is_low_price: false,
       })),
     },
   });
@@ -119,12 +122,12 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       }
 
       const quotationData = {
-        rfq_no: `rfq_no(${generateRandomString()})`,
-        purchase_request: data.purchase_request,
-        supplier_name: data.supplier_name,
-        supplier_address: data.supplier_address,
-        tin: data.tin,
-        isVAT: data.isVAT,
+        rfq_no: `${rfq_no}(${generateRandomString()})`,
+        purchase_request: data.purchase_request ?? "",
+        supplier_name: data.supplier_name ?? "",
+        supplier_address: data.supplier_address ?? "",
+        tin: data.tin ?? "",
+        is_VAT: data.is_VAT ?? "",
       };
 
       addRFQMutation(quotationData, {
@@ -132,18 +135,29 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
           const rfqNo = rfqResponse.data?.rfq_no;
 
           // Map over the items and perform addItemMutation with rfqNo from the response
+          const itemDataArray = data.items.map((item) => {
+            const sortedItem = sortedItems.find(
+              (sorted) => sorted.item_no === item.item 
+            );
+
+            return {
+              purchase_request: pr_no ?? "",
+              rfq: rfqNo ?? "",
+              item: item.item ?? "",
+              unit_price: item.unit_price ?? 0,
+              brand_model: item.brand_model ?? "",
+              is_low_price: sortedItem
+                ? Number(item.unit_price) < Number(sortedItem.unit_cost)
+                : false,
+            };
+          });
+
+          // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
-            data.items.map((item) => {
-              const itemData = {
-                rfq: rfqNo,
-                item: item.item,
-                unit_price: item.unit_price,
-                brand_model: item.brand_model,
-              };
-              return addItemMutation(itemData);
-            })
+            itemDataArray.map((itemData) => addItemMutation(itemData))
           );
-          setIsLoading(false) 
+
+          setIsLoading(false);
           setIsDialogOpen(false);
           reset();
         },
@@ -159,20 +173,20 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-full w-[70rem]">
-        <ScrollArea className="h-[32rem] mb-8">
           <DialogHeader>
             <DialogTitle className="text-2xl">
               Create Request of Qoutation
             </DialogTitle>
           </DialogHeader>
+        <ScrollArea className="h-[30rem] mb-9">
           <form onSubmit={handleSubmit(onSubmit)}>
             <Tabs defaultValue="supplier">
               <div className="w-full flex flex-col items-center">
                 <TabsList className="grid grid-cols-2 w-1/2 items-center">
                   <TabsTrigger className="" value="supplier">
-                    Supplier
+                    <span className="bg-gray-400  w-8 h-8 p-2 rounded-full mx-2">1</span> Supplier
                   </TabsTrigger>
-                  <TabsTrigger value="items">Items</TabsTrigger>
+                  <TabsTrigger value="items"><span className="bg-gray-400  w-8 h-8 p-2 rounded-full mx-2">2</span>Items</TabsTrigger>
                 </TabsList>
               </div>
               <TabsContent value="supplier" className="">
@@ -224,14 +238,14 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    <div className="grid grid-cols-8 gap-2 items-center p-2  border-b-2 sticky bg-background top-0">
-                      <Label>Stock Property No</Label>
+                    <div className="grid grid-cols-7 gap-2 items-center p-2  border-b-2 sticky bg-background top-0">
+                      {/* <Label>Stock Property No</Label> */}
                       <Label>Unit</Label>
                       <Label>Item Description</Label>
                       <Label>Quantity</Label>
                       <Label>Unit Cost</Label>
-                      <Label>Total Cost</Label>
-                      <Label>Brand / Model</Label>
+                      {/* <Label>Total Cost</Label> */}
+                      <Label className="col-span-2">Brand / Model</Label>
                       <Label>Unit Price </Label>
                     </div>
                     {sortedItems.length > 0 ? (
@@ -240,11 +254,11 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                           sortedItems && (
                             <div
                               key={field.id}
-                              className="grid grid-cols-8 gap-2 mb-4 items-center p-2 border-b-2"
+                              className="grid grid-cols-7 gap-2 mb-8 items-center p-2 border-b-2"
                             >
-                              <Label className="text-gray-500">
+                              {/* <Label className="text-gray-500">
                                 {sortedItems[index]?.stock_property_no}
-                              </Label>
+                              </Label> */}
                               <Label className="text-gray-500">
                                 {sortedItems[index]?.unit}
                               </Label>
@@ -257,12 +271,13 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                               <Label className="text-gray-500">
                                 {sortedItems[index]?.unit_cost}
                               </Label>
-                              <Label className="text-gray-500">
+                              {/* <Label className="text-gray-500">
                                 {sortedItems[index]?.total_cost}
-                              </Label>
-                              <div className="flex flex-col">
-                                <Input
+                              </Label> */}
+                              <div className="flex flex-col col-span-2">
+                                <Textarea
                                   {...register(`items.${index}.brand_model`)}
+                                  className=""
                                 />
                                 {errors.items?.[index]?.brand_model && (
                                   <span className="text-xs text-red-500">
@@ -272,7 +287,9 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                               </div>
                               <div className="flex flex-col">
                                 <Input
-                                  {...register(`items.${index}.unit_price`, {valueAsNumber:true})}
+                                  {...register(`items.${index}.unit_price`, {
+                                    valueAsNumber: true,
+                                  })}
                                   type="number"
                                 />
                                 {errors.items?.[index]?.unit_price && (
@@ -288,12 +305,18 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                       <Loading />
                     )}
 
-                    <div className="mt-6 fixed bottom-6 right-10">
+                    <div className="fixed bottom-6 right-10">
                       <Button
-                        className={`text-slate-950 bg-orange-200 hover:bg-orange-300 ${isLoading && "px-16"}`}
+                        className={`text-slate-950 bg-orange-200 px-8 hover:bg-orange-300 ${
+                          isLoading && "px-16"
+                        }`}
                         type="submit"
                       >
-                        {isLoading ? <Loader2 className="animate-spin"/> : "Submit Quotattion"}
+                        {isLoading ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          "Submit Quotation"
+                        )}
                       </Button>
                     </div>
                   </CardContent>

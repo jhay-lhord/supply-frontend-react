@@ -1,18 +1,20 @@
 import api from "@/api";
 import {
-  itemQuotationType,
   qoutationType,
-  requestForQoutationType,
 } from "@/types/request/request_for_qoutation";
+import {
+  itemQuotationResponseType,
+  quotationResponseType,
+} from "@/types/response/request-for-qoutation";
 import { ApiResponse } from "@/types/response/api-response";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const getAllRequestForQoutation = async (): Promise<
-  ApiResponse<requestForQoutationType[]>
+  ApiResponse<quotationResponseType[]>
 > => {
   try {
-    const response = await api.get<requestForQoutationType[]>(
+    const response = await api.get<quotationResponseType[]>(
       "/api/request-for-qoutation/"
     );
     return handleSucess(response);
@@ -22,7 +24,7 @@ export const getAllRequestForQoutation = async (): Promise<
 };
 
 export const useRequestForQoutation = () => {
-  return useQuery<ApiResponse<requestForQoutationType[]>, Error>({
+  return useQuery<ApiResponse<quotationResponseType[]>, Error>({
     queryFn: getAllRequestForQoutation,
     queryKey: ["request-for-qoutations"],
   });
@@ -55,11 +57,7 @@ export const addRequestForQoutation = async (
 
 export const useAddRequestForQoutation = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    ApiResponse<qoutationType>,
-    Error,
-    qoutationType
-  >({
+  return useMutation<ApiResponse<qoutationType>, Error, qoutationType>({
     mutationFn: (data) => addRequestForQoutation(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["request-for-qoutations"] });
@@ -67,48 +65,57 @@ export const useAddRequestForQoutation = () => {
   });
 };
 
-export const getItemQuotation = async ():Promise<ApiResponse<itemQuotationType>> => {
+export const getItemQuotation = async (): Promise<
+  ApiResponse<itemQuotationResponseType[]>
+> => {
   try {
-    const response = await api.post<itemQuotationType>("/api/item-quotation/")
-    return handleSucess(response)
+    const response = await api.get<itemQuotationResponseType[]>(
+      "/api/item-quotation/"
+    );
+    return handleSucess(response);
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
-}
+};
 
 export const useGetItemQuotation = () => {
-  return useQuery<ApiResponse<itemQuotationType>, Error, itemQuotationType>({
+  return useQuery<ApiResponse<itemQuotationResponseType[]>, Error>({
     queryFn: getItemQuotation,
-    queryKey: ["items-quotation"]
-  })
-}
-
-export const addItemQuotation = async (data:itemQuotationType):Promise<ApiResponse<itemQuotationType>> => {
-  try {
-    const response = await api.post<itemQuotationType>("/api/item-quotation/", data)
-    return handleSucess(response)
-  } catch (error) {
-    return handleError(error)
-  }
-}
-
-export const useAddItemQuotation = () => {
-  const queryClient = useQueryClient()
-  return useMutation<ApiResponse<itemQuotationType>, Error, itemQuotationType>({
-    mutationFn: (data) => addItemQuotation(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["items-quotation"]})
-    }
-  })
-}
-
-export const useRequestForQoutationCount = (pr_no: string) => {
-  const { data } = useRequestForQoutation();
-  
-  const rfqCount = data?.data?.map(data => data).filter(data => data.purchase_request === pr_no).length
-  
-  return rfqCount
+    queryKey: ["items-quotation"],
+  });
 };
 
 
+export const addItemQuotation = async (
+  data: itemQuotationResponseType
+): Promise<ApiResponse<itemQuotationResponseType>> => {
+  try {
+    const response = await api.post<itemQuotationResponseType>(
+      "/api/item-quotation/",
+      data
+    );
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
 
+export const useAddItemQuotation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<ApiResponse<itemQuotationResponseType>, Error, itemQuotationResponseType>({
+    mutationFn: (data) => addItemQuotation(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items-quotation"] });
+    },
+  });
+};
+
+export const useRequestForQoutationCount = (pr_no: string) => {
+  const { data } = useRequestForQoutation();
+
+  const rfqCount = data?.data
+    ?.map((data) => data)
+    .filter((data) => data.purchase_request === pr_no).length;
+
+  return rfqCount;
+};
