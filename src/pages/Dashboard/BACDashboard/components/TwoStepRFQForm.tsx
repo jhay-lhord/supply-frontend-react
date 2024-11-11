@@ -37,6 +37,7 @@ import Loading from "../../shared/components/Loading";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { v4 as uuidv4 } from "uuid";
 
 interface TwoStepRFQFormProps {
   isDialogOpen: boolean;
@@ -52,6 +53,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   const sortedItems = arraySort(items!, "stock_property_no");
   const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit handler it have a random Letter
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState<string>('non-VAT')
 
   const { mutate: addRFQMutation } = useAddRequestForQoutation();
   const { mutate: addItemMutation } = useAddItemQuotation();
@@ -70,8 +72,9 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       supplier_name: "",
       supplier_address: "",
       tin: "",
-      is_VAT: true,
+      is_VAT: selectedOption === 'vat' ? true : false,
       items: sortedItems?.map((item) => ({
+        item_quotation_no: "",
         purchase_request: pr_no,
         rfq: rfq_no,
         item: item.item_no,
@@ -141,6 +144,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
             );
 
             return {
+              item_quotation_no: uuidv4(),
               purchase_request: pr_no ?? "",
               rfq: rfqNo ?? "",
               item: item.item ?? "",
@@ -214,15 +218,16 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                       {renderField({ label: "TIN", field_name: "tin", errors })}
                       <RadioGroup
                         className="flex items-center mb-3"
-                        defaultValue="option-one"
+                        value={selectedOption}
+                        onValueChange={(value) => setSelectedOption(value)}
                       >
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="option-one" id="option-one" />
-                          <Label htmlFor="option-one">Non VAT</Label>
+                          <RadioGroupItem value="non-VAT" id="non-VAT" />
+                          <Label htmlFor="non-VAT">Non VAT</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="option-two" id="option-two" />
-                          <Label htmlFor="option-two">VAT</Label>
+                          <RadioGroupItem value="vat" id="vat" />
+                          <Label htmlFor="vat">VAT</Label>
                         </div>
                       </RadioGroup>
                     </div>
