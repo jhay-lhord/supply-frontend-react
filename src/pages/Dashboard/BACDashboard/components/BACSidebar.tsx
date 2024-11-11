@@ -24,7 +24,7 @@ const BACSidebar = () => {
             variant: "default",
           },
           {
-            title: "Purchase Request",
+            title: "Request For Quotation",
             label: "",
             link_to: "/bac/purchase-request",
             icon: FileText,
@@ -35,13 +35,6 @@ const BACSidebar = () => {
             label: "",
             link_to: "/bac/abstract-of-quotation",
             icon: FileText,
-            variant: "default",
-          },
-          {
-            title: "Request For Quotation",
-            label: "",
-            link_to: "/bac/request-for-quotation",
-            icon: FileCheck,
             variant: "default",
           },
           {

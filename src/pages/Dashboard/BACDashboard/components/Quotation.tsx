@@ -27,8 +27,8 @@ export const Quotation = () => {
 
   const itemQuotation = items?.data?.filter((data) => data.rfq === rfq_no);
   const quotation = data && data.data;
-
-  if (isLoading && item_loading) return <Loading />;
+  
+  if (isLoading || item_loading) return <Loading />;
 
   return (
     <div className=" w-full pt-8">
@@ -71,16 +71,16 @@ export const Quotation = () => {
             {itemQuotation && itemQuotation?.length > 0 ? (itemQuotation
               ?.map((item) => {
                 return (
-                  <div className="grid grid-cols-7 gap-2 items-center py-8 border-b-2" key={item.item.item_no}>
-                    <Label className="text-gray-500">{item.item.unit}</Label>
+                  <div className="grid grid-cols-7 gap-2 items-center py-8 border-b-2" key={item.item_details.item_no}>
+                    <Label className="text-gray-500">{item.item_details.unit}</Label>
                     <Label className="text-gray-500">
-                      {item.item.item_description}
+                      {item.item_details.item_description}
                     </Label>
                     <Label className="text-gray-500">
-                      {item.item.quantity}
+                      {item.item_details.quantity}
                     </Label>
                     <Label className="text-gray-500">
-                      {item.item.unit_cost}
+                      {item.item_details.unit_cost}
                     </Label>
 
                     <Label className="text-gray-500 col-span-2">
