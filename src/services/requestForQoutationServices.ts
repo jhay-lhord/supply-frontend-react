@@ -10,6 +10,7 @@ import {
 import { ApiResponse } from "@/types/response/api-response";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const getAllRequestForQoutation = async (): Promise<
   ApiResponse<quotationResponseType[]>
@@ -82,6 +83,47 @@ export const useAddRequestForQoutation = () => {
     },
   });
 };
+
+export const editRequestForQuotation = async (data: qoutationType):Promise<ApiResponse<qoutationType>> => {
+  try {
+    const response = await api.put<qoutationType>(`/api/request-for-qoutation/${data.rfq_no}`, data)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useEditRequestForQuotation = () => {
+  const queryClient = useQueryClient()
+  return useMutation<ApiResponse<qoutationType>, Error, qoutationType>({
+    mutationFn: editRequestForQuotation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["request-for-qoutations"]})
+      toast.success("Successfully Edit", {
+        description: "Edit Request for Quotation Successfully"
+      })
+    }
+  })
+}
+
+export const editItemQuotation = async (data: itemQuotationRequestType):Promise<ApiResponse<itemQuotationRequestType>> => {
+  try {
+    const response = await api.put<itemQuotationRequestType>(`/api/item-quotation/${data.item_quotation_no}`, data)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useEditItemQuotation = () => {
+  const queryClient = useQueryClient()
+  return useMutation<ApiResponse<itemQuotationRequestType>, Error, itemQuotationRequestType>({
+    mutationFn: editItemQuotation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["items-quotation"]})
+    }
+  })
+}
 
 export const getItemQuotation = async (): Promise<
   ApiResponse<itemQuotationResponseType[]>

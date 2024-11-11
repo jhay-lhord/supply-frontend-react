@@ -3,6 +3,7 @@ import { z } from "zod";
 export const itemQuotationSchema = z.object({
   items: z.array(
     z.object({
+      item_quotation_no: z.string(),
       purchase_request: z.string(),
       rfq: z.string().min(1, "Required"),
       item: z.string().min(1, "Required"),
@@ -22,6 +23,7 @@ export const quotationSchema = z.object({
 });
 
 export type itemQuotationRequestType = {
+  item_quotation_no:string;
   purchase_request: string;
   rfq: string;
   item: string;

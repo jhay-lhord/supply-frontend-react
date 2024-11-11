@@ -17,25 +17,17 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { generateRandomString } from "@/services/generateRandomString";
 import {
-  arraySort,
-  FilteredItemInPurchaseRequest,
-} from "@/services/itemServices";
-import {
-  useAddItemQuotation,
-  useAddRequestForQoutation,
-  useGetItemQuotation,
-  useGetRequestForQuotation,
+  useEditItemQuotation,
+  useEditRequestForQuotation,
+
 } from "@/services/requestForQoutationServices";
 import {
-  itemQuotationRequestType,
   requestForQoutationSchema,
   requestForQoutationType,
 } from "@/types/request/request_for_qoutation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldErrors, useFieldArray, useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
 import Loading from "../../shared/components/Loading";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -55,21 +47,10 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
   itemQuotation,
   quotation
 }) => {
-  // const { pr_no } = useParams();
-  // const items = FilteredItemInPurchaseRequest(pr_no!);
-  // const sortedItems = arraySort(items!, "stock_property_no");
-  // const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit handler it have a random Letter
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const {rfq_no} = useParams()
-  const { data, isLoading: data_loading } = useGetRequestForQuotation(rfq_no!);
-  const { data: items, isLoading: item_loading } = useGetItemQuotation();
-  console.log(items)
 
-  // const itemQuotation = items?.data?.filter(data => data.rfq === rfq_no)
-  // const quotation = data && data.data;
-
-  const { mutate: addRFQMutation } = useAddRequestForQoutation();
-  const { mutate: addItemMutation } = useAddItemQuotation();
+  const { mutate: editRFQMutation } = useEditRequestForQuotation();
+  const { mutate: editItemMutation } = useEditItemQuotation();
 
 
   const {
@@ -88,9 +69,10 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
       tin: quotation?.tin,
       is_VAT: true,
       items: itemQuotation?.map((item) => ({
+        item_quotation_no: item.item_quotation_no,
         purchase_request: item.purchase_request,
         rfq: item.rfq,
-        item: item.item.item_no,
+        item: item.item_details.item_no,
         unit_price: item.unit_price,
         brand_model: item.brand_model,
         is_low_price: false,
@@ -110,9 +92,10 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
         tin: quotation.tin,
         is_VAT: true,
         items: itemQuotation.map((item) => ({
+          item_quotation_no:item.item_quotation_no,
           purchase_request: item.purchase_request,
           rfq: item.rfq,
-          item: item.item.item_no,
+          item: item.item_details.item_no,
           unit_price: item.unit_price,
           brand_model: item.brand_model,
           is_low_price: false,
@@ -121,8 +104,6 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
     }
   }, [isDialogOpen, quotation, itemQuotation, reset]);
   
-  if(data_loading && item_loading) return <Loading/>
-
   type RequestForQuotationField =
     | "purchase_request"
     | "items"
@@ -162,38 +143,37 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
 
       const quotationData = {
         rfq_no: quotation?.rfq_no,
-        purchase_request: data.purchase_request ?? "",
-        supplier_name: data.supplier_name ?? "",
-        supplier_address: data.supplier_address ?? "",
-        tin: data.tin ?? "",
-        is_VAT: data.is_VAT ?? "",
+        purchase_request: data.purchase_request,
+        supplier_name: data.supplier_name,
+        supplier_address: data.supplier_address,
+        tin: data.tin,
+        is_VAT: data.is_VAT,
       };
 
-      addRFQMutation(quotationData, {
-        onSuccess: async (rfqResponse) => {
-          const rfqNo = rfqResponse.data?.rfq_no;
+      editRFQMutation(quotationData, {
+        onSuccess: async () => {
 
           // Map over the items and perform addItemMutation with rfqNo from the response
           const itemDataArray = data.items.map((item) => {
             const sortedItem = itemQuotation?.find(
-              (sorted) => sorted.item.item_no === item.item 
+              (sorted) => sorted.item_details.item_no === item.item 
             );
 
             return {
-              purchase_request: item.purchase_request ?? "",
-              rfq: rfqNo ?? "",
-              item: item.item ?? "",
-              unit_price: item.unit_price ?? 0,
-              brand_model: item.brand_model ?? "",
+              item_quotation_no:item.item_quotation_no,
+              purchase_request: item.purchase_request,
+              rfq: item.rfq,
+              item: item.item,
+              unit_price: item.unit_price,
+              brand_model: item.brand_model,
               is_low_price: sortedItem
-                ? Number(item.unit_price) < Number(sortedItem.item.unit_cost)
+                ? Number(item.unit_price) < Number(sortedItem.item_details.unit_cost)
                 : false,
             };
           });
-
           // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
-            itemDataArray.map((itemData) => addItemMutation(itemData))
+            itemDataArray.map((itemData) => editItemMutation(itemData))
           );
 
           setIsLoading(false);
@@ -209,7 +189,6 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
     }
   };
   
-
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -296,16 +275,16 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
                               className="grid grid-cols-7 gap-2 mb-8 items-center p-2 border-b-2"
                             >
                               <Label className="text-gray-500">
-                                {itemQuotation[index].item.unit}
+                                {itemQuotation[index].item_details.unit}
                               </Label>
                               <Label className="text-gray-500">
-                                {itemQuotation[index].item.item_description}
+                                {itemQuotation[index].item_details.item_description}
                               </Label>
                               <Label className="text-gray-500">
-                                {itemQuotation[index].item.quantity}
+                                {itemQuotation[index].item_details.quantity}
                               </Label>
                               <Label className="text-gray-500">
-                                {itemQuotation[index].item.unit_cost}
+                                {itemQuotation[index].item_details.unit_cost}
                               </Label>
                               <div className="flex flex-col col-span-2">
                                 <Textarea

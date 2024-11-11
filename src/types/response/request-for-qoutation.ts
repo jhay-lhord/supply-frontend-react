@@ -10,9 +10,10 @@ export type quotationResponseType = {
 };
 
 export type itemQuotationResponseType = {
+  item_quotation_no:string;
   purchase_request: string;
   rfq: string;
-  item: {
+  item_details: {
     item_no: string,
     item_description: string;
     unit: string;
