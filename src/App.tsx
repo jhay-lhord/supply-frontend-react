@@ -24,6 +24,7 @@ import { Logout, RegisterAndLogout } from "./components/Auth/auth";
 import BACPurchaseRequestList from "./pages/Dashboard/BACDashboard/BACPurchaseRequestList";
 import ItemNotFound from "./pages/Dashboard/SupplyDashboard/components/ItemNotFound";
 import { QuotationList } from "./pages/Dashboard/BACDashboard/QuotationList";
+import { BACQuotation } from "./pages/Dashboard/BACDashboard/BACQuotation";
 
 const App = () => {
   return (
@@ -75,6 +76,10 @@ const App = () => {
            <Route
             path="/bac/request-for-quotation/:pr_no"
             element={<QuotationList />}
+          />
+          <Route
+            path="/bac/quotation/:rfq_no"
+            element={<BACQuotation />}
           />
           <Route
             path="/bac/abstract-of-quotation"

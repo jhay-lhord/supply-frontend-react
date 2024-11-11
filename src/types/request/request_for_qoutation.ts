@@ -21,6 +21,15 @@ export const quotationSchema = z.object({
   is_VAT: z.boolean(),
 });
 
+export type itemQuotationRequestType = {
+  purchase_request: string;
+  rfq: string;
+  item: string;
+  unit_price: number;   
+  brand_model: string;
+  is_low_price: boolean;
+}
+
 export const requestForQoutationSchema = z.intersection(quotationSchema, itemQuotationSchema)
 
 export type itemQuotationType = z.infer<typeof itemQuotationSchema>;

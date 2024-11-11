@@ -4,7 +4,11 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { CheckIcon, Cross2Icon, OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import {
+  CheckIcon,
+  Cross2Icon,
+  OpenInNewWindowIcon,
+} from "@radix-ui/react-icons";
 import {
   useGetItemQuotation,
   useRequestForQoutation,
@@ -15,6 +19,7 @@ import { useGetItemInPurchaseRequest } from "@/services/itemServices";
 import { useParams } from "react-router-dom";
 import { ItemType } from "@/types/request/item";
 import { itemQuotationResponseType } from "@/types/response/request-for-qoutation";
+import { useNavigate } from "react-router-dom";
 
 const getLowPriceSummary = (
   items: ItemType[],
@@ -26,7 +31,8 @@ const getLowPriceSummary = (
     (data) => data.rfq === rfq_no && data.is_low_price === true
   ).length;
 
-  if(items.length === 0) return <p className="text-sm text-orange-400">Processing...</p>
+  if (items.length === 0)
+    return <p className="text-sm text-orange-400">Processing...</p>;
   return (
     <div
       className={`rounded-md ${
@@ -43,6 +49,7 @@ const getLowPriceSummary = (
 
 export const QuotationCard = () => {
   const { pr_no } = useParams();
+  const navigate = useNavigate();
   const { data: items, isLoading: item_loading } = useGetItemInPurchaseRequest(
     pr_no!
   );
@@ -73,6 +80,9 @@ export const QuotationCard = () => {
                     width={20}
                     height={20}
                     className="hover:cursor-pointer"
+                    onClick={() =>
+                      navigate(`/bac/quotation/${quotation.rfq_no}`)
+                    }
                   />
                 </div>
               </CardHeader>
@@ -86,12 +96,16 @@ export const QuotationCard = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                  {!item_loading ? getLowPriceSummary(_items, itemQuotations, quotation.rfq_no) : <p className="text-orange-400">Processing...</p>}
+                {!item_loading ? (
+                  getLowPriceSummary(_items, itemQuotations, quotation.rfq_no)
+                ) : (
+                  <p className="text-orange-400">Processing...</p>
+                )}
               </CardFooter>
             </Card>
           ))
         ) : (
-          <Loading/>
+          <Loading />
         )}
       </div>
     </div>

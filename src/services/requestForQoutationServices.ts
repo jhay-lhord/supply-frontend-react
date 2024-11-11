@@ -1,5 +1,6 @@
 import api from "@/api";
 import {
+  itemQuotationRequestType,
   qoutationType,
 } from "@/types/request/request_for_qoutation";
 import {
@@ -29,6 +30,23 @@ export const useRequestForQoutation = () => {
     queryKey: ["request-for-qoutations"],
   });
 };
+
+export const getRequestForQuotation = async (rfq_no: string):Promise<ApiResponse<quotationResponseType>> => {
+  try {
+    const response = await api.get<quotationResponseType>(`/api/request-for-qoutation/${rfq_no}`)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useGetRequestForQuotation = (rfq_no: string) => {
+  return useQuery<ApiResponse<quotationResponseType>, Error>({
+    queryKey: ["request-for-qoutations", rfq_no],
+    queryFn: () => getRequestForQuotation(rfq_no),
+    enabled: !!rfq_no
+  })
+}
 
 export const useGetPurchaseRequestRequestBySupplier = (
   supplier_name: string
@@ -87,10 +105,10 @@ export const useGetItemQuotation = () => {
 
 
 export const addItemQuotation = async (
-  data: itemQuotationResponseType
-): Promise<ApiResponse<itemQuotationResponseType>> => {
+  data: itemQuotationRequestType
+): Promise<ApiResponse<itemQuotationRequestType>> => {
   try {
-    const response = await api.post<itemQuotationResponseType>(
+    const response = await api.post<itemQuotationRequestType>(
       "/api/item-quotation/",
       data
     );
@@ -102,7 +120,7 @@ export const addItemQuotation = async (
 
 export const useAddItemQuotation = () => {
   const queryClient = useQueryClient();
-  return useMutation<ApiResponse<itemQuotationResponseType>, Error, itemQuotationResponseType>({
+  return useMutation<ApiResponse<itemQuotationRequestType>, Error, itemQuotationRequestType>({
     mutationFn: (data) => addItemQuotation(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items-quotation"] });

@@ -175,7 +175,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       <DialogContent className="max-w-full w-[70rem]">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              Create Request of Qoutation
+              Create Request for Qoutation
             </DialogTitle>
           </DialogHeader>
         <ScrollArea className="h-[30rem] mb-9">
@@ -184,9 +184,9 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
               <div className="w-full flex flex-col items-center">
                 <TabsList className="grid grid-cols-2 w-1/2 items-center">
                   <TabsTrigger className="" value="supplier">
-                    <span className="bg-gray-400  w-8 h-8 p-2 rounded-full mx-2">1</span> Supplier
+                    <span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">1</span> Create Supplier
                   </TabsTrigger>
-                  <TabsTrigger value="items"><span className="bg-gray-400  w-8 h-8 p-2 rounded-full mx-2">2</span>Items</TabsTrigger>
+                  <TabsTrigger value="items"><span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">2</span>Select Items</TabsTrigger>
                 </TabsList>
               </div>
               <TabsContent value="supplier" className="">
@@ -239,12 +239,10 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-7 gap-2 items-center p-2  border-b-2 sticky bg-background top-0">
-                      {/* <Label>Stock Property No</Label> */}
                       <Label>Unit</Label>
                       <Label>Item Description</Label>
                       <Label>Quantity</Label>
                       <Label>Unit Cost</Label>
-                      {/* <Label>Total Cost</Label> */}
                       <Label className="col-span-2">Brand / Model</Label>
                       <Label>Unit Price </Label>
                     </div>
@@ -256,9 +254,6 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                               key={field.id}
                               className="grid grid-cols-7 gap-2 mb-8 items-center p-2 border-b-2"
                             >
-                              {/* <Label className="text-gray-500">
-                                {sortedItems[index]?.stock_property_no}
-                              </Label> */}
                               <Label className="text-gray-500">
                                 {sortedItems[index]?.unit}
                               </Label>
@@ -271,9 +266,6 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                               <Label className="text-gray-500">
                                 {sortedItems[index]?.unit_cost}
                               </Label>
-                              {/* <Label className="text-gray-500">
-                                {sortedItems[index]?.total_cost}
-                              </Label> */}
                               <div className="flex flex-col col-span-2">
                                 <Textarea
                                   {...register(`items.${index}.brand_model`)}
