@@ -48,6 +48,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
   quotation
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState<string>(quotation.is_VAT ? "vat" : "non-VAT")
 
   const { mutate: editRFQMutation } = useEditRequestForQuotation();
   const { mutate: editItemMutation } = useEditItemQuotation();
@@ -67,7 +68,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
       supplier_name: quotation?.supplier_name,
       supplier_address: quotation?.supplier_address,
       tin: quotation?.tin,
-      is_VAT: true,
+      is_VAT: quotation.is_VAT,
       items: itemQuotation?.map((item) => ({
         item_quotation_no: item.item_quotation_no,
         purchase_request: item.purchase_request,
@@ -90,7 +91,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
         supplier_name: quotation.supplier_name,
         supplier_address: quotation.supplier_address,
         tin: quotation.tin,
-        is_VAT: true,
+        is_VAT: quotation.is_VAT,
         items: itemQuotation.map((item) => ({
           item_quotation_no:item.item_quotation_no,
           purchase_request: item.purchase_request,
@@ -147,13 +148,12 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
         supplier_name: data.supplier_name,
         supplier_address: data.supplier_address,
         tin: data.tin,
-        is_VAT: data.is_VAT,
+        is_VAT: selectedOption === "vat" ? true : false,
       };
 
       editRFQMutation(quotationData, {
         onSuccess: async () => {
 
-          // Map over the items and perform addItemMutation with rfqNo from the response
           const itemDataArray = data.items.map((item) => {
             const sortedItem = itemQuotation?.find(
               (sorted) => sorted.item_details.item_no === item.item 
@@ -234,15 +234,16 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
                       {renderField({ label: "TIN", field_name: "tin", errors })}
                       <RadioGroup
                         className="flex items-center mb-3"
-                        defaultValue="option-one"
+                        value={selectedOption}
+                        onValueChange={(value) => setSelectedOption(value)}
                       >
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="option-one" id="option-one" />
-                          <Label htmlFor="option-one">Non VAT</Label>
+                          <RadioGroupItem value="non-VAT" id="non-VAT" />
+                          <Label htmlFor="non-VAT">Non VAT</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="option-two" id="option-two" />
-                          <Label htmlFor="option-two">VAT</Label>
+                          <RadioGroupItem value="vat" id="vat" />
+                          <Label htmlFor="vat">VAT</Label>
                         </div>
                       </RadioGroup>
                     </div>

@@ -32,22 +32,26 @@ export const useRequestForQoutation = () => {
   });
 };
 
-export const getRequestForQuotation = async (rfq_no: string):Promise<ApiResponse<quotationResponseType>> => {
+export const getRequestForQuotation = async (
+  rfq_no: string
+): Promise<ApiResponse<quotationResponseType>> => {
   try {
-    const response = await api.get<quotationResponseType>(`/api/request-for-qoutation/${rfq_no}`)
-    return handleSucess(response)
+    const response = await api.get<quotationResponseType>(
+      `/api/request-for-qoutation/${rfq_no}`
+    );
+    return handleSucess(response);
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
-}
+};
 
 export const useGetRequestForQuotation = (rfq_no: string) => {
   return useQuery<ApiResponse<quotationResponseType>, Error>({
     queryKey: ["request-for-qoutations", rfq_no],
     queryFn: () => getRequestForQuotation(rfq_no),
-    enabled: !!rfq_no
-  })
-}
+    enabled: !!rfq_no,
+  });
+};
 
 export const useGetPurchaseRequestRequestBySupplier = (
   supplier_name: string
@@ -84,46 +88,84 @@ export const useAddRequestForQoutation = () => {
   });
 };
 
-export const editRequestForQuotation = async (data: qoutationType):Promise<ApiResponse<qoutationType>> => {
+export const editRequestForQuotation = async (
+  data: qoutationType
+): Promise<ApiResponse<qoutationType>> => {
   try {
-    const response = await api.put<qoutationType>(`/api/request-for-qoutation/${data.rfq_no}`, data)
+    const response = await api.put<qoutationType>(
+      `/api/request-for-qoutation/${data.rfq_no}`,
+      data
+    );
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const useEditRequestForQuotation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<ApiResponse<qoutationType>, Error, qoutationType>({
+    mutationFn: editRequestForQuotation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["request-for-qoutations"] });
+      toast.success("Successfully Edit", {
+        description: "Edit Request for Quotation Successfully",
+      });
+    },
+  });
+};
+
+export const deleteRequestForQuotation = async (
+  rfq_no: string
+): Promise<ApiResponse<qoutationType>> => {
+  try {
+    const response = await api.delete(`/api/request-for-qoutation/${rfq_no}`);
     return handleSucess(response)
   } catch (error) {
     return handleError(error)
   }
-}
+};
 
-export const useEditRequestForQuotation = () => {
+export const useDeleteRequestForQuotation = () => {
   const queryClient = useQueryClient()
-  return useMutation<ApiResponse<qoutationType>, Error, qoutationType>({
-    mutationFn: editRequestForQuotation,
+  return useMutation({
+    mutationFn: deleteRequestForQuotation,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ["request-for-qoutations"]})
-      toast.success("Successfully Edit", {
-        description: "Edit Request for Quotation Successfully"
+      toast.success("Success", {
+        description: "Request For Qoutation successfully deleted"
       })
     }
   })
 }
 
-export const editItemQuotation = async (data: itemQuotationRequestType):Promise<ApiResponse<itemQuotationRequestType>> => {
+export const editItemQuotation = async (
+  data: itemQuotationRequestType
+): Promise<ApiResponse<itemQuotationRequestType>> => {
   try {
-    const response = await api.put<itemQuotationRequestType>(`/api/item-quotation/${data.item_quotation_no}`, data)
-    return handleSucess(response)
+    const response = await api.put<itemQuotationRequestType>(
+      `/api/item-quotation/${data.item_quotation_no}`,
+      data
+    );
+    return handleSucess(response);
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
-}
+};
 
 export const useEditItemQuotation = () => {
-  const queryClient = useQueryClient()
-  return useMutation<ApiResponse<itemQuotationRequestType>, Error, itemQuotationRequestType>({
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiResponse<itemQuotationRequestType>,
+    Error,
+    itemQuotationRequestType
+  >({
     mutationFn: editItemQuotation,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["items-quotation"]})
-    }
-  })
-}
+      queryClient.invalidateQueries({ queryKey: ["items-quotation"] });
+    },
+  });
+};
 
 export const getItemQuotation = async (): Promise<
   ApiResponse<itemQuotationResponseType[]>
@@ -145,7 +187,6 @@ export const useGetItemQuotation = () => {
   });
 };
 
-
 export const addItemQuotation = async (
   data: itemQuotationRequestType
 ): Promise<ApiResponse<itemQuotationRequestType>> => {
@@ -162,7 +203,11 @@ export const addItemQuotation = async (
 
 export const useAddItemQuotation = () => {
   const queryClient = useQueryClient();
-  return useMutation<ApiResponse<itemQuotationRequestType>, Error, itemQuotationRequestType>({
+  return useMutation<
+    ApiResponse<itemQuotationRequestType>,
+    Error,
+    itemQuotationRequestType
+  >({
     mutationFn: (data) => addItemQuotation(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items-quotation"] });

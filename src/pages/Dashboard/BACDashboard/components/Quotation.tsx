@@ -27,7 +27,7 @@ export const Quotation = () => {
 
   const itemQuotation = items?.data?.filter((data) => data.rfq === rfq_no);
   const quotation = data && data.data;
-  
+
   if (isLoading || item_loading) return <Loading />;
 
   return (
@@ -42,10 +42,10 @@ export const Quotation = () => {
                   {formatDate(quotation?.created_at as Date)}
                 </p>
                 <p className="text-base">{quotation?.supplier_address}</p>
+                <p className="text-base">{quotation?.tin}</p>
                 <p className="text-base">
                   {quotation?.is_VAT ? "VAT" : "non-VAT"}
                 </p>
-                <p className="text-base"></p>
               </div>
               <div className="flex gap-2 ">
                 <Button onClick={() => setIsDialogOpen(true)}>
