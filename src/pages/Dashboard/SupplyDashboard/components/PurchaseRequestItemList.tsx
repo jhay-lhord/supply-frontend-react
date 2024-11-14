@@ -93,7 +93,7 @@ export default function PurchaseRequestItemList() {
     sortedItems = arraySort(items!, "stock_property_no");
   }
 
-  const onSubmit = (data: purchaseRequestType) => {
+  const onSubmit = (data: PurchaseRequestData) => {
     const result = purchaseRequestFormSchema.safeParse(data);
 
     if (result.success) {

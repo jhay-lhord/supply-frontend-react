@@ -8,8 +8,10 @@ import {
   CheckIcon,
   Cross2Icon,
   OpenInNewWindowIcon,
+  TrashIcon,
 } from "@radix-ui/react-icons";
 import {
+  useDeleteRequestForQuotation,
   useGetItemQuotation,
   useRequestForQoutation,
 } from "@/services/requestForQoutationServices";
@@ -20,6 +22,8 @@ import { useParams } from "react-router-dom";
 import { ItemType } from "@/types/request/item";
 import { itemQuotationResponseType } from "@/types/response/request-for-qoutation";
 import { useNavigate } from "react-router-dom";
+import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { useState } from "react";
 
 const getLowPriceSummary = (
   items: ItemType[],
@@ -47,27 +51,49 @@ const getLowPriceSummary = (
   );
 };
 
-export const QuotationCard = () => {
+interface QuotationCardProps {
+  isDeleteAllowed?:boolean
+  title:string 
+}
+
+export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, title = "All Quotes"}) => {
   const { pr_no } = useParams();
   const navigate = useNavigate();
+
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedQuotation, setSelectedQuotation] = useState<string | null>(
+    null
+  );
+
   const { data: items, isLoading: item_loading } = useGetItemInPurchaseRequest(
     pr_no!
   );
   const { data } = useRequestForQoutation();
   const { data: item, isLoading } = useGetItemQuotation();
+  const { mutate } = useDeleteRequestForQuotation();
+
   const _items = Array.isArray(items?.data) ? items.data : [];
   const itemQuotations = Array.isArray(item?.data) ? item?.data : [];
   const quotations = Array.isArray(data?.data) ? data?.data : [];
+
+  const handleDeleteClick = () => {
+    mutate(selectedQuotation!);
+  };
+
+  const handleOpenDialog = (rfq_no: string) => {
+    setIsDialogOpen(true);
+    setSelectedQuotation(rfq_no);
+  };
 
   if (isLoading) return <Loading />;
 
   return (
     <div className=" w-full">
-      <p className="text-xl">All Request For Quotation</p>
+      <p className="text-xl">{title}</p>
       <div className="grid grid-cols-3 gap-4 mt-8">
         {quotations.length > 0 ? (
           quotations.map((quotation) => (
-            <Card>
+            <Card className="group">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -96,18 +122,36 @@ export const QuotationCard = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                {!item_loading ? (
-                  getLowPriceSummary(_items, itemQuotations, quotation.rfq_no)
-                ) : (
-                  <p className="text-orange-400">Processing...</p>
-                )}
+                <div className="w-full flex justify-between items-center">
+                  {!item_loading ? (
+                    getLowPriceSummary(_items, itemQuotations, quotation.rfq_no)
+                  ) : (
+                    <p className="text-orange-400">Processing...</p>
+                  )}
+                  {isDeleteAllowed && (
+                    <div className="bg-red-200 rounded-full p-2 opacity-0 group-hover:opacity-100 ease-in-out cursor-pointer">
+                    <TrashIcon
+                      className=""
+                      width={20}
+                      height={20}
+                      onClick={() => handleOpenDialog(quotation.rfq_no)}
+                    />
+                  </div>
+                  )}
+                </div>
               </CardFooter>
             </Card>
           ))
         ) : (
-          <Loading />
+          <p>No Quotes found</p>
         )}
       </div>
+      <DeleteDialog
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+        message="Request For Quotation"
+        onDeleteClick={handleDeleteClick}
+      />
     </div>
   );
 };

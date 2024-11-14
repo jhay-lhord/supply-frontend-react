@@ -34,7 +34,7 @@ export const Quotation = () => {
     <div className=" w-full pt-8">
       <div className="">
         <Card className="">
-          <CardHeader>
+          <CardHeader className="bg-orange-100 rounded-t">
             <div className="flex justify-between items-end ">
               <div>
                 <p className="text-xl">{quotation?.supplier_name}</p>
@@ -59,42 +59,42 @@ export const Quotation = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <p>Qoutations</p>
-            <div className="grid grid-cols-7 gap-2 items-center p-2  border-b-2 sticky bg-background top-0">
-              <Label>Unit</Label>
-              <Label>Item Description</Label>
-              <Label>Quantity</Label>
-              <Label>Unit Cost</Label>
-              <Label className="col-span-2">Brand / Model</Label>
-              <Label>Unit Price </Label>
+            <p className="text-xl py-2">Qoutations</p>
+            <div className="grid grid-cols-8 gap-2 items-center p-2  border-b-2 sticky bg-background top-0">
+              <p className="text-base">UNIT/</p>
+              <p className="text-base col-span-2">ITEM DESCRIPTION</p>
+              <p className="text-base">QUANTITY</p>
+              <p className="text-base">UNIT COST</p>
+              <p className="text-base col-span-2">BRAND / MODEL</p>
+              <p className="text-base">UNIT PRICE</p>
             </div>
             {itemQuotation && itemQuotation?.length > 0 ? (itemQuotation
               ?.map((item) => {
                 return (
-                  <div className="grid grid-cols-7 gap-2 items-center py-8 border-b-2" key={item.item_details.item_no}>
-                    <Label className="text-gray-500">{item.item_details.unit}</Label>
-                    <Label className="text-gray-500">
+                  <div className="grid grid-cols-8 gap-2 items-center py-8 border-b-2" key={item.item_details.item_no}>
+                    <p className="text-gray-500">{item.item_details.unit}</p>
+                    <p className="text-gray-500 col-span-2">
                       {item.item_details.item_description}
-                    </Label>
-                    <Label className="text-gray-500">
+                    </p>
+                    <p className="text-gray-500">
                       {item.item_details.quantity}
-                    </Label>
-                    <Label className="text-gray-500">
+                    </p>
+                    <p className="text-gray-500">
                       {item.item_details.unit_cost}
-                    </Label>
+                    </p>
 
-                    <Label className="text-gray-500 col-span-2">
+                    <p className="text-gray-500 col-span-2">
                       {item.brand_model}
-                    </Label>
+                    </p>
 
-                    <Label
+                    <p
                       className={`${
                         item.is_low_price ? "text-green-400" : "text-red-400"
                       } flex gap-2 items-center`}
                     >
                       {item.is_low_price ? <CheckIcon /> : <Cross2Icon />}
                       {item.unit_price}
-                    </Label>
+                    </p>
                   </div>
                 );
               })) : (<Loading/>)}
