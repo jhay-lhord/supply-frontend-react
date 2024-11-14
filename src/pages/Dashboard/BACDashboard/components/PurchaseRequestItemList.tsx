@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { TwoStepRFQForm } from "./TwoStepRFQForm";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { generateRFQPDF } from "@/services/requestForQoutationServices";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -72,7 +73,12 @@ export default function PurchaseRequestItemList() {
   const handleAddRFQ = () => {
     setIsDialogOpen(true);
   };
-
+  
+  const handlePrintCLick = async () => {
+    const url = await generateRFQPDF()
+    return window.open(url, '_blank')
+  }
+  
   return (
     <div className="m-8 bg-slate-100  rounded-md">
       <div className="flex place-content-between items-end py-2 rounded-md bg-orange-100">
@@ -119,7 +125,7 @@ export default function PurchaseRequestItemList() {
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950">
+                <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950" onClick={handlePrintCLick}>
                   <Printer strokeWidth={1.3} />
                 </Button>
               </TooltipTrigger>
@@ -161,30 +167,30 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   return (
     <div className="border-none  mt-4 px-8">
       <p className="text-2xl">Items</p>
-      <div className="grid grid-cols-6 gap-2 items-center border-b-2 py-4">
-        <Label className="text-base">Stock Property No.</Label>
-        <Label className="text-base">Unit</Label>
-        <Label className="text-base">Description</Label>
-        <Label className="text-base">Quantity</Label>
-        <Label className="text-base">Unit Cost</Label>
-        <Label className="text-base">Total Cost</Label>
+      <div className="grid grid-cols-7 gap-2 items-center border-b-2 py-4">
+        <p className="text-base uppercase">Stock Property No.</p>
+        <p className="text-base uppercase">Unit</p>
+        <p className="text-base uppercase col-span-2">Description</p>
+        <p className="text-base uppercase">Quantity</p>
+        <p className="text-base uppercase">Unit Cost</p>
+        <p className="text-base uppercase">Total Cost</p>
       </div>
       {sortedItems?.length ? (
         sortedItems.map((item) => (
           <div
             key={item.item_no}
-            className="grid grid-cols-6 gap-2 items-center py-6 border-b-2 font-thin"
+            className="grid grid-cols-7 gap-2 items-center py-6 border-b-2 font-thin"
           >
-            <Label className="text-gray-700">{item.stock_property_no}</Label>
-            <Label className="text-gray-700">{item.unit}</Label>
-            <Label className="text-gray-700">{item.item_description}</Label>
-            <Label className="text-gray-700">{item.quantity}</Label>
-            <Label className="text-gray-700">{item.unit_cost}</Label>
-            <Label className="text-gray-700">{item.total_cost}</Label>
+            <p className="text-gray-700">{item.stock_property_no}</p>
+            <p className="text-gray-700">{item.unit}</p>
+            <p className="text-gray-700 col-span-2">{item.item_description}</p>
+            <p className="text-gray-700">{item.quantity}</p>
+            <p className="text-gray-700">{item.unit_cost}</p>
+            <p className="text-gray-700">{item.total_cost}</p>
           </div>
         ))
       ) : (
-        <Loading />
+        <p>No items Found</p>
       )}
     </div>
   );

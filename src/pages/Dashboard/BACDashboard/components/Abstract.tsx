@@ -26,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { QuotationCard } from "./QuotationCard";
 import { AbstractForm } from "./AbstractForm";
+import { generateAOQPDF } from "@/services/AbstractOfQuotationServices";
 
 export default function Abstract() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -68,6 +69,11 @@ export default function Abstract() {
   const handleAddAOQ = () => {
     setIsDialogOpen(true);
   };
+
+  const handlePrintClick = async () => {
+    const url = await generateAOQPDF()
+    window.open(url, '_blank')
+  }
 
   return (
     <div className="my-8 bg-slate-100  rounded-md">
@@ -121,11 +127,11 @@ export default function Abstract() {
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950">
+                <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950" onClick={handlePrintClick}>
                   <Printer strokeWidth={1.3} />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">Print Empty RFQ Form</TooltipContent>
+              <TooltipContent side="top">Print Empty AOQ Form</TooltipContent>
             </Tooltip>
 
             <Tooltip>
