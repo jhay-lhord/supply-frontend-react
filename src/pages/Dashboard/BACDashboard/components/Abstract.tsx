@@ -1,7 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  FilteredItemInPurchaseRequest,
-} from "@/services/itemServices";
+import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import { usePurchaseRequestList } from "@/services/purchaseRequestServices";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -30,9 +28,9 @@ import { generateAOQPDF } from "@/services/AbstractOfQuotationServices";
 
 export default function Abstract() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
+
   const { pr_no } = useParams();
-  const items = FilteredItemInPurchaseRequest(pr_no!);
-  console.log(items);
   const {
     isLoading,
     data: purchase_request,
@@ -54,6 +52,14 @@ export default function Abstract() {
   });
 
   useEffect(() => {
+    const fetchPdfUrl = async () => {
+      const url = await generateAOQPDF();
+      setPdfUrl(url);
+    };
+    fetchPdfUrl();
+  }, []);
+
+  useEffect(() => {
     if (purchase_request?.data) {
       setValue("purpose", purchase_request.data.purpose || "");
       setValue("res_center_code", purchase_request.data.res_center_code || "");
@@ -71,9 +77,8 @@ export default function Abstract() {
   };
 
   const handlePrintClick = async () => {
-    const url = await generateAOQPDF()
-    window.open(url, '_blank')
-  }
+    window.open(pdfUrl, "_blank");
+  };
 
   return (
     <div className="my-8 bg-slate-100  rounded-md">
@@ -127,7 +132,10 @@ export default function Abstract() {
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950" onClick={handlePrintClick}>
+                <Button
+                  className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950"
+                  onClick={handlePrintClick}
+                >
                   <Printer strokeWidth={1.3} />
                 </Button>
               </TooltipTrigger>
@@ -137,7 +145,9 @@ export default function Abstract() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950">
-                  <DownloadIcon strokeWidth={1.3} />
+                  <a href={pdfUrl} download={"Abstract_For_Quotation_Form.pdf"}>
+                    <DownloadIcon strokeWidth={1.3} />
+                  </a>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">Download RFQ Form</TooltipContent>
@@ -155,8 +165,8 @@ export default function Abstract() {
         </div>
       </div>
       <Separator className="" />
-      <div className="p-8"> 
-        <QuotationCard isDeleteAllowed={false} title={"All Supplier"}/>
+      <div className="p-8">
+        <QuotationCard isDeleteAllowed={false} title={"All Supplier"} />
       </div>
 
       <AbstractForm
@@ -166,4 +176,3 @@ export default function Abstract() {
     </div>
   );
 }
-

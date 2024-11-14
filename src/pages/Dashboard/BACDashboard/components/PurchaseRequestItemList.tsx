@@ -32,16 +32,17 @@ import { generateRFQPDF } from "@/services/requestForQoutationServices";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [pdfUrl, setPdfUrl] = useState<string | undefined>();
+
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
-  console.log(items)
   const {
     isLoading,
     data: purchase_request,
     error,
   } = usePurchaseRequestList(pr_no!);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { setValue } = useForm<PurchaseRequestData>({
     resolver: zodResolver(purchaseRequestFormSchema),
@@ -65,6 +66,14 @@ export default function PurchaseRequestItemList() {
     }
   }, [purchase_request, setValue]);
 
+  useEffect(()=> {
+    const fetchPdfUrl = async () => {
+      const url = await generateRFQPDF()
+      setPdfUrl(url)
+    }
+    fetchPdfUrl()
+  }, [])
+
   const sortedItems = arraySort(items!, "stock_property_no");
 
   if (isLoading) return <Loading />;
@@ -73,12 +82,12 @@ export default function PurchaseRequestItemList() {
   const handleAddRFQ = () => {
     setIsDialogOpen(true);
   };
-  
+
+
   const handlePrintCLick = async () => {
-    const url = await generateRFQPDF()
-    return window.open(url, '_blank')
-  }
-  
+    return window.open(pdfUrl, "_blank");
+  };
+
   return (
     <div className="m-8 bg-slate-100  rounded">
       <div className="flex place-content-between items-end py-2 rounded-t-md bg-orange-100">
@@ -107,8 +116,14 @@ export default function PurchaseRequestItemList() {
           <p className="flex items-center gap-2">
             <div className="relative">
               <div className="font-medium text-lg hover:cursor-pointer flex gap-2 items-center">
-                <p>Request of Qoutations:</p> 
-                <OpenInNewWindowIcon width="25" height="25" onClick={() => navigate(`/bac/request-for-quotation/${pr_no}`)}/>
+                <p>Request of Qoutations:</p>
+                <OpenInNewWindowIcon
+                  width="25"
+                  height="25"
+                  onClick={() =>
+                    navigate(`/bac/request-for-quotation/${pr_no}`)
+                  }
+                />
               </div>
             </div>
           </p>
@@ -125,7 +140,10 @@ export default function PurchaseRequestItemList() {
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950" onClick={handlePrintCLick}>
+                <Button
+                  className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950"
+                  onClick={handlePrintCLick}
+                >
                   <Printer strokeWidth={1.3} />
                 </Button>
               </TooltipTrigger>
@@ -135,7 +153,9 @@ export default function PurchaseRequestItemList() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950">
-                  <DownloadIcon strokeWidth={1.3} />
+                  <a href={pdfUrl} download={"Request_For_Quotation_Form.pdf"}>
+                    <DownloadIcon strokeWidth={1.3} />
+                  </a>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">Download RFQ Form</TooltipContent>
