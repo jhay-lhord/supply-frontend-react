@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { toast } from "sonner";
 import { ItemType } from "@/types/request/item";
+import { PurchaseRequestData } from "@/types/request/purchase-request";
 
 export const GetPurchaseRequest = async (): Promise<
   ApiResponse<purchaseRequestType[]>
@@ -51,7 +52,7 @@ export const AddPurchaseRequest = async (data: {
   }
 };
 
-export const UpdatePurchaseRequest = async (data: purchaseRequestType) => {
+export const UpdatePurchaseRequest = async (data: PurchaseRequestData) => {
   try {
     const response = await api.put(`api/purchase-request/${data.pr_no}`, data);
     return handleSucess(response);
@@ -63,9 +64,9 @@ export const UpdatePurchaseRequest = async (data: purchaseRequestType) => {
 export const useUpdatePurchaseRequest = () => {
   const queryClient = useQueryClient();
   return useMutation<
-    ApiResponse<purchaseRequestType>,
+    ApiResponse<PurchaseRequestData>,
     Error,
-    purchaseRequestType
+    PurchaseRequestData
   >({
     mutationFn: UpdatePurchaseRequest,
     onSuccess: () => {
@@ -107,7 +108,9 @@ export const usePurchaseRequestInProgressCount = () => {
 export const usePurchaseRequestInProgress = () => {
   const { data, isLoading } = usePurchaseRequest();
 
-  const purchaseRequestInProgress = data?.data
+  const inProgress = Array.isArray(data?.data) ? data.data : []
+
+  const purchaseRequestInProgress = inProgress
     ?.map((data) => {
       return data;
     })
@@ -137,7 +140,7 @@ export const GetPurchaseRequestItem = async (): Promise<
   }
 };
 
-export const deletePurchaseRequest = async (pr_no: string): Promise<T> => {
+export const deletePurchaseRequest = async (pr_no: string) => {
   try {
     const response = await api.delete(`/api/purchase-request/${pr_no}`);
     console.log(response);
