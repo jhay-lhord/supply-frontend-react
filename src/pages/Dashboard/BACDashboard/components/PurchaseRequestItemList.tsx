@@ -102,7 +102,7 @@ export default function PurchaseRequestItemList() {
               variant="destructive"
               className="bg-orange-300 text-slate-950 hover:bg-orange-200"
             >
-              {purchase_request?.data?.status}
+              <p className="font-normal text-sm ">{purchase_request?.data?.status}</p>
             </Badge>
           </p>
           <p>

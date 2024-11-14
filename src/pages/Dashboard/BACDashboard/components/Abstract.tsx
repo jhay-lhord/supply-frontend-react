@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import { usePurchaseRequestList } from "@/services/purchaseRequestServices";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -94,7 +93,7 @@ export default function Abstract() {
               variant="destructive"
               className="bg-orange-300 text-slate-950 hover:bg-orange-200"
             >
-              {purchase_request?.data?.status}
+              <p className="font-normal text-sm">{purchase_request?.data?.status}</p>
             </Badge>
           </p>
           <p>
