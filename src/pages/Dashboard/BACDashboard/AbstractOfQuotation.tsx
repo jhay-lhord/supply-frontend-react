@@ -7,7 +7,7 @@ const AbstractOfQuotation: React.FC = () => {
     <DashboardLayout>
         <BACSidebar />
 
-        <div className="pt-16 w-full">
+        <div className="pt-16 w-full m-4">
             <AbstractOfQuotationDataTable/>
         </div>
             

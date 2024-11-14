@@ -9,7 +9,7 @@ export const QuotationList: React.FC = () => {
         <BACSidebar />
 
         <div className="pt-16 w-full m-8">
-            <QuotationCard/>
+            <QuotationCard isDeleteAllowed={true} title={"All Quotes"}/>
         </div>
             
     </DashboardLayout>

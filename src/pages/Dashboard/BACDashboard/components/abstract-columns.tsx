@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
-export const columns: ColumnDef<purchaseRequestType>[] = [
+export const AbstractColumn: ColumnDef<purchaseRequestType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -47,7 +47,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       const pr_no = row.getValue("pr_no")
       return (
         <div className="flex space-x-2 items-center">
-          <span className="max-w-[500px] truncate font-medium hover:underline" onClick={()=> navigate(`/bac/purchase-request/${pr_no}`)}>
+          <span className="max-w-[500px] truncate font-medium hover:underline" onClick={()=> navigate(`/bac/abstract-of-quotation/${pr_no}`)}>
             {row.getValue("pr_no")}
           </span>
             <Badge className="m-2 p-2 w-6 h-6 flex items-center justify-center bg-orange-100 border-2 border-orange-300 text-slate-950">{!rfqCount ? "0" : rfqCount}</Badge>
