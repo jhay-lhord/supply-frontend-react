@@ -12,10 +12,12 @@ import { useNavigate } from "react-router-dom";
 interface DataTableRowActionsProps {
   pr_no: string;
   _data: purchaseRequestType;
+  link: string;
 }
 
 export const DataTableRowActions = ({
   pr_no,
+  link
 }: DataTableRowActionsProps) => {
 
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ export const DataTableRowActions = ({
 
   const handleViewClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    navigate(`/bac/purchase-request/${pr_no}`);
+    navigate(`/bac/${link}/${pr_no}`);
   };
 
 
