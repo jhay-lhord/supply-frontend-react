@@ -40,7 +40,7 @@ export const DataTableRowActions = ({
                 variant="default"
                 className="flex data-[state=open]:bg-muted hover:rounded-full"
               >
-                <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
+                <ArrowTopRightIcon className="h-4 w-4 text-gray-900" />
                 <span className="sr-only">Open</span>
               </Button>
             </TooltipTrigger>

@@ -50,7 +50,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
           <span className="max-w-[500px] truncate font-medium hover:underline" onClick={()=> navigate(`/bac/purchase-request/${pr_no}`)}>
             {row.getValue("pr_no")}
           </span>
-            <Badge className="m-2 p-2 w-6 h-6 flex items-center justify-center bg-orange-100 border-2 border-orange-300 text-slate-950">{!rfqCount ? "0" : rfqCount}</Badge>
+            <Badge className="m-2 p-2 w-6 h-6 flex items-center justify-center bg-orange-200 border-2 text-slate-950">{!rfqCount ? "0" : rfqCount}</Badge>
         </div>
       );
     },

@@ -119,9 +119,9 @@ export default function Abstract() {
           <Button
             onClick={handleAddAOQ}
             variant={"outline"}
-            className="bg-slate-100 text-base"
+            className="bg-slate-100"
           >
-            Create Abstract
+            <p className="text-base font-light">Create AOQ</p>
           </Button>
 
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>

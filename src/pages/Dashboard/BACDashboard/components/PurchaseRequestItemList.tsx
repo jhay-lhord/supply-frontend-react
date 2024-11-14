@@ -80,8 +80,8 @@ export default function PurchaseRequestItemList() {
   }
   
   return (
-    <div className="m-8 bg-slate-100  rounded-md">
-      <div className="flex place-content-between items-end py-2 rounded-md bg-orange-100">
+    <div className="m-8 bg-slate-100  rounded">
+      <div className="flex place-content-between items-end py-2 rounded-t-md bg-orange-100">
         <div className="flex flex-col gap-1 p-8">
           <p>
             <span className="font-medium text-lg">PR Number: </span>
@@ -119,7 +119,7 @@ export default function PurchaseRequestItemList() {
             variant={"outline"}
             className="bg-slate-100"
           >
-            Create RFQ
+            <p className="text-base font-light">Create RFQ</p>
           </Button>
 
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
@@ -165,7 +165,7 @@ export default function PurchaseRequestItemList() {
 
 const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   return (
-    <div className="border-none  mt-4 px-8">
+    <div className="border-none  mt-4 px-8 pb-6">
       <p className="text-2xl">Items</p>
       <div className="grid grid-cols-7 gap-2 items-center border-b-2 py-4">
         <p className="text-base uppercase">Stock Property No.</p>
