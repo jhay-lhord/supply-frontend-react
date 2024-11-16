@@ -3,53 +3,72 @@ import {
   abstractType,
   itemSelectedQuoteType,
 } from "@/types/request/abstract_of_quotation";
-import { abstractType_, itemSelectedType_ } from "@/types/response/abstract-of-quotation";
+import {
+  abstractType_,
+  itemSelectedType_,
+} from "@/types/response/abstract-of-quotation";
 import { ApiResponse } from "@/types/response/api-response";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { toast } from "sonner";
 
-export const getAllAbstractOfQuotation = async ():Promise<ApiResponse<abstractType_[]>> => {
+export const getAllAbstractOfQuotation = async (): Promise<
+  ApiResponse<abstractType_[]>
+> => {
   try {
-    const response = await api.get<abstractType_[]>("api/abstract-of-quotation/")
-    return handleSucess(response)
+    const response = await api.get<abstractType_[]>(
+      "api/abstract-of-quotation/"
+    );
+    return handleSucess(response);
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
-}
+};
 
 export const useAbstractOfQuotation = () => {
   return useQuery<ApiResponse<abstractType_[]>, Error>({
     queryKey: ["abstract-of-quotations"],
-    queryFn: getAllAbstractOfQuotation
-  })
-}
+    queryFn: getAllAbstractOfQuotation,
+  });
+};
 
-export const getAllItemSelectedQuote = async ():Promise<ApiResponse<itemSelectedType_[]>> => {
+export const getAllItemSelectedQuote = async (): Promise<
+  ApiResponse<itemSelectedType_[]>
+> => {
   try {
-    const response = await api.get<itemSelectedType_[]>("api/item-selected-quote/")
-    return handleSucess(response)
+    const response = await api.get<itemSelectedType_[]>(
+      "api/item-selected-quote/"
+    );
+    return handleSucess(response);
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
-}
+};
 
 export const useAllItemSelectedQuote = () => {
   return useQuery<ApiResponse<itemSelectedType_[]>>({
     queryKey: ["item-selected-quotes"],
-    queryFn: getAllItemSelectedQuote
-  })
-}
+    queryFn: getAllItemSelectedQuote,
+  });
+};
 
-export const FilteredItemSelectedInPR = (data: itemSelectedType_[], pr_no:string) => {
-  console.log(data)
-  return data.filter(item => item.pr_details.pr_no === pr_no)
-}
+export const FilteredItemSelectedInPR = (
+  data: itemSelectedType_[],
+  pr_no: string
+) => {
+  console.log(data);
+  return data.filter((item) => item.pr_details.pr_no === pr_no);
+};
 
-export const totalItemSelectedInAOQ = (data: itemSelectedType_[], aoq_no: string) => {
-  return data.filter(item => item.is_item_selected && item.afq === aoq_no).length
-}
+export const totalItemSelectedInAOQ = (
+  data: itemSelectedType_[],
+  aoq_no: string
+) => {
+  return data.filter((item) => item.is_item_selected && item.afq === aoq_no)
+    .length;
+};
 
 export const addAbstractOfQuotation = async (
   data: abstractType
@@ -97,11 +116,38 @@ export const useAddItemSelectedQuote = () => {
   });
 };
 
+export const deleteAbstractOfQuoutation = async (
+  aoq_no: string
+): Promise<ApiResponse<abstractType>> => {
+  try {
+    const response = await api.delete(`api/abstract-of-quotation/${aoq_no}`);
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
 
-export const filterAOQInItemSelectedQuote = (data: abstractType, afq_no:string) => {
-  const items = Array.isArray(data) ? data : []
-  return items.filter(item => item.afq === afq_no) 
-}
+export const useDeleteAbstractOfQuotation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteAbstractOfQuoutation,
+    mutationKey: ["abstract-of-quotations"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
+      toast.success("Success", {
+        description: "Abstract of Quotation successfully deleted",
+      });
+    },
+  });
+};
+
+export const filterAOQInItemSelectedQuote = (
+  data: abstractType,
+  afq_no: string
+) => {
+  const items = Array.isArray(data) ? data : [];
+  return items.filter((item) => item.afq === afq_no);
+};
 
 export const generateAOQPDF = async () => {
   const pdfDoc = await PDFDocument.create();
