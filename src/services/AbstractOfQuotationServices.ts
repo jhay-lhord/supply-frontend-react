@@ -3,22 +3,61 @@ import {
   abstractType,
   itemSelectedQuoteType,
 } from "@/types/request/abstract_of_quotation";
+import { abstractType_, itemSelectedType_ } from "@/types/response/abstract-of-quotation";
 import { ApiResponse } from "@/types/response/api-response";
 import { handleError, handleSucess } from "@/utils/apiHelper";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+
+export const getAllAbstractOfQuotation = async ():Promise<ApiResponse<abstractType_[]>> => {
+  try {
+    const response = await api.get<abstractType_[]>("api/abstract-of-quotation/")
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useAbstractOfQuotation = () => {
+  return useQuery<ApiResponse<abstractType_[]>, Error>({
+    queryKey: ["abstract-of-quotations"],
+    queryFn: getAllAbstractOfQuotation
+  })
+}
+
+export const getAllItemSelectedQuote = async ():Promise<ApiResponse<itemSelectedType_[]>> => {
+  try {
+    const response = await api.get<itemSelectedType_[]>("api/item-selected-quote/")
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useAllItemSelectedQuote = () => {
+  return useQuery<ApiResponse<itemSelectedType_[]>>({
+    queryKey: ["item-selected-quotes"],
+    queryFn: getAllItemSelectedQuote
+  })
+}
+
+export const FilteredItemSelectedInPR = (data: itemSelectedType_[], pr_no:string) => {
+  console.log(data)
+  return data.filter(item => item.pr_details.pr_no === pr_no)
+}
+
+export const totalItemSelectedInAOQ = (data: itemSelectedType_[], aoq_no: string) => {
+  return data.filter(item => item.is_item_selected && item.afq === aoq_no).length
+}
 
 export const addAbstractOfQuotation = async (
   data: abstractType
 ): Promise<ApiResponse<abstractType>> => {
   try {
-    console.log(data);
     const response = await api.post("/api/abstract-of-quotation/", data);
-    console.log(response);
     return handleSucess(response);
   } catch (error) {
-    console.log(error);
     return handleError(error);
   }
 };
@@ -37,12 +76,9 @@ export const addItemSelectedQuote = async (
   data: itemSelectedQuoteType
 ): Promise<ApiResponse<itemSelectedQuoteType>> => {
   try {
-    console.log(data);
     const response = await api.post("api/item-selected-quote/", data);
-    console.log(response);
     return handleSucess(response);
   } catch (error) {
-    console.log(error);
     return handleError(error);
   }
 };
@@ -60,6 +96,12 @@ export const useAddItemSelectedQuote = () => {
     },
   });
 };
+
+
+export const filterAOQInItemSelectedQuote = (data: abstractType, afq_no:string) => {
+  const items = Array.isArray(data) ? data : []
+  return items.filter(item => item.afq === afq_no) 
+}
 
 export const generateAOQPDF = async () => {
   const pdfDoc = await PDFDocument.create();
