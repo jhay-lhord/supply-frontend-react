@@ -33,6 +33,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { itemQuotationResponseType, quotationResponseType } from "@/types/response/request-for-qoutation";
+import { useToast } from "@/hooks/use-toast";
 
 interface RFQFormEditProps {
   isDialogOpen: boolean;
@@ -47,6 +48,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
   itemQuotation,
   quotation
 }) => {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string>(quotation.is_VAT ? "vat" : "non-VAT")
 
@@ -178,6 +180,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
 
           setIsLoading(false);
           setIsDialogOpen(false);
+          toast({title: "Success", description: "Request for Quotation Updated successfully"})
           reset();
         },
         onError: (error) => {

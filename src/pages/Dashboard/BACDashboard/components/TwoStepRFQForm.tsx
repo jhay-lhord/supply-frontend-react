@@ -38,6 +38,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
 
 interface TwoStepRFQFormProps {
   isDialogOpen: boolean;
@@ -49,6 +50,8 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   setIsDialogOpen,
 }) => {
   const { pr_no } = useParams();
+  const { toast } = useToast()
+
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const sortedItems = arraySort(items!, "stock_property_no");
   const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit handler it have a random Letter
@@ -126,7 +129,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
 
       const quotationData = {
         rfq_no: `${rfq_no}(${generateRandomString()})`,
-        purchase_request: data.purchase_request ?? "",
+        purchase_request: data.purchase_request!,
         supplier_name: data.supplier_name ?? "",
         supplier_address: data.supplier_address ?? "",
         tin: data.tin ?? "",
@@ -145,7 +148,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
 
             return {
               item_quotation_no: uuidv4(),
-              purchase_request: pr_no ?? "",
+              purchase_request: pr_no!,
               rfq: rfqNo ?? "",
               item: item.item ?? "",
               unit_price: item.unit_price ?? 0,
@@ -166,6 +169,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
           setIsLoading(false);
           setIsDialogOpen(false);
           reset();
+          toast({title: "Success", description: "Request for Qoutation successfully added"})
         },
         onError: (error) => {
           console.error("Error saving RFQ:", error);

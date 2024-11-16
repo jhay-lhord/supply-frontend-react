@@ -12,7 +12,6 @@ import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { toast } from "sonner";
 
 export const getAllAbstractOfQuotation = async (): Promise<
   ApiResponse<abstractType_[]>
@@ -134,9 +133,6 @@ export const useDeleteAbstractOfQuotation = () => {
     mutationKey: ["abstract-of-quotations"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
-      toast.success("Success", {
-        description: "Abstract of Quotation successfully deleted",
-      });
     },
   });
 };
