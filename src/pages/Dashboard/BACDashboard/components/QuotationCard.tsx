@@ -23,7 +23,7 @@ import { ItemType } from "@/types/request/item";
 import { itemQuotationResponseType } from "@/types/response/request-for-qoutation";
 import { useNavigate } from "react-router-dom";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const getLowPriceSummary = (
   items: ItemType[],
@@ -74,7 +74,11 @@ export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, tit
 
   const _items = Array.isArray(items?.data) ? items.data : [];
   const itemQuotations = Array.isArray(item?.data) ? item?.data : [];
-  const quotations = Array.isArray(data?.data) ? data?.data : [];
+  
+  const filteredQuotations = useMemo(() => {
+    const quotations = Array.isArray(data?.data) ? data?.data : [];
+    return quotations.filter(item => item.purchase_request === pr_no)
+  }, [data?.data,pr_no])
 
   const handleDeleteClick = () => {
     mutate(selectedQuotation!);
@@ -91,8 +95,8 @@ export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, tit
     <div className=" w-full">
       <p className="text-xl">{title}</p>
       <div className="grid grid-cols-3 gap-4 mt-8">
-        {quotations.length > 0 ? (
-          quotations.map((quotation) => (
+        {filteredQuotations.length > 0 ? (
+          filteredQuotations.map((quotation) => (
             <Card className="group">
               <CardHeader>
                 <div className="flex justify-between items-start">
