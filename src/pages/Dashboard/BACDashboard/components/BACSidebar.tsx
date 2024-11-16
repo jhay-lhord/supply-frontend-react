@@ -1,8 +1,6 @@
 import {
   LayoutDashboard,
   FileText,
-
-  FileCheck,
   FileSpreadsheet,
   FileSymlink,
 } from "lucide-react";

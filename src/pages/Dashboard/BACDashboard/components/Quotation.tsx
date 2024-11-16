@@ -12,7 +12,6 @@ import {
 import { formatDate } from "@/services/formatDate";
 import Loading from "../../shared/components/Loading";
 import { useParams } from "react-router-dom";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PenBoxIcon, PrinterIcon } from "lucide-react";
 import { RFQFormEdit } from "./RFQFormEdit";

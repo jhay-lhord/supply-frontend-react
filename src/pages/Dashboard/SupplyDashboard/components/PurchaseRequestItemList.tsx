@@ -39,7 +39,6 @@ import { toast } from "sonner";
 import { DeleteDialog } from "./DeleteDialog";
 import Loading from "../../shared/components/Loading";
 import EditItemForm from "./EditItemForm";
-import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
 import { Loader2 } from "lucide-react";
 import { generatePDF } from "@/services/purchaseRequestServices";
