@@ -112,7 +112,7 @@ export default function Abstract() {
                   width="25"
                   height="25"
                   onClick={() =>
-                    navigate(`/bac/request-for-quotation/${pr_no}`)
+                    navigate(`/bac/item-selected-quotation/${pr_no}`)
                   }
                 />
               </div>

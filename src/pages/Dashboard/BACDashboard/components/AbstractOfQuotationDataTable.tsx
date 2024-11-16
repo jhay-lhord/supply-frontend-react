@@ -5,7 +5,6 @@ import Loading from "../../shared/components/Loading";
 
 export default function AbstractOfQuotationDataTable() {
   const {purchaseRequestInProgress, isLoading} = usePurchaseRequestInProgress()
-  console.log(purchaseRequestInProgress)
 
   if(isLoading) return <Loading/>
 

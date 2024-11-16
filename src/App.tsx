@@ -26,6 +26,7 @@ import ItemNotFound from "./pages/Dashboard/SupplyDashboard/components/ItemNotFo
 import { QuotationList } from "./pages/Dashboard/BACDashboard/QuotationList";
 import { BACQuotation } from "./pages/Dashboard/BACDashboard/BACQuotation";
 import { AbstractList } from "./pages/Dashboard/BACDashboard/AbstractList";
+import { AbstractItemList } from "./pages/Dashboard/BACDashboard/AbstractItemList";
 
 const App = () => {
   return (
@@ -89,6 +90,10 @@ const App = () => {
           <Route
             path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
+          />
+          <Route
+            path="/bac/item-selected-quotation/:pr_no"
+            element={<AbstractItemList />}
           />
           <Route path="/bac/bac-reports" element={<BACReports />} />
           <Route path="/bac/bac-transaction" element={<BACTransaction />} />

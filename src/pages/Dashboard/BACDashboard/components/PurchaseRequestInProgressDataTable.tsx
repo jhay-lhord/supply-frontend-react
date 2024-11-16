@@ -14,7 +14,7 @@ export default function PurchaseRequestInProgressDataTable() {
   const purchaseRequestInProgressData: purchaseRequestType[] = Array.isArray(purchaseRequestInProgress) ? purchaseRequestInProgress : []
   return (
     <>
-      <div className="hidden w-full flex-col space-y-8 p-8 md:flex">
+      <div className="hidden w-full flex-col space-y-8 p-4 md:flex">
         <DataTable data={purchaseRequestInProgressData} columns={columns} />
       </div>
     </>

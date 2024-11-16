@@ -7,8 +7,8 @@ export const itemQuotationSchema = z.object({
       purchase_request: z.string(),
       rfq: z.string().min(1, "Required"),
       item: z.string().min(1, "Required"),
-      unit_price: z.number().min(1, "Must be atleast 1"),
-      brand_model: z.string().min(1, "Required"),
+      unit_price: z.number(),
+      brand_model: z.string(),
       is_low_price: z.boolean()
     })
   ),
