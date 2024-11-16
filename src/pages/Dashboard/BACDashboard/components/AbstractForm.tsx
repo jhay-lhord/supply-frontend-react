@@ -65,33 +65,27 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const { pr_no } = useParams();
   const afq_no = uuidv4();
 
+  const { data } = useRequestForQoutation();
   const { data: items_, isLoading: item_loading } = useGetItemQuotation();
   const { data: item_quote } = useAllItemSelectedQuote();
 
-  const item_selected_quote = useMemo(() => {
+
+  const item_selected_quote_no = useMemo(() => {
     const item_quote_data = Array.isArray(item_quote?.data)
       ? item_quote.data
       : [];
-    return item_quote_data?.filter((data) => data.is_item_selected && data.pr_details.pr_no === pr_no);
+    return item_quote_data?.filter((data) => data.is_item_selected && data.pr_details.pr_no === pr_no).map(data => data.item_details.item_details.item_no);
   }, [item_quote, pr_no]);
-
-  const item_selected_quote_no = useMemo(() => {
-   return item_selected_quote.map(data => data.item_details.item_details.item_no)
-
-  }, [item_selected_quote])
-
 
   const itemQuotation = useMemo(() => {
     const _items = Array.isArray(items_?.data) ? items_.data : [];
-    return _items .filter((data) => data.rfq === rfqNo);
+    return _items.filter((data) => data.rfq === rfqNo);
   }, [items_?.data, rfqNo]);
 
   const filteredItemQuotation = useMemo(() => {
     return itemQuotation.filter(quotations => !item_selected_quote_no.includes(quotations.item_details.item_no)
     )
   }, [itemQuotation, item_selected_quote_no])
-
-  const { data } = useRequestForQoutation();
 
   const quotations = useMemo(() => {
     const data_ = Array.isArray(data?.data) ? data.data : [];
@@ -202,6 +196,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
           setIsLoading(false);
           setIsDialogOpen(false);
+          
           reset();
         },
         onError: (error) => {
