@@ -158,7 +158,9 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
 
           // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
-            itemDataArray.map((itemData) => addItemMutation(itemData))
+            itemDataArray.map((itemData) => {
+              if(itemData.brand_model && itemData.unit_price) return addItemMutation(itemData)
+            })
           );
 
           setIsLoading(false);
