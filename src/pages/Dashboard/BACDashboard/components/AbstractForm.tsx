@@ -44,6 +44,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import {
   useAddAbstractOfQuotation,
   useAddItemSelectedQuote,
+  useAllItemSelectedQuote,
 } from "@/services/AbstractOfQuotationServices";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -62,32 +63,45 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
 
   const { pr_no } = useParams();
-  const afq_no = uuidv4()
+  const afq_no = uuidv4();
 
   const { data: items_, isLoading: item_loading } = useGetItemQuotation();
+  const { data: item_quote } = useAllItemSelectedQuote();
+
+  const item_selected_quote = useMemo(() => {
+    const item_quote_data = Array.isArray(item_quote?.data)
+      ? item_quote.data
+      : [];
+    return item_quote_data?.filter((data) => data.is_item_selected && data.pr_details.pr_no === pr_no);
+  }, [item_quote, pr_no]);
+
+  const item_selected_quote_no = useMemo(() => {
+   return item_selected_quote.map(data => data.item_details.item_details.item_no)
+
+  }, [item_selected_quote])
+
 
   const itemQuotation = useMemo(() => {
     const _items = Array.isArray(items_?.data) ? items_.data : [];
-    return _items.filter((data) => data.rfq === rfqNo)
+    return _items .filter((data) => data.rfq === rfqNo);
   }, [items_?.data, rfqNo]);
+
+  const filteredItemQuotation = useMemo(() => {
+    return itemQuotation.filter(quotations => !item_selected_quote_no.includes(quotations.item_details.item_no)
+    )
+  }, [itemQuotation, item_selected_quote_no])
 
   const { data } = useRequestForQoutation();
 
   const quotations = useMemo(() => {
-    return Array.isArray(data?.data) ? data.data : [];
-  }, [data?.data])
-
+    const data_ = Array.isArray(data?.data) ? data.data : [];
+    return data_.filter((data) => data.purchase_request === pr_no);
+  }, [data?.data, pr_no]);
 
   const { mutate: addAOQMutation } = useAddAbstractOfQuotation();
   const { mutate: addItemSelectedMutation } = useAddItemSelectedQuote();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-  } = useForm({
+  const { control, handleSubmit, reset, setValue, watch } = useForm({
     resolver: zodResolver(abstractOfQuotationSchema),
     defaultValues: {
       afq_no: uuidv4(),
@@ -124,7 +138,6 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
       });
     }
   }, [isDialogOpen, setValue, rfqNo, itemQuotation, pr_no]);
-
 
   const handleCheckboxChange = (index: number) => {
     const currentValue = itemsWatch[index]?.is_item_selected;
@@ -181,8 +194,9 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
           // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
-            itemSelectedDataArray.map((itemData) =>
-              addItemSelectedMutation(itemData)
+            itemSelectedDataArray.map((itemData) => {
+              if(itemData.is_item_selected) return addItemSelectedMutation(itemData)
+            }
             )
           );
 
@@ -244,11 +258,15 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       quotations?.map((supplier) => (
                         <SupplierCard
                           supplier={supplier}
-                          isSelected={supplier.supplier_name === selectedSupplier}
+                          isSelected={
+                            supplier.supplier_name === selectedSupplier
+                          }
                           onToggle={() => handleToggle(supplier)}
                         />
                       ))
-                    ) : (<p>No Suppliers Found</p>)}
+                    ) : (
+                      <p>No Suppliers Found</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -292,8 +310,8 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       <p>UNIT PRICE </p>
                       <p>SELECT ITEM</p>
                     </div>
-                    {itemQuotation && itemQuotation?.length > 0 ? (
-                      itemQuotation.map(
+                    {filteredItemQuotation && filteredItemQuotation?.length > 0 ? (
+                      filteredItemQuotation.map(
                         (item, index) =>
                           fields && (
                             <div
@@ -301,23 +319,23 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                               className="grid grid-cols-9 gap-2 mb-8 items-center py-4 border-b-2"
                             >
                               <p className="text-gray-500">
-                                {itemQuotation[index].item_details.unit}
+                                {filteredItemQuotation[index].item_details.unit}
                               </p>
                               <p className="text-gray-500 col-span-2">
                                 {
-                                  itemQuotation[index].item_details
+                                  filteredItemQuotation[index].item_details
                                     .item_description
                                 }
                               </p>
                               <p className="text-gray-500">
-                                {itemQuotation[index].item_details.quantity}
+                                {filteredItemQuotation[index].item_details.quantity}
                               </p>
                               <p className="text-gray-500">
-                                {itemQuotation[index].item_details.unit_cost}
+                                {filteredItemQuotation[index].item_details.unit_cost}
                               </p>
                               <div className="flex flex-col col-span-2">
                                 <p className="text-gray-500">
-                                  {itemQuotation[index].brand_model}
+                                  {filteredItemQuotation[index].brand_model}
                                 </p>
                               </div>
                               <div className="flex flex-col">
@@ -335,7 +353,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                                       <CrossCircledIcon />
                                     )}
                                   </div>
-                                  <p>{itemQuotation[index].unit_price}</p>
+                                  <p>{filteredItemQuotation[index].unit_price}</p>
                                 </div>
                               </div>
                               <Checkbox
@@ -345,7 +363,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                                     itemsWatch[index]?.is_item_selected
                                   );
                                   handleCheckboxChange(index);
-                                }} 
+                                }}
                               />
                             </div>
                           )
