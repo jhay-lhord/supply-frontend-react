@@ -11,12 +11,15 @@ import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userLoginSchema, userLoginType } from "@/types/request/user";
 import { loginUser } from "@/services/LoginUserServices";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOTPSent, setIsOTPSent] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const { toast } = useToast();
 
   const {
     register,
@@ -39,6 +42,8 @@ const Login = () => {
     const { status, isOTPSent, errorMessage } = await loginUser(data);
 
     setIsOTPSent(isOTPSent);
+
+    if(isOTPSent) return toast({title: "Success", description: "OTP sent to your email, please verify"})
 
     if (status === 200 && !isOTPSent) {
       navigate("/");
