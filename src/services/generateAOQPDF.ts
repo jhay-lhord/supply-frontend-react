@@ -1,27 +1,27 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { HeaderAndFooter } from "./HeaderAndFooter";
-import { itemSelectedType_ } from "@/types/response/abstract-of-quotation";
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { HeaderAndFooter } from './HeaderAndFooter';
+import { itemSelectedType_ } from '@/types/response/abstract-of-quotation';
 
 export const generateAOQPDF = async (data: itemSelectedType_[]) => {
+  
+  const items = Array.isArray(data) ? data : []
+  
+  if (items.length === 0) {
+    console.error("No data available");
+    return null;
+  }
 
   const pdfDoc = await PDFDocument.create();
   const timesBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-  const itemsPerPage = 5;
-
-  const items = Array.isArray(data) ? data : []
- 
-  const pages = Math.ceil(items.length / Number(itemsPerPage));
+  const itemsPerPage = 10;
+  const pages = Math.ceil(items.length / itemsPerPage);
 
   for (let pageIndex = 0; pageIndex < pages; pageIndex++) {
     const page = pdfDoc.addPage([936, 612]);
     let yPosition = 355;
     let yPosition1 = 353;
-    const pageItems = items.slice(
-      pageIndex * itemsPerPage,
-      (pageIndex + 1) * itemsPerPage
-    );
-
+    const pageItems = items.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage);
     pageItems.forEach((item, index) => {
       const numtext = (index + 1).toString() || "";
       const numwidth = timesRomanFont.widthOfTextAtSize(numtext, 11);
@@ -31,7 +31,7 @@ export const generateAOQPDF = async (data: itemSelectedType_[]) => {
       const itemwidth = timesRomanFont.widthOfTextAtSize(itemtext, 12);
       const itemplace = (240 + 183.07) / 2;
       page.drawText(itemtext, { x: itemplace - itemwidth / 2, y: yPosition1, size: 12, font: timesRomanFont });
-      const quantityText = item.item_details.item_details.quantity.toString() || "";
+      const quantityText = item.item_details.item_details.quantity?.toString() || "";
       const quantityWidth = timesRomanFont.widthOfTextAtSize(quantityText, 12);
       const quantityColumnCenter = (405 + 366.14) / 2; 
       page.drawText(quantityText, {  x: quantityColumnCenter - quantityWidth / 2, y: yPosition1, size: 11, font: timesRomanFont });
@@ -46,6 +46,7 @@ export const generateAOQPDF = async (data: itemSelectedType_[]) => {
       const winningpricewidth = timesRomanFont.widthOfTextAtSize(winningPriceText, 12);
       const winningpriceplace = 890; 
       page.drawText(winningPriceText, { x: winningpriceplace - winningpricewidth, y: yPosition1, size: 12, font: timesRomanFont });
+
       page.drawLine({
         start: { x: 29.53, y: yPosition - 5 },
         end: { x: 898.98, y: yPosition - 5 },
@@ -55,31 +56,20 @@ export const generateAOQPDF = async (data: itemSelectedType_[]) => {
       yPosition -= 15;
       yPosition1 -= 15;
     });
-    const verticalLinePositions = [
-      29.53, 64.96, 366.14, 425.2, 480.31, 780.38, 898.5,
-    ];
+
+    const verticalLinePositions = [29.53, 64.96, 356.14, 415.20, 480.31, 780.38, 898.50];
     verticalLinePositions.forEach((x) => {
       page.drawLine({
-        start: { x, y: 375 },
+        start: { x, y: 368 },
         end: { x, y: yPosition + 10 }, // Align to the last row's y-position
         thickness: 1.5,
         color: rgb(0, 0, 0),
       });
     });
-    const footerYPosition = yPosition - 20; // Adjust footer position based on items
-
-    // Draw header and footer
-    await HeaderAndFooter(
-      pdfDoc,
-      page,
-      timesBoldFont,
-      timesRomanFont,
-      footerYPosition,
-      timesBoldFont
-    );
+    const footerYPosition = yPosition - 10;
+    await HeaderAndFooter(pdfDoc, page, timesBoldFont, timesRomanFont, footerYPosition, timesBoldFont);
   }
 
-  // Generate PDF Blob and display
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
   const pdfBlobUrl = URL.createObjectURL(blob);
