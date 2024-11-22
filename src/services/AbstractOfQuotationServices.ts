@@ -33,6 +33,23 @@ export const useAbstractOfQuotation = () => {
   });
 };
 
+export const getAbstractOfQuotation = async (afq_no:string):Promise<ApiResponse<abstractType_>> => {
+  try {
+    const response = await api.get<abstractType_>(`api/abstract-of-quotation/${afq_no}`)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useGetAbstractOfQuotation = (aoq_no: string) => {
+  return useQuery<ApiResponse<abstractType_>, Error>({
+    queryKey: ["abstract-of-quotations", aoq_no],
+    queryFn: () => getAbstractOfQuotation(aoq_no)
+  })
+}
+
+
 export const getAllItemSelectedQuote = async (): Promise<
   ApiResponse<itemSelectedType_[]>
 > => {
@@ -145,7 +162,7 @@ export const filterAOQInItemSelectedQuote = (
   return items.filter((item) => item.afq === afq_no);
 };
 
-export const generateAOQPDF = async () => {
+export const generateEmptyAOQPDF = async () => {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([936, 612]);
   const timesBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
@@ -153,7 +170,7 @@ export const generateAOQPDF = async () => {
 
   // text
 
-  page.drawText("ABSTRACT OF QUOTATIONS", {
+  page.drawText("ABSTRACT OF QUOTATIONS hahahhaha", {
     x: 383,
     y: 496.06,
     size: 14,
