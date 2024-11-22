@@ -38,7 +38,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("pr_no")}
+            <p className="font-thin">{row.getValue("pr_no")}</p>
           </span>
         </div>
       );
