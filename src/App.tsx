@@ -1,8 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "@/pages/Forms/Login";
 import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -57,10 +53,13 @@ const App = () => {
             element={<PurchaseRequestList />}
           />
           <Route path="/supply/purchase-order" element={<PurchaseOrder />} />
-          <Route path="/supply/in-progress" element={<PurchaseRequestInProgress />} />
+          <Route
+            path="/supply/in-progress"
+            element={<PurchaseRequestInProgress />}
+          />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />
-          <Route path="/supply/not-found" element={<ItemNotFound/>} />
+          <Route path="/supply/not-found" element={<ItemNotFound />} />
 
           {/* Pages in BAC Dashboard */}
           <Route
@@ -75,18 +74,16 @@ const App = () => {
             path="/bac/request-for-quotation"
             element={<RequestForQuotation />}
           />
-           <Route
+          <Route
             path="/bac/request-for-quotation/:pr_no"
             element={<QuotationList />}
           />
-           <Route
+          <Route
             path="/bac/abstract-of-quotation/:pr_no"
             element={<AbstractList />}
           />
-          <Route
-            path="/bac/quotation/:rfq_no"
-            element={<BACQuotation />}
-          />
+          <Route path="/bac/quotation/:rfq_no" element={<BACQuotation />} />
+          <Route path="/bac/abstract-item-list/:aoq_no" element={<AbstractItemList />} />
           <Route
             path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
