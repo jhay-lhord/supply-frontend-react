@@ -35,28 +35,30 @@ const RequisitionerForm = () => {
 
   const { data } = useGetAllRequisitioner();
   const requisitioner_data = Array.isArray(data?.data) ? data.data : [];
-
-  console.log(requisitioner_data);
-
   const { mutate, isPending } = useAddRequisitioner();
 
   const onSubmit = async (data: RequisitionerType) => {
+    const requisition_id = uuidv4()
     try {
       const result = requisitionerSchema.safeParse({
         ...data,
-        requisition_id: uuidv4(),
+        requisition_id: requisition_id,
       });
-      console.log(result);
 
       if (result.success) {
         mutate(data);
-        reset();
+        reset({
+          requisition_id: uuidv4(), // Update default value with the new UUID
+          name: "",
+          gender: "",
+          department: "",
+          designation: "",
+        });
       }
     } catch (error) {
       console.log(error);
     }
   };
-  console.log(errors);
   return (
     <>
       <form onSubmit={handleSubmit((data) => onSubmit(data))}>

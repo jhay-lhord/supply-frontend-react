@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const requisitionerSchema = z.object({
-  requisition_id: z.string().min(1, { message: "name is required" }),
+  requisition_id: z.string().min(1),
   name: z.string().min(1, { message: "name is required" }),
   gender: z.string().min(1, { message: "gender is required" }),
   department: z.string().min(1, { message: "department is required" }),
