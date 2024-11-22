@@ -24,6 +24,8 @@ import { itemQuotationResponseType } from "@/types/response/request-for-qoutatio
 import { useNavigate } from "react-router-dom";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
 import { useMemo, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+
 
 const getLowPriceSummary = (
   items: ItemType[],
@@ -52,13 +54,17 @@ const getLowPriceSummary = (
 };
 
 interface QuotationCardProps {
-  isDeleteAllowed?:boolean
-  title:string 
+  isDeleteAllowed?: boolean;
+  title: string;
 }
 
-export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, title = "All Quotes"}) => {
+export const QuotationCard: React.FC<QuotationCardProps> = ({
+  isDeleteAllowed,
+  title = "All Quotes",
+}) => {
   const { pr_no } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedQuotation, setSelectedQuotation] = useState<string | null>(
@@ -74,14 +80,18 @@ export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, tit
 
   const _items = Array.isArray(items?.data) ? items.data : [];
   const itemQuotations = Array.isArray(item?.data) ? item?.data : [];
-  
+
   const filteredQuotations = useMemo(() => {
     const quotations = Array.isArray(data?.data) ? data?.data : [];
-    return quotations.filter(item => item.purchase_request === pr_no)
-  }, [data?.data,pr_no])
+    return quotations.filter((item) => item.purchase_request === pr_no);
+  }, [data?.data, pr_no]);
 
   const handleDeleteClick = () => {
     mutate(selectedQuotation!);
+    toast({
+      title: "Success",
+      description: "Request of Quotation Successfully deleted",
+    });
   };
 
   const handleOpenDialog = (rfq_no: string) => {
@@ -92,9 +102,9 @@ export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, tit
   if (isLoading) return <Loading />;
 
   return (
-    <div className=" w-full">
+    <div className="w-full ">
       <p className="text-xl">{title}</p>
-      <div className="grid grid-cols-3 gap-4 mt-8">
+      <div className="grid grid-cols-3 gap-4 mt-8 relative">
         {filteredQuotations.length > 0 ? (
           filteredQuotations.map((quotation) => (
             <Card className="group">
@@ -134,20 +144,23 @@ export const QuotationCard:React.FC<QuotationCardProps> = ({isDeleteAllowed, tit
                   )}
                   {isDeleteAllowed && (
                     <div className="bg-red-200 rounded-full p-2 opacity-0 group-hover:opacity-100 ease-in-out cursor-pointer">
-                    <TrashIcon
-                      className=""
-                      width={20}
-                      height={20}
-                      onClick={() => handleOpenDialog(quotation.rfq_no)}
-                    />
-                  </div>
+                      <TrashIcon
+                        className=""
+                        width={20}
+                        height={20}
+                        onClick={() => handleOpenDialog(quotation.rfq_no)}
+                      />
+                    </div>
                   )}
                 </div>
               </CardFooter>
             </Card>
           ))
         ) : (
-          <p>No Quotes found</p>
+          <div className="grid place-items-center w-full h-96">
+            <img src="/empty-box.svg" className="w-80 h-80" alt="Empty box" />
+            <p>No Supplier </p>
+          </div>
         )}
       </div>
       <DeleteDialog
