@@ -48,6 +48,8 @@ import {
 } from "@/services/AbstractOfQuotationServices";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import { Empty } from "../../shared/components/Empty";
+import { useToast } from "@/hooks/use-toast";
 
 interface AbstractFormProps {
   isDialogOpen: boolean;
@@ -63,6 +65,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
 
   const { pr_no } = useParams();
+  const { toast } = useToast()
   const afq_no = uuidv4();
 
   const { data } = useRequestForQoutation();
@@ -128,7 +131,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         setValue(`items.${index}.rfq`, rfqNo!);
         setValue(`items.${index}.item_q`, item.item_quotation_no);
         setValue(`items.${index}.is_item_selected`, false);
-        setValue(`items.${index}.total_amount`, item.unit_price.toString());
+        setValue(`items.${index}.total_amount`, (Number(item.unit_price) * Number(item.item_details.quantity)).toString());
       });
     }
   }, [isDialogOpen, setValue, rfqNo, itemQuotation, pr_no]);
@@ -157,6 +160,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const onSubmit = async (data: abstractOfQuotationType) => {
     setIsLoading(true);
     try {
+      let isSuccess: boolean;
       const result = abstractOfQuotationSchema.safeParse(data);
       if (!result.success) {
         console.error("Validation failed:", result.error);
@@ -189,14 +193,17 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
           // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
             itemSelectedDataArray.map((itemData) => {
-              if(itemData.is_item_selected) return addItemSelectedMutation(itemData)
+              if(itemData.is_item_selected){
+                addItemSelectedMutation(itemData)
+                isSuccess = true
+              } 
             }
-            )
+            ),
           );
-
+          
           setIsLoading(false);
           setIsDialogOpen(false);
-          
+          if(isSuccess) return toast({title: "Success", description: "Abstract of Quotation successfully added"})
           reset();
         },
         onError: (error) => {
@@ -212,7 +219,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[70rem]">
+      <DialogContent className="max-w-full w-[70rem] ">
         <DialogHeader>
           <DialogTitle className="text-2xl">
             Create Abstract of Quotation
@@ -237,7 +244,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                   </TabsTrigger>
                 </TabsList>
               </div>
-              <TabsContent value="supplier" className="">
+              <TabsContent value="supplier" className=" ">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-xl">
@@ -248,7 +255,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       <p>Selected Supplier: {selectedSupplier}</p>
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="grid grid-cols-3 gap-2">
+                  <CardContent className="grid grid-cols-3 gap-2 relative">
                     {quotations.length > 0 ? (
                       quotations?.map((supplier) => (
                         <SupplierCard
@@ -260,7 +267,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                         />
                       ))
                     ) : (
-                      <p>No Suppliers Found</p>
+                      <Empty message="No Supplier Found"/>
                     )}
                   </CardContent>
                 </Card>
@@ -365,7 +372,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       )
                     ) : (
                       <div className="grid place-items-center w-full h-96">
-                        <p className="flex">Please select Supplier</p>
+                        <p className="flex">No items found, maybe you forget to select Supplier</p>
                       </div>
                     )}
 
