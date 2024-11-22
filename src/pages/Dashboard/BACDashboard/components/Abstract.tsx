@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { QuotationCard } from "./QuotationCard";
 import { AbstractForm } from "./AbstractForm";
-import { generateAOQPDF } from "@/services/AbstractOfQuotationServices";
+import { generateEmptyAOQPDF } from "@/services/AbstractOfQuotationServices";
 
 export default function Abstract() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -52,7 +52,7 @@ export default function Abstract() {
 
   useEffect(() => {
     const fetchPdfUrl = async () => {
-      const url = await generateAOQPDF();
+      const url = await generateEmptyAOQPDF();
       setPdfUrl(url);
     };
     fetchPdfUrl();

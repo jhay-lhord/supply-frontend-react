@@ -23,6 +23,7 @@ import { QuotationList } from "./pages/Dashboard/BACDashboard/QuotationList";
 import { BACQuotation } from "./pages/Dashboard/BACDashboard/BACQuotation";
 import { AbstractList } from "./pages/Dashboard/BACDashboard/AbstractList";
 import { AbstractItemList } from "./pages/Dashboard/BACDashboard/AbstractItemList";
+import { BACItemList } from "./pages/Dashboard/BACDashboard/BACItemList";
 
 const App = () => {
   return (
@@ -83,7 +84,7 @@ const App = () => {
             element={<AbstractList />}
           />
           <Route path="/bac/quotation/:rfq_no" element={<BACQuotation />} />
-          <Route path="/bac/abstract-item-list/:aoq_no" element={<AbstractItemList />} />
+          <Route path="/bac/abstract-item-list/:aoq_no" element={<BACItemList />} />
           <Route
             path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}

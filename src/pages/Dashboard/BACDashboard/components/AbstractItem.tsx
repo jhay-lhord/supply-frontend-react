@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Empty } from "../../shared/components/Empty";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
 import { AbstractFormEdit } from "./AbstractFormEdit";
+import { useNavigate } from "react-router-dom";
 
 export const AbstractItem = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -35,6 +36,7 @@ export const AbstractItem = () => {
   const { data: aoq_data, isLoading } = useAbstractOfQuotation();
   const { mutate } = useDeleteAbstractOfQuotation();
   const { toast } = useToast();
+  const navigate = useNavigate()
 
   const abstract = useMemo(() => {
     if (aoq_data) {
@@ -74,10 +76,6 @@ export const AbstractItem = () => {
     });
   };
 
-  const handleOpenEditForm = () => {
-    setIsOpenEditForm(true)
-  }
-
   if (isLoading) return <Loading />;
 
   return (
@@ -105,7 +103,7 @@ export const AbstractItem = () => {
                           <OpenInNewWindowIcon
                             width={20}
                             height={20}
-                            onClick={handleOpenEditForm}
+                            onClick={() => navigate(`/bac/abstract-item-list/${data.afq_no}`)}
                             className="hover:cursor-pointer hover:text-orange-300 transition-colors duration-200"
                           />
                         </TooltipTrigger>
@@ -130,11 +128,12 @@ export const AbstractItem = () => {
                   </p>
                   <div className="mt-4 border-t pt-2">
                     <p className="text-base font-semibold">Quotation Summary</p>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-base text-gray-700">
                       Total Items: {totalItemsCount(data.afq_no)}
+                      
                     </p>
-                    <p className="text-sm text-gray-700"></p>
-                    <p className="text-sm text-green-600 font-medium">
+                    <p className="text-base text-gray-700"></p>
+                    <p className="text-base text-green-600 font-medium">
                       Total Price: {totalAmount(data.afq_no)}
                     </p>
                   </div>
