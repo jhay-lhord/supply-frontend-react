@@ -111,14 +111,14 @@ export const DataTableRowActions = ({
         </TooltipProvider>
       ) : (
         <TooltipProvider  delayDuration={100} skipDelayDuration={200}>
-          <div className="flex gap-4 bg-orange-200 rounded p-1">
+          <div className="flex gap-4 bg-orange-200 rounded p-1 items-center justify-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
                 >
-                  <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
+                  <ArrowTopRightIcon className="h-4 w-4 text-gray-900" />
                   <span className="sr-only">Open</span>
                 </Button>
               </TooltipTrigger>
@@ -131,7 +131,7 @@ export const DataTableRowActions = ({
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-gray-900 hover:bg-red-400 hover:text-gray-100"
                 >
                   <TrashIcon className="h-4 w-4" />
                   <span className="sr-only">Delete</span>

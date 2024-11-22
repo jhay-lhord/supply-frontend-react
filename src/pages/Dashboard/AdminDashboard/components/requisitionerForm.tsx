@@ -61,7 +61,7 @@ const RequisitionerForm = () => {
   };
   return (
     <>
-      <form onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <form className="m-6 p-6 bg-slate-100 rounded" onSubmit={handleSubmit((data) => onSubmit(data))}> 
         <div className="">
           <div className="grid grid-cols-5 gap-2 mb-4 items-center">
             <Label className="text-base">Name</Label>

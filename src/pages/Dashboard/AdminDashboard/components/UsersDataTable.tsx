@@ -19,7 +19,8 @@ export default function UsersDataTable() {
 
   return (
     <>
-      <div className="hidden w-full flex-col space-y-8 p-8 md:flex">
+      <div className="hidden flex-col md:flex">
+        <p className="mx-6 my-4 text-xl">All Users</p>
         <DataTable data={usersData} columns={columns} />
       </div>
     </>

@@ -6,7 +6,7 @@ const Users: React.FC = () => {
   return (
     <DashboardLayout>
       <AdminSidebar />
-      <div className="pt-16 w-full">
+      <div className="pt-16">
         <UsersDataTable />
       </div>
     </DashboardLayout>
