@@ -23,6 +23,20 @@ const AdminSidebar = () => {
               icon: User2Icon,
               variant: "default",
             },
+            {
+              title: "Requisitioner",
+              label: "",
+              link_to: "/admin/users",
+              icon: User2Icon,
+              variant: "default",
+            },
+            {
+              title: "Campus Director",
+              label: "",
+              link_to: "/admin/users",
+              icon: User2Icon,
+              variant: "default",
+            },
           ]}
         />
       </aside>
