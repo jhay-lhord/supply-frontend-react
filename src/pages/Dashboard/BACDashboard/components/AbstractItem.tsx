@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -23,13 +23,18 @@ import { formatDate } from "@/services/formatDate";
 import Loading from "../../shared/components/Loading";
 import { useToast } from "@/hooks/use-toast";
 import { Empty } from "../../shared/components/Empty";
+import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { AbstractFormEdit } from "./AbstractFormEdit";
 
 export const AbstractItem = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedAbstract, setSelectedAbstract] = useState<string | null>(null)
+  const [isOpenEditForm,  setIsOpenEditForm] = useState<boolean>(false)
   const { pr_no } = useParams();
   const { data } = useAllItemSelectedQuote();
   const { data: aoq_data, isLoading } = useAbstractOfQuotation();
   const { mutate } = useDeleteAbstractOfQuotation();
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   const abstract = useMemo(() => {
     if (aoq_data) {
@@ -54,9 +59,23 @@ export const AbstractItem = () => {
     );
   };
 
-  const handleDelete = (aoq_no: string) => {
-    mutate(aoq_no)
-    toast({title: "Success", description: "Abstract of Quotation successfully deleted."})
+  const handleOpenDialog = (aoq_no: string) => {
+    setSelectedAbstract(aoq_no)
+    console.log(selectedAbstract)
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    console.log("delete")
+    mutate(selectedAbstract!);
+    toast({
+      title: "Success",
+      description: "Abstract of Quotation successfully deleted.",
+    });
+  };
+
+  const handleOpenEditForm = () => {
+    setIsOpenEditForm(true)
   }
 
   if (isLoading) return <Loading />;
@@ -86,6 +105,7 @@ export const AbstractItem = () => {
                           <OpenInNewWindowIcon
                             width={20}
                             height={20}
+                            onClick={handleOpenEditForm}
                             className="hover:cursor-pointer hover:text-orange-300 transition-colors duration-200"
                           />
                         </TooltipTrigger>
@@ -128,7 +148,7 @@ export const AbstractItem = () => {
                     <div className="flex space-x-2">
                       <div className="bg-red-200 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                         <TrashIcon
-                          onClick={() => handleDelete(data.afq_no)}
+                          onClick={() => handleOpenDialog(data.afq_no)}
                           className="text-red-500"
                           width={20}
                           height={20}
@@ -140,10 +160,18 @@ export const AbstractItem = () => {
               </Card>
             ))
           ) : (
-            <Empty message="No Abstract of Quotation found"/>
+            <Empty message="No Abstract of Quotation found" />
           )}
         </div>
       </div>
+      <DeleteDialog
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+        onDeleteClick={handleDelete}
+        message={"Abstract of Quotation"}
+      />
+
+      <AbstractFormEdit isDialogOpen={isOpenEditForm} setIsDialogOpen={setIsOpenEditForm}/>
     </div>
   );
 };
