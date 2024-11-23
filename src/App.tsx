@@ -24,6 +24,7 @@ import { BACQuotation } from "./pages/Dashboard/BACDashboard/BACQuotation";
 import { AbstractList } from "./pages/Dashboard/BACDashboard/AbstractList";
 import { AbstractItemList } from "./pages/Dashboard/BACDashboard/AbstractItemList";
 import { BACItemList } from "./pages/Dashboard/BACDashboard/BACItemList";
+import Requisitioner from "./pages/Dashboard/AdminDashboard/Requisitioner";
 
 const App = () => {
   return (
@@ -99,6 +100,7 @@ const App = () => {
           {/* Pages in Admin */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/requisitioner" element={<Requisitioner />} />
         </Routes>
       </Router>
     </>

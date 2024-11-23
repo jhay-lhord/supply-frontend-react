@@ -19,12 +19,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Loader2 } from "lucide-react";
 import { useActivateUser } from "@/services/userServices";
+import { RequisitionerType } from "@/types/request/requisitioner";
 
 //Step 5: define the data props to users Type
 
 interface DataTableRowActionsProps {
   id: string | undefined;
-  _data: UsersType;
+  _data: UsersType | RequisitionerType;
 }
 
 export const DataTableRowActions = ({
@@ -37,11 +38,11 @@ export const DataTableRowActions = ({
     setIsDropdownOpen(true);
   };
 
-  const buttonLabel = _data.is_active ? "Deactivate" : "Activate";
+  const buttonLabel = (_data as UsersType).is_active ? "Deactivate" : "Activate";
   const { mutate, isPending, } = useActivateUser(buttonLabel);
 
   const handleActivateUser = () => {
-    mutate({ id: id!, status: !_data.is_active });
+    mutate({ id: id!, status: !(_data as UsersType).is_active });
   };
 
   return (
@@ -50,7 +51,7 @@ export const DataTableRowActions = ({
         <div className="flex gap-4 ">
           <div
             className={`flex ${
-              _data.is_active
+              (_data as UsersType).is_active
                 ? "bg-red-200 hover:bg-red-200"
                 : "bg-green-200 hover:bg-green-200"
             }  rounded items-center`}
@@ -58,7 +59,7 @@ export const DataTableRowActions = ({
             <Button
               onClick={handleActivateUser}
               className={`${
-                _data.is_active
+                (_data as UsersType).is_active
                   ? "bg-red-200 hover:bg-red-200"
                   : "bg-green-200 hover:bg-green-200"
               }  text-slate-950 `}

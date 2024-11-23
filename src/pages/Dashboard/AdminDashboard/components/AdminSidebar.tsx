@@ -26,7 +26,7 @@ const AdminSidebar = () => {
             {
               title: "Requisitioner",
               label: "",
-              link_to: "/admin/users",
+              link_to: "/admin/requisitioner",
               icon: User2Icon,
               variant: "default",
             },
