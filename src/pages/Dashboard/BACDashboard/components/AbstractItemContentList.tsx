@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +14,7 @@ import Loading from "../../shared/components/Loading";
 import { useAllItemSelectedQuote, useGetAbstractOfQuotation } from "@/services/AbstractOfQuotationServices";
 import { Checkbox } from "@/components/ui/checkbox";
 import { generateAOQPDF } from "@/services/generateAOQPDF";
+import { AbstractFormEdit } from "./AbstractFormEdit";
 
 export const AbstractItemContentList = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
@@ -27,11 +28,14 @@ export const AbstractItemContentList = () => {
   console.log(abstractItems)
   if (isLoading || abstract_loading) return <Loading />;
 
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true)
+  }
+
   const handlePDFPrint = async () => {
     const url = await generateAOQPDF(abstractItems!)
-    return window.open(url, '_blank')
+    return window.open(url!, '_blank')
   }
-  console.log(quotation)
 
   return (
     <div className=" w-full pt-8">
@@ -61,7 +65,7 @@ export const AbstractItemContentList = () => {
               </div>
               <div className="flex gap-2 ">
                 <Button>
-                  <Pencil2Icon width={20} height={20} className="mx-2" /> Edit
+                  <Pencil2Icon onClick={handleOpenDialog} width={20} height={20} className="mx-2" /> Edit
                 </Button>
                 <Button variant={"outline"}>
                   <PrinterIcon onClick={handlePDFPrint} width={20} height={20} className="mx-2" />
@@ -120,6 +124,7 @@ export const AbstractItemContentList = () => {
           <CardFooter></CardFooter>
         </Card>
       </div>
+      <AbstractFormEdit isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
     </div>
   );
 };

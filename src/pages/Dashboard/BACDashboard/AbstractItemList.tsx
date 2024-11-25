@@ -1,17 +1,10 @@
-import DashboardLayout from "../shared/Layouts/DashboardLayout"
-import { AbstractItem } from "./components/AbstractItem"
-import BACSidebar from "./components/BACSidebar"
+import { AbstractItem } from "./components/AbstractItem";
+import Layout from "./components/Layout/BACDashboardLayout";
 
 export const AbstractItemList: React.FC = () => {
   return (
-    <DashboardLayout>
-        <BACSidebar />
-
-        <div className="pt-16 w-full p-6">
-            <AbstractItem/>
-        </div>
-            
-    </DashboardLayout>
-
-  )
-}
+    <Layout>
+      <AbstractItem />
+    </Layout>
+  );
+};

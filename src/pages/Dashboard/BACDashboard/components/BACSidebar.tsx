@@ -4,57 +4,108 @@ import {
   FileSpreadsheet,
   FileSymlink,
 } from "lucide-react";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import Logo from "/public/CTU_new_logotransparent.svg";
+
+const dashboard = [
+  {
+    title: "Dashboard",
+    url: "/",
+    icon: LayoutDashboard,
+  },
+];
+
+const purchase_request = [
+  {
+    title: "Approved PR",
+    url: "/bac/purchase-request",
+    icon: FileText,
+  },
+];
+
+const quotation = [
+  {
+    title: "Request For Quotation",
+    url: "/bac/purchase-request",
+    icon: FileText,
+  },
+  {
+    title: "Abstract Of Quotation",
+    url: "/bac/abstract-of-quotation",
+    icon: FileText,
+  },
+];
 
 const BACSidebar = () => {
   return (
-    <TooltipProvider>
-    <aside className="hidden md:flex flex-col w-auto h-screen p-2 border-r border-gray-200 sticky top-0 pt-16">
-      <SideNav
-        isCollapsed={false}
-        links={[
-          {
-            title: "Dashboard",
-            label: "",
-            link_to: "/",
-            icon: LayoutDashboard,
-            variant: "default",
-          },
-          {
-            title: "Request For Quotation",
-            label: "",
-            link_to: "/bac/purchase-request",
-            icon: FileText,
-            variant: "default",
-          },
-          {
-            title: "Abstract Of Quotation",
-            label: "",
-            link_to: "/bac/abstract-of-quotation",
-            icon: FileText,
-            variant: "default",
-          },
-          {
-            title: "Reports",
-            label: "",
-            link_to: "/bac/bac-reports",
-            icon: FileSpreadsheet,
-            variant: "default",
-          },
-          {
-            title: "Transaction",
-            label: "",
-            link_to: "/bac/bac-transaction",
-            icon: FileSymlink,
-            variant: "default",
-          },
-        
-        ]}
-      />
-    </aside>
-  </TooltipProvider>
-  )
-}
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <img
+          src={Logo}
+          alt="Logo"
+          width={50}
+          height={50}
+          style={{ display: "block" }}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarGroupLabel>Analytics</SidebarGroupLabel>
+            <SidebarMenu>
+              {dashboard.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6">
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+            <SidebarGroupLabel>Purchase Request</SidebarGroupLabel>
+            <SidebarMenu>
+              {purchase_request.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6">
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+            <SidebarGroupLabel>Quotations</SidebarGroupLabel>
+            <SidebarMenu>
+              {quotation.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6">
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+};
 
-export default BACSidebar
+export default BACSidebar;

@@ -80,7 +80,7 @@ export default function Abstract() {
   };
 
   return (
-    <div className="my-8 bg-slate-100  rounded-md">
+    <div className="bg-slate-100 rounded-md w-full">
       <div className="flex place-content-between items-end py-2 rounded-md bg-orange-100">
         <div className="flex flex-col gap-1 p-8">
           <p>

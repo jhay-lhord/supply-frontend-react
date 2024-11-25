@@ -30,7 +30,7 @@ export const Quotation = () => {
   if (isLoading || item_loading) return <Loading />;
 
   return (
-    <div className=" w-full pt-8">
+    <div className=" w-full">
       <div className="">
         <Card className="">
           <CardHeader className="bg-orange-100 rounded-t">

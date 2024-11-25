@@ -1,14 +1,10 @@
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import BACSidebar from "./components/BACSidebar";
-
+import Layout from "./components/Layout/BACDashboardLayout";
 
 const BACReports: React.FC = () => {
   return (
-    <DashboardLayout>
-      <BACSidebar />
-      <h1 className="pt-16 text-3xl">BAC Reports
-      </h1>
-    </DashboardLayout>
+    <Layout>
+      <h1>BAC Reports</h1>
+    </Layout>
   );
 };
 
