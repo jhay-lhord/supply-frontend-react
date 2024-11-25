@@ -88,7 +88,7 @@ export default function PurchaseRequestItemList() {
   };
 
   return (
-    <div className="m-8 bg-slate-100  rounded">
+    <div className=" bg-slate-100  rounded">
       <div className="flex place-content-between items-end py-2 rounded-t-md bg-orange-100">
         <div className="flex flex-col gap-1 p-8">
           <p>
