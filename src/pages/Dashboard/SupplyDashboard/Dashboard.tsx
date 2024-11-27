@@ -7,44 +7,37 @@ import {
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import { RecentActivity } from "../shared/components/RecentActivity";
 import { DataTable } from "../shared/components/DataTable";
 import {
   usePurchaseRequestCount,
   usePurchaseRequestInProgressCount,
 } from "@/services/purchaseRequestServices";
-import SupplySidebar from "./components/SupplySidebar";
 import { usePurchaseOrderCount } from "@/services/puchaseOrderServices";
 import { Loader2 } from "lucide-react";
+import Layout from "./components/Layout/SupplyDashboardLayout";
 
 const SupplyDashboard: React.FC = () => {
   const { purchase_order_count, isLoading: isPurchaseOrderLoading } =
     usePurchaseOrderCount();
+
   const { purchaseRequestCount, isLoading: isPurchaseRequestLoading } =
     usePurchaseRequestCount();
+
   const { inProgressCount, isLoading: isInProgressLoading } =
     usePurchaseRequestInProgressCount();
 
   const navigate = useNavigate();
 
   return (
-    <DashboardLayout>
-      <SupplySidebar />
-      {/* Main Content */}
-      <ScrollArea className="w-full mt-14">
+    <Layout>
+      <ScrollArea className="w-full">
         <main className=" flex-grow">
           <div className="md:hidden"></div>
           <div className="hidden flex-col md:flex">
-            <div className=" space-y-4 p-8 pt-6">
+            <div className=" space-y-4">
               <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                {/* <div className="flex items-center space-x-2">
-                  <CalendarDateRangePicker className="border-1 rounded border-orange-200" />
-                  <Button className="bg-orange-200 text-black hover:bg-orange-300">
-                    Download
-                  </Button>
-                </div> */}
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <Card
@@ -182,7 +175,7 @@ const SupplyDashboard: React.FC = () => {
           </div>
         </main>
       </ScrollArea>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

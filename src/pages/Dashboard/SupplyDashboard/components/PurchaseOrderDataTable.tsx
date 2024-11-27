@@ -12,7 +12,7 @@ export default function PurchaseOrderDataTable() {
 
   return (
     <>
-      <div className="hidden w-full flex-col space-y-8 p-8 md:flex bg-slate-100 h-screen">
+      <div className="w-full flex-col space-y-8 p-8 md:flex bg-slate-100">
         <DataTable data={purchaseOrderData!} columns={po_columns} />
       </div>
     </>

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input, } from "@/components/ui/input";
@@ -94,9 +93,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-full w-[45rem]">
         <ScrollArea className="h-[32rem] mb-8">
-          <DialogHeader>
-            <DialogTitle className="py-6">Create Purchase Request</DialogTitle>
-          </DialogHeader>
+          <DialogTitle className="pb-6">Create Purchase Request</DialogTitle>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4">
               {renderField("PR No.", "pr_no", (
@@ -107,7 +104,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
               {renderField("Requested By", "requested_by", (
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
+                    <Button variant="none" role="combobox" aria-expanded={open} className="w-full justify-between border ">
                       {selectedChairman || "Select Chairman"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>

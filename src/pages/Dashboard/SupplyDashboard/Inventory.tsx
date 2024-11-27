@@ -1,13 +1,10 @@
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import SupplySidebar from "./components/SupplySidebar";
-
+import Layout from "./components/Layout/SupplyDashboardLayout";
 
 const Inventory: React.FC = () => {
   return (
-    <DashboardLayout>
-      <SupplySidebar />
-      <h1 className="pt-16 text-3xl">Inventory</h1>
-    </DashboardLayout>
+    <Layout>
+      <h1>Inventory</h1>
+    </Layout>
   );
 };
 

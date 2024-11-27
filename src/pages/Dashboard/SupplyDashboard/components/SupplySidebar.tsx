@@ -5,56 +5,113 @@ import {
   FileSpreadsheet,
   FileSymlink,
 } from "lucide-react";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import Logo from "/public/CTU_new_logotransparent.svg";
+
+const dashboard = [
+  {
+    title: "Dashboard",
+    url: "/",
+    icon: LayoutDashboard,
+  },
+];
+
+const procurement = [
+  {
+    title: "Purchase Request",
+    url: "/supply/purchase-request",
+    icon: FileText,
+  },
+  {
+    title: "Purchase Order",
+    url: "/supply/purchase-order",
+    icon: ShoppingCart,
+  },
+];
+
+const inventory = [
+  {
+    title: "Manage Inventory",
+    url: "/supply/inventory",
+    icon: FileSymlink,
+  },
+  {
+    title: "Reports",
+    url: "/supply/reports",
+    icon: FileSpreadsheet,
+  },
+];
 
 const SupplySidebar = () => {
   return (
-    <TooltipProvider>
-        <aside className="hidden md:flex flex-col w-auto h-screen  sticky top-0 pt-16">
-          <SideNav
-            isCollapsed={false}
-            links={[
-              {
-                title: "Dashboard",
-                label: "",
-                link_to: "/",
-                icon: LayoutDashboard,
-                variant: "default",
-              },
-              {
-                title: "Purchase Request",
-                label: "",
-                link_to: "/supply/purchase-request",
-                icon: FileText,
-                variant: "default",
-              },
-              {
-                title: "Purchase Order",
-                label: "",
-                link_to: "/supply/purchase-order",
-                icon: ShoppingCart,
-                variant: "default",
-              },
-              {
-                title: "Reports",
-                label: "",
-                link_to: "/supply/reports",
-                icon: FileSpreadsheet,
-                variant: "default",
-              },
-              {
-                title: "Inventory",
-                label: "",
-                link_to: "/supply/inventory",
-                icon: FileSymlink,
-                variant: "default",
-              },
-            ]}
-          />
-        </aside>
-      </TooltipProvider>
-  )
-}
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <img
+          src={Logo}
+          alt="Logo"
+          width={50}
+          height={50}
+          style={{ display: "block" }}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarGroupLabel>Analytics</SidebarGroupLabel>
+            <SidebarMenu>
+              {dashboard.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6">
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+            <SidebarGroupLabel>Procurement</SidebarGroupLabel>
+            <SidebarMenu>
+              {procurement.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6">
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+            <SidebarGroupLabel>Inventory</SidebarGroupLabel>
+            <SidebarMenu>
+              {inventory.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6">
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+};
 
-export default SupplySidebar
+export default SupplySidebar;

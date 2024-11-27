@@ -1,14 +1,10 @@
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import SupplySidebar from "./components/SupplySidebar";
-
+import Layout from "./components/Layout/SupplyDashboardLayout";
 
 const Reports: React.FC = () => {
   return (
-    <DashboardLayout>
-      <SupplySidebar />
-      <h1 className="pt-16 text-3xl">Reports
-      </h1>
-    </DashboardLayout>
+    <Layout>
+      <h1>Reports</h1>
+    </Layout>
   );
 };
 

@@ -13,35 +13,36 @@ export default function PurchaseRequestDataTable() {
   const { isLoading, error, data } = usePurchaseRequest();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  if (isLoading) return <Loading/>
+  if (isLoading) return <Loading />;
 
   if (error) return <div>{error.message}</div>;
 
   const purchaseRequestData: purchaseRequestType[] =
     data?.status === "success" ? data.data || [] : [];
 
-  const sortedPurchaseRequestData = arraySort(purchaseRequestData, "pr_no")
+  const sortedPurchaseRequestData = arraySort(purchaseRequestData, "pr_no");
 
-  console.log(purchaseRequestData)
+  console.log(purchaseRequestData);
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
 
-  const lastPrNo =
-    sortedPurchaseRequestData?.length
-      ? sortedPurchaseRequestData[sortedPurchaseRequestData.length - 1].pr_no
-      : undefined;
+  const lastPrNo = sortedPurchaseRequestData?.length
+    ? sortedPurchaseRequestData[sortedPurchaseRequestData.length - 1].pr_no
+    : undefined;
   console.log(lastPrNo);
 
   return (
     <>
-      <div className="hidden w-full flex-col space-y-8 p-8 md:flex">
-        <Button
-          className="px-6 bg-orange-200 w-40 flex-1 hover:bg-orange-300 hover:scale-110 ease-in-out transition duration-300 hover:ease-in text-black"
-          onClick={handleOpenDialog}
-        >
-          <PlusIcon className="mr-2"></PlusIcon>ADD
-        </Button>
+      <div className="hidden w-full flex-col md:flex">
+        <div>
+          <Button
+            className="mb-4 hover:bg-orange-300 text-black"
+            onClick={handleOpenDialog}
+          >
+            <PlusIcon className="mr-2"/> Add Purchase Request
+          </Button>
+        </div>
         <PurchaseRequestForm
           isDialogOpen={isDialogOpen}
           setIsDialogOpen={setIsDialogOpen}

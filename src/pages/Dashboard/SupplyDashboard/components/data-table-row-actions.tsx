@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { TrashIcon, ArrowTopRightIcon, ArrowRightIcon } from "@radix-ui/react-icons";
+import {
+  TrashIcon,
+  ArrowTopRightIcon,
+  ArrowRightIcon,
+} from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "./DeleteDialog";
 import {
@@ -26,10 +30,9 @@ export const DataTableRowActions = ({
 }: DataTableRowActionsProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  const location = useLocation()
-  console.log(location.pathname)
+  const location = useLocation();
 
-  const purchaseRequestPath = "/supply/purchase-request"
+  const purchaseRequestPath = "/supply/purchase-request";
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -65,41 +68,50 @@ export const DataTableRowActions = ({
 
   return (
     <>
-     { location.pathname === purchaseRequestPath ? (
-       <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-       <div className="flex gap-4 ">
-         <Tooltip>
-           <TooltipTrigger asChild>
-             <Button
-               onClick={handleViewClick}
-               variant="ghost"
-               className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
-             >
-               <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
-               <span className="sr-only">Open</span>
-             </Button>
-           </TooltipTrigger>
-           <TooltipContent side="top">Open</TooltipContent>
-         </Tooltip>
+      {location.pathname === purchaseRequestPath ? (
+        <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+          <div className="flex gap-4 ">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleViewClick}
+                  variant="ghost"
+                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+                >
+                  <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
+                  <span className="sr-only">Open</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Open</TooltipContent>
+            </Tooltip>
 
-         <Separator className="h-8" orientation="vertical" decorative />
+            <Separator className="h-8" orientation="vertical" decorative />
 
-         <Tooltip>
-           <TooltipTrigger asChild>
-             <Button
-               onClick={handleOpenDialog}
-               variant="ghost"
-               className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
-             >
-               <TrashIcon className="h-4 w-4" />
-               <span className="sr-only">Delete</span>
-             </Button>
-           </TooltipTrigger>
-           <TooltipContent side="top">Delete</TooltipContent>
-         </Tooltip>
-       </div>
-     </TooltipProvider>
-     ) : ( <Button className="group"><p className="px-2 text-base">Place Order</p><ArrowRightIcon width={20} height={20} className="opacity-0 group-hover:opacity-100"/></Button>)}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleOpenDialog}
+                  variant="ghost"
+                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                  <span className="sr-only">Delete</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Delete</TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      ) : (
+        <Button className="group">
+          <p className="px-2 text-base">Place Order</p>
+          <ArrowRightIcon
+            width={20}
+            height={20}
+            className="opacity-0 group-hover:opacity-100"
+          />
+        </Button>
+      )}
 
       <DeleteDialog
         onDeleteClick={handleDeletePurchaseRequest}
