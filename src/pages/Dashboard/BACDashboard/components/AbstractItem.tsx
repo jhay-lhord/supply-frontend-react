@@ -63,7 +63,6 @@ export const AbstractItem = () => {
 
   const handleOpenDialog = (aoq_no: string) => {
     setSelectedAbstract(aoq_no)
-    console.log(selectedAbstract)
     setIsDialogOpen(true);
   };
 
@@ -93,7 +92,7 @@ export const AbstractItem = () => {
                         {data.rfq_details.supplier_name}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {data.rfq_details.rfq_no}
+                        {data.afq_no}
                       </p>
                     </div>
 

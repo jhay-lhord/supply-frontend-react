@@ -38,10 +38,12 @@ import Loading from "../../shared/components/Loading";
 import {
   abstractOfQuotationSchema,
   abstractOfQuotationType,
+  itemSelectedQuoteType,
 } from "@/types/request/abstract_of_quotation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
+  useAbstractOfQuotation,
   useAddAbstractOfQuotation,
   useAddItemSelectedQuote,
   useAllItemSelectedQuote,
@@ -50,6 +52,7 @@ import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { Empty } from "../../shared/components/Empty";
 import { useToast } from "@/hooks/use-toast";
+import { generateAOQNo } from "@/services/generateAOQNo";
 
 interface AbstractFormProps {
   isDialogOpen: boolean;
@@ -63,40 +66,59 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [rfqNo, setRfqNo] = useState<string | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
+  const [itemSelected, setItemSelected] = useState<itemSelectedQuoteType[]>([]);
 
   const { pr_no } = useParams();
-  const { toast } = useToast()
-  const afq_no = uuidv4();
+  const { toast } = useToast();
 
   const { data } = useRequestForQoutation();
   const { data: items_, isLoading: item_loading } = useGetItemQuotation();
-  const { data: item_quote } = useAllItemSelectedQuote();
+  const { data: item_quote} =
+    useAllItemSelectedQuote();
+  const { data: abstract} =
+    useAbstractOfQuotation();
+  const abstract_data = Array.isArray(abstract?.data) ? abstract.data : [];
+  const aoq_no = generateAOQNo(abstract_data, pr_no!);
 
-
+  //get all selected item
   const item_selected_quote_no = useMemo(() => {
     const item_quote_data = Array.isArray(item_quote?.data)
       ? item_quote.data
       : [];
-    return item_quote_data?.filter((data) => data.is_item_selected && data.pr_details.pr_no === pr_no).map(data => data.item_details.item_details.item_no);
+    const item_quote_no = item_quote_data
+      ?.filter(
+        (data) => data.is_item_selected && data.pr_details.pr_no === pr_no
+      )
+      .map((data) => data.item_details.item_details.item_no);
+    return Array.from(new Set(item_quote_no));
   }, [item_quote, pr_no]);
 
+  //get the item quotation in specific request for quotation
   const itemQuotation = useMemo(() => {
     const _items = Array.isArray(items_?.data) ? items_.data : [];
     return _items.filter((data) => data.rfq === rfqNo);
   }, [items_?.data, rfqNo]);
 
+  //filter the item which is not yet selected
   const filteredItemQuotation = useMemo(() => {
-    return itemQuotation.filter(quotations => !item_selected_quote_no.includes(quotations.item_details.item_no)
-    )
-  }, [itemQuotation, item_selected_quote_no])
+    return itemQuotation.filter(
+      (quotations) =>
+        !item_selected_quote_no.includes(quotations.item_details.item_no)
+    );
+  }, [itemQuotation, item_selected_quote_no]);
+
 
   const quotations = useMemo(() => {
     const data_ = Array.isArray(data?.data) ? data.data : [];
     return data_.filter((data) => data.purchase_request === pr_no);
   }, [data?.data, pr_no]);
 
-  const { mutate: addAOQMutation } = useAddAbstractOfQuotation();
-  const { mutate: addItemSelectedMutation } = useAddItemSelectedQuote();
+
+  const { mutate: addAOQMutation, isPending: aoqPending } =
+    useAddAbstractOfQuotation();
+  const { mutate: addItemSelectedMutation, isPending: itemSelectedPending } =
+    useAddItemSelectedQuote();
+  console.log(aoqPending);
 
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     resolver: zodResolver(abstractOfQuotationSchema),
@@ -119,30 +141,54 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const itemsWatch = watch("items");
 
   useEffect(() => {
+    if(!isDialogOpen){
+      setItemSelected([])
+    }
+  }, [isDialogOpen])
+
+  useEffect(() => {
     if (isDialogOpen && itemQuotation.length > 0) {
-      setValue("afq_no", afq_no);
+      setValue("afq_no", aoq_no);
       setValue("rfq", rfqNo!);
       setValue("purchase_request", pr_no);
 
       itemQuotation?.forEach((item, index) => {
         setValue(`items.${index}.item_quote_no`, uuidv4());
-        setValue(`items.${index}.afq`, afq_no);
+        setValue(`items.${index}.afq`, aoq_no);
         setValue(`items.${index}.purchase_request`, pr_no);
         setValue(`items.${index}.rfq`, rfqNo!);
         setValue(`items.${index}.item_q`, item.item_quotation_no);
         setValue(`items.${index}.is_item_selected`, false);
-        setValue(`items.${index}.total_amount`, (Number(item.unit_price) * Number(item.item_details.quantity)).toString());
+        setValue(
+          `items.${index}.total_amount`,
+          (
+            Number(item.unit_price) * Number(item.item_details.quantity)
+          ).toString()
+        );
       });
+
     }
-  }, [isDialogOpen, setValue, rfqNo, itemQuotation, pr_no]);
+  }, [isDialogOpen, setValue, rfqNo, itemQuotation, pr_no, aoq_no]);
 
   const handleCheckboxChange = (index: number) => {
     const currentValue = itemsWatch[index]?.is_item_selected;
 
-    setValue(`items.${index}.is_item_selected`, !currentValue, {
+    const updatedValue = !currentValue;
+    setValue(`items.${index}.is_item_selected`, updatedValue, {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true,
+    });updatedItem
+
+    const updatedItem = itemsWatch[index];
+    setItemSelected((prevSelected: itemSelectedQuoteType[]) => {
+      if (updatedValue) {
+        return [...prevSelected, updatedItem as itemSelectedQuoteType];
+      } else {
+        return prevSelected.filter(
+          (item: itemSelectedQuoteType) => item.item_q !== updatedItem.item_q
+        );
+      }
     });
   };
 
@@ -173,12 +219,12 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         purchase_request: data.purchase_request,
       };
 
-      addAOQMutation(abstractData, {
+      await addAOQMutation(abstractData, {
         onSuccess: async (afqResponse) => {
           const afqNo = afqResponse.data?.afq_no;
 
           // Map over the items and perform addItemMutation with rfqNo from the response
-          const itemSelectedDataArray = data.items.map((item) => {
+          const itemSelectedDataArray = itemSelected.map((item) => {
             return {
               item_quote_no: item.item_quote_no,
               afq: afqNo!,
@@ -193,20 +239,37 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
           // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
             itemSelectedDataArray.map((itemData) => {
-              if(itemData.is_item_selected){
-                addItemSelectedMutation(itemData)
-                isSuccess = true
-              } 
-            }
-            ),
+              console.log(itemData);
+              addItemSelectedMutation(itemData);
+              isSuccess = true;
+            })
           );
-          
-          setIsLoading(false);
-          setIsDialogOpen(false);
-          if(isSuccess) return toast({title: "Success", description: "Abstract of Quotation successfully added"})
-          reset();
+          if (!aoqPending || !itemSelectedPending) {
+            setIsLoading(false);
+            setIsDialogOpen(false);
+          }
+
+          if (isSuccess) {
+            toast({
+              title: "Success",
+              description: "Abstract of Quotation successfully added",
+            });
+          }
+
+          reset({
+            afq_no: "",
+            rfq: "",
+            purchase_request: "",
+            items: [],
+          });
         },
         onError: (error) => {
+          toast({
+            title: "Error",
+            description:
+              "Failed to save Abstract of Quotation. Please try again.",
+            variant: "destructive",
+          });
           console.error("Error saving RFQ:", error);
         },
       });
@@ -215,7 +278,9 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     }
   };
 
-  if (isLoading || item_loading) return <Loading />;
+  const overallLoading =
+    isLoading || item_loading || aoqPending || itemSelectedPending;
+  if (overallLoading) return <Loading />;
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -267,7 +332,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                         />
                       ))
                     ) : (
-                      <Empty message="No Supplier Found"/>
+                      <Empty message="No Supplier Found" />
                     )}
                   </CardContent>
                 </Card>
@@ -312,7 +377,8 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       <p>UNIT PRICE </p>
                       <p>SELECT ITEM</p>
                     </div>
-                    {filteredItemQuotation && filteredItemQuotation?.length > 0 ? (
+                    {filteredItemQuotation &&
+                    filteredItemQuotation?.length > 0 ? (
                       filteredItemQuotation.map(
                         (item, index) =>
                           fields && (
@@ -330,10 +396,16 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                                 }
                               </p>
                               <p className="text-gray-500">
-                                {filteredItemQuotation[index].item_details.quantity}
+                                {
+                                  filteredItemQuotation[index].item_details
+                                    .quantity
+                                }
                               </p>
                               <p className="text-gray-500">
-                                {filteredItemQuotation[index].item_details.unit_cost}
+                                {
+                                  filteredItemQuotation[index].item_details
+                                    .unit_cost
+                                }
                               </p>
                               <div className="flex flex-col col-span-2">
                                 <p className="text-gray-500">
@@ -355,15 +427,14 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                                       <CrossCircledIcon />
                                     )}
                                   </div>
-                                  <p>{filteredItemQuotation[index].unit_price}</p>
+                                  <p>
+                                    {filteredItemQuotation[index].unit_price}
+                                  </p>
                                 </div>
                               </div>
                               <Checkbox
                                 checked={itemsWatch[index]?.is_item_selected} // Controlled checked state
                                 onCheckedChange={() => {
-                                  console.log(
-                                    itemsWatch[index]?.is_item_selected
-                                  );
                                   handleCheckboxChange(index);
                                 }}
                               />
@@ -372,7 +443,9 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       )
                     ) : (
                       <div className="grid place-items-center w-full h-96">
-                        <p className="flex">No items found, maybe you forget to select Supplier</p>
+                        <p className="flex">
+                          No suppliers found. Please add a supplier to proceed.
+                        </p>
                       </div>
                     )}
 

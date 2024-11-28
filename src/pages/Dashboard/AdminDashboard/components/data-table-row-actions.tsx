@@ -69,6 +69,7 @@ export const DataTableRowActions = ({
   const buttonLabel = (_data as UsersType).is_active
     ? "Deactivate"
     : "Activate";
+
   const { mutate, isPending } = useActivateUser(buttonLabel);
 
   const handleActivateUser = () => {
