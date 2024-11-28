@@ -177,6 +177,7 @@ export default function PurchaseRequestItemList() {
       <TwoStepRFQForm
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
+        pr_no={pr_no!}
       />
     </div>
   );

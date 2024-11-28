@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/tooltip";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useNavigate } from "react-router-dom";
+import { FilePlusIcon } from "lucide-react";
+import { TwoStepRFQForm } from "./TwoStepRFQForm";
+import { useState } from "react";
 
 interface DataTableRowActionsProps {
   pr_no: string;
@@ -20,8 +23,8 @@ export const DataTableRowActions = ({
   link
 }: DataTableRowActionsProps) => {
 
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-
 
   const handleViewClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -46,8 +49,24 @@ export const DataTableRowActions = ({
             </TooltipTrigger>
             <TooltipContent side="top">Open</TooltipContent>
           </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => setIsDialogOpen(true)}
+                variant="outline"
+                className="flex data-[state=open]:bg-muted hover:rounded-full"
+              >
+                <FilePlusIcon className="h-4 w-4 text-gray-900" />
+                <span className="sr-only">Create RFQ</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Create RFQ</TooltipContent>
+          </Tooltip>
         </div>
       </TooltipProvider>
+
+      <TwoStepRFQForm isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}pr_no={pr_no} />
     </>
   );
 };

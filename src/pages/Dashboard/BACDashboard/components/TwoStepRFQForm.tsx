@@ -32,9 +32,8 @@ import {
 } from "@/types/request/request_for_qoutation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldErrors, useFieldArray, useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
 import Loading from "../../shared/components/Loading";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { v4 as uuidv4 } from "uuid";
@@ -43,20 +42,23 @@ import { useToast } from "@/hooks/use-toast";
 interface TwoStepRFQFormProps {
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+  pr_no: string;
 }
 
 export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   isDialogOpen,
   setIsDialogOpen,
+  pr_no,
 }) => {
-  const { pr_no } = useParams();
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const items = FilteredItemInPurchaseRequest(pr_no!);
-  const sortedItems = arraySort(items!, "stock_property_no");
+  const sortedItems = useMemo(() => {
+    return arraySort(items!, "stock_property_no")
+  },[items]);
   const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit handler it have a random Letter
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<string>('non-VAT')
+  const [selectedOption, setSelectedOption] = useState<string>("non-VAT");
 
   const { mutate: addRFQMutation } = useAddRequestForQoutation();
   const { mutate: addItemMutation } = useAddItemQuotation();
@@ -65,6 +67,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset,
   } = useForm({
@@ -75,7 +78,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       supplier_name: "",
       supplier_address: "",
       tin: "",
-      is_VAT: selectedOption === 'vat' ? true : false,
+      is_VAT: selectedOption === "vat" ? true : false,
       items: sortedItems?.map((item) => ({
         item_quotation_no: "",
         purchase_request: pr_no,
@@ -87,8 +90,27 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       })),
     },
   });
+  const { fields } = useFieldArray({
+    control,
+    name: "items", 
+  });
 
-  const { fields } = useFieldArray({ control, name: "items" });
+  useEffect(() => {
+    if (sortedItems.length > 0) {
+      setValue("items", sortedItems.map((item) => ({
+        item_quotation_no: "",
+        purchase_request: pr_no,
+        rfq: rfq_no,
+        item: item.item_no,
+        unit_price: 0,
+        brand_model: "",
+        is_low_price: false,
+      })));
+    }
+  }, [isDialogOpen]);
+
+  console.log(fields)
+  console.log(sortedItems)
 
   type RequestForQuotationField =
     | "purchase_request"
@@ -143,7 +165,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
           // Map over the items and perform addItemMutation with rfqNo from the response
           const itemDataArray = data.items.map((item) => {
             const sortedItem = sortedItems.find(
-              (sorted) => sorted.item_no === item.item 
+              (sorted) => sorted.item_no === item.item
             );
 
             return {
@@ -162,14 +184,18 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
           // Perform all addItemMutation calls in parallel, but only once for each item
           await Promise.all(
             itemDataArray.map((itemData) => {
-              if(itemData.brand_model && itemData.unit_price) return addItemMutation(itemData)
+              if (itemData.brand_model && itemData.unit_price)
+                return addItemMutation(itemData);
             })
           );
 
           setIsLoading(false);
           setIsDialogOpen(false);
           reset();
-          toast({title: "Success", description: "Request for Qoutation successfully added"})
+          toast({
+            title: "Success",
+            description: "Request for Qoutation successfully added",
+          });
         },
         onError: (error) => {
           console.error("Error saving RFQ:", error);
@@ -183,20 +209,28 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-full w-[70rem]">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">
-              Create Request for Qoutation
-            </DialogTitle>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle className="text-2xl">
+            Create Request for Qoutation
+          </DialogTitle>
+        </DialogHeader>
         <ScrollArea className="h-[30rem] mb-9">
           <form onSubmit={handleSubmit(onSubmit)}>
             <Tabs defaultValue="supplier">
               <div className="w-full flex flex-col items-center">
                 <TabsList className="grid grid-cols-2 w-1/2 items-center">
                   <TabsTrigger className="" value="supplier">
-                    <span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">1</span> Create Supplier
+                    <span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">
+                      1
+                    </span>
+                    Create Supplier
                   </TabsTrigger>
-                  <TabsTrigger value="items"><span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">2</span>Select Items</TabsTrigger>
+                  <TabsTrigger value="items">
+                    <span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">
+                      2
+                    </span>
+                    Select Items
+                  </TabsTrigger>
                 </TabsList>
               </div>
               <TabsContent value="supplier" className="">
