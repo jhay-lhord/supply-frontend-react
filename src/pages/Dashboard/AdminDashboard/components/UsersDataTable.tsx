@@ -9,13 +9,11 @@ export default function UsersDataTable() {
 
   console.log(data)
 
-  if (isLoading) return <Loading/>
+  if(isLoading) return <Loading/>
 
   if (error) return <div>{error.message}</div>
   const usersData: UsersType[] =
     data?.status === "success" ? data.data || [] : [];
-
-
 
   return (
     <>

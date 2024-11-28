@@ -23,37 +23,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Loader2 } from "lucide-react";
 import { useActivateUser } from "@/services/userServices";
-import { RequisitionerType } from "@/types/request/requisitioner";
 import { useLocation } from "react-router-dom";
 import { DeleteDialog } from "./DeleteDialog";
-import { useDeleteRequisitioner } from "@/services/requisitionerServices";
-import EditRequisitionerForm from "./EditRequisitionerForm";
+import { CampusDirectorType } from "@/types/request/campus-director";
+import { useDeleteCampusDirector } from "@/services/campusDirectorServices";
+import EditCDForm from "./EditCDForm";
 
 //Step 5: define the data props to users Type
 
-interface DataTableRowActionsProps {
+interface CDDataTableRowActionsProps {
   id: string | undefined;
-  _data: UsersType | RequisitionerType;
+  _data: UsersType | CampusDirectorType;
 }
 
-export const DataTableRowActions = ({
+export const CDDataTableRowActions = ({
   id,
   _data,
-}: DataTableRowActionsProps) => {
+}: CDDataTableRowActionsProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const [isEditDialogOpen, setIsEditDialogOpen ] =  useState<boolean>(false);
-  const [requisitionId, setRequisitionId] = useState<string>("");
+  const [cdId, setcdId] = useState<string>("");
   const location = useLocation();
   const usersPath = "/admin/users";
-  const {mutate:requisitionerMutation} = useDeleteRequisitioner()
+  const {mutate:cdMutation} = useDeleteCampusDirector()
 
   const handleOpenDropdown = () => {
     setIsDropdownOpen(true);
   };
   const handleDelete = () => {
-    requisitionerMutation(id!)
+    cdMutation(id!)
   };
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -62,7 +62,7 @@ export const DataTableRowActions = ({
 
   const handleEditOpenDialog = () => {
     setIsEditDialogOpen(true);
-    setRequisitionId(id!);
+    setcdId(id!);
    
   };
 
@@ -169,14 +169,14 @@ export const DataTableRowActions = ({
       <DeleteDialog
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
-        message="requisitioner"
+        message="Campus Director"
         onDeleteClick={handleDelete}
       />
 
-      <EditRequisitionerForm 
+      <EditCDForm 
        isEditDialogOpen={isEditDialogOpen}
        setIsEditDialogOpen={setIsEditDialogOpen}
-       requisition_id={requisitionId}
+       cd_id={cdId}
 
       />
 

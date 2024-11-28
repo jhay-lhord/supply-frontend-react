@@ -1,4 +1,4 @@
-import { User2Icon, LayoutDashboard } from "lucide-react";
+import { User2Icon, LayoutDashboard, Users} from "lucide-react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
 
@@ -20,21 +20,28 @@ const AdminSidebar = () => {
               title: "Users",
               label: "",
               link_to: "/admin/users",
-              icon: User2Icon,
+              icon: Users,
               variant: "default",
             },
             {
               title: "Requisitioner",
               label: "",
               link_to: "/admin/requisitioner",
-              icon: User2Icon,
+              icon: Users,
               variant: "default",
             },
             {
               title: "Campus Director",
               label: "",
-              link_to: "/admin/users",
+              link_to: "/admin/campus-director",
               icon: User2Icon,
+              variant: "default",
+            },
+            {
+              title: "BAC Members",
+              label: "",
+              link_to: "/admin/campus-director",
+              icon: Users,
               variant: "default",
             },
           ]}
