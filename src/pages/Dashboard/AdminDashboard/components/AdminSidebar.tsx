@@ -12,7 +12,7 @@ const AdminSidebar = () => {
             {
               title: "Dashboard",
               label: "",
-              link_to: "/dashboard",
+              link_to: "/admin/dashboard",
               icon: LayoutDashboard,
               variant: "default",
             },
@@ -40,7 +40,7 @@ const AdminSidebar = () => {
             {
               title: "BAC Members",
               label: "",
-              link_to: "/admin/campus-director",
+              link_to: "/admin/BACmembers",
               icon: Users,
               variant: "default",
             },

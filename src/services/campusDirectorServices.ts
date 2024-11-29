@@ -5,6 +5,20 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { CampusDirectorType } from "@/types/request/campus-director";
 
+
+export const GetCampusDirectors = async (): Promise<
+  ApiResponse<CampusDirectorType[]>
+> => {
+  try {
+    const response = await api.get<CampusDirectorType[]>(
+      "/api/campus-director/"
+    )
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 export const AddCampusDirector = async (data: CampusDirectorType) => {
   try {
     const response = await api.post("api/campus-director/", data);
@@ -102,4 +116,19 @@ export const useUpdateCampusDirector = () => {
       toast({title:"Success", description:"Edit Successfully"})
     },
   });
+};
+
+
+export const useCampusDirector = () => {
+  return useQuery<ApiResponse<CampusDirectorType[]>, Error>({
+    queryKey: ["campus-directors"],
+    queryFn: GetCampusDirectors,
+    refetchInterval: 5000,
+  });
+};
+
+export const useCampusDirectorCount = () => {
+  const { data, isLoading } = useCampusDirector();
+  const CampusDirectorCount = data?.data?.length;
+  return { CampusDirectorCount, isLoading };
 };

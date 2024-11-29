@@ -5,6 +5,20 @@ import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
+
+export const GetRequisitioners = async (): Promise<
+  ApiResponse<RequisitionerType[]>
+> => {
+  try {
+    const response = await api.get<RequisitionerType[]>(
+      "/api/requisitioner/"
+    )
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 export const AddRequisitioner = async (data: RequisitionerType) => {
   try {
     const response = await api.post("api/requisitioner/", data);
@@ -102,4 +116,18 @@ export const useUpdateRequisitioner = () => {
       toast({title:"Success", description:"Edit Successfully"})
     },
   });
+};
+
+export const useRequisitioner = () => {
+  return useQuery<ApiResponse<RequisitionerType[]>, Error>({
+    queryKey: ["requisitioners"],
+    queryFn: GetRequisitioners,
+    refetchInterval: 5000,
+  });
+};
+
+export const useRequisitionerCount = () => {
+  const { data, isLoading } = useRequisitioner();
+  const RequisitionerCount = data?.data?.length;
+  return { RequisitionerCount, isLoading };
 };

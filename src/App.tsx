@@ -26,6 +26,7 @@ import { AbstractItemList } from "./pages/Dashboard/BACDashboard/AbstractItemLis
 import { BACItemList } from "./pages/Dashboard/BACDashboard/BACItemList";
 import Requisitioner from "./pages/Dashboard/AdminDashboard/Requisitioner";
 import CampusDirector from "./pages/Dashboard/AdminDashboard/CampusDirector";
+import BACmember from "./pages/Dashboard/AdminDashboard/BACmember";
 
 const App = () => {
   return (
@@ -103,6 +104,7 @@ const App = () => {
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/requisitioner" element={<Requisitioner />} />
           <Route path="/admin/campus-director" element={<CampusDirector/>} />
+          <Route path="/admin/BACmembers" element ={<BACmember/>} />
         </Routes>
       </Router>
     </>
