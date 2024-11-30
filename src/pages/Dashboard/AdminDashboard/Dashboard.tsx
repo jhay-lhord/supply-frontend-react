@@ -8,29 +8,23 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import { RecentActivity } from "../shared/components/RecentActivity";
+import { RecentActivities } from "../shared/components/RecentActivities";
 
 import { useBACmemberCount } from "@/services/BACmemberServices";
 import { useCampusDirectorCount } from "@/services/campusDirectorServices";
 import { useRequisitionerCount } from "@/services/requisitionerServices";
 import { useUserCount } from "@/services/userServices";
 
-
 import AdminSidebar from "./components/AdminSidebar";
 import { Loader2, UserIcon, UsersIcon, UsersRoundIcon } from "lucide-react";
 
-
 const AdminDashboard: React.FC = () => {
-
-  const { BACmemberCount, isLoading: isBACmemberLoading } =
-        useBACmemberCount();
+  const { BACmemberCount, isLoading: isBACmemberLoading } = useBACmemberCount();
   const { CampusDirectorCount, isLoading: isCampusDirectorLoading } =
-        useCampusDirectorCount();
+    useCampusDirectorCount();
   const { RequisitionerCount, isLoading: isRequisitionerLoading } =
-        useRequisitionerCount();
-  const { UserCount, isLoading: isUserLoading } =
-        useUserCount();
-      
+    useRequisitionerCount();
+  const { UserCount, isLoading: isUserLoading } = useUserCount();
 
   const navigate = useNavigate();
 
@@ -45,7 +39,6 @@ const AdminDashboard: React.FC = () => {
             <div className=" space-y-20 p-8 pt-6">
               <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-  
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-8">
                 {/* First Row: 4 Boxes */}
@@ -58,16 +51,16 @@ const AdminDashboard: React.FC = () => {
                       <CardTitle className="text-md font-medium">
                         Users
                       </CardTitle>
-                      <UserIcon/>
+                      <UserIcon />
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl text-orange-300">
-                      {isUserLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        UserCount
-                      )}
-                    </div>
+                        {isUserLoading ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          UserCount
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -79,16 +72,16 @@ const AdminDashboard: React.FC = () => {
                       <CardTitle className="text-md font-medium">
                         Requisitioners
                       </CardTitle>
-                      <UsersIcon/>
+                      <UsersIcon />
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl text-orange-300">
-                      {isRequisitionerLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        RequisitionerCount
-                      )}
-                    </div>
+                        {isRequisitionerLoading ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          RequisitionerCount
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -100,16 +93,16 @@ const AdminDashboard: React.FC = () => {
                       <CardTitle className="text-md font-medium">
                         Campus Director
                       </CardTitle>
-                     <UserIcon/>
+                      <UserIcon />
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl text-orange-300">
-                      {isCampusDirectorLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        CampusDirectorCount
-                      )}
-                    </div>
+                        {isCampusDirectorLoading ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          CampusDirectorCount
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -121,16 +114,16 @@ const AdminDashboard: React.FC = () => {
                       <CardTitle className="text-md font-medium">
                         BAC Members
                       </CardTitle>
-                      <UsersRoundIcon/>
+                      <UsersRoundIcon />
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl text-orange-300">
-                      {isBACmemberLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        BACmemberCount
-                      )}
-                    </div>
+                        {isBACmemberLoading ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          BACmemberCount
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -146,7 +139,7 @@ const AdminDashboard: React.FC = () => {
                     </CardHeader>
                     <ScrollArea className="h-96">
                       <CardContent>
-                        <RecentActivity />
+                        <RecentActivities />
                       </CardContent>
                     </ScrollArea>
                   </Card>

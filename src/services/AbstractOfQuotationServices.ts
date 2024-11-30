@@ -33,6 +33,12 @@ export const useAbstractOfQuotation = () => {
   });
 };
 
+export const useAbstractOfQuotationCount = () => {
+  const { data, isLoading } = useAbstractOfQuotation()
+  const abstractCount = data?.data?.length ?? 0
+  return { abstractCount, isLoading}
+}
+
 export const getAbstractOfQuotation = async (afq_no:string):Promise<ApiResponse<abstractType_>> => {
   try {
     const response = await api.get<abstractType_>(`api/abstract-of-quotation/${afq_no}`)
