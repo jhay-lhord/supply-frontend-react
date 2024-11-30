@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PenBoxIcon, PrinterIcon } from "lucide-react";
 import { RFQFormEdit } from "./RFQFormEdit";
+import { generateRFQPDF } from "@/services/generateRFQPDF";
 import { useState } from "react";
 
 export const Quotation = () => {
@@ -26,6 +27,10 @@ export const Quotation = () => {
 
   const itemQuotation = items?.data?.filter((data) => data.rfq === rfq_no);
   const quotation = data && data.data;
+  const handlePrint = async () => {
+    const url = await generateRFQPDF(itemQuotation!)
+    return window.open(url, '_blank')
+  }
 
   if (isLoading || item_loading) return <Loading />;
 
@@ -50,7 +55,7 @@ export const Quotation = () => {
                 <Button onClick={() => setIsDialogOpen(true)}>
                   <PenBoxIcon width={20} height={20} className="mx-2" /> Edit
                 </Button>
-                <Button variant={"outline"}>
+                <Button variant={"outline"} onClick={handlePrint}>
                   <PrinterIcon width={20} height={20} className="mx-2" />
                   Print
                 </Button>
