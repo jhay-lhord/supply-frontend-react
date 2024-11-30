@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RecentActivity } from "../shared/components/RecentActivity";
+import { RecentActivities } from "../shared/components/RecentActivities";
 import { DataTable } from "../shared/components/DataTable";
 import {
   usePurchaseRequestCount,
@@ -166,7 +166,7 @@ const SupplyDashboard: React.FC = () => {
                   </CardHeader>
                   <ScrollArea className="h-96">
                     <CardContent className="">
-                      <RecentActivity />
+                      <RecentActivities />
                     </CardContent>
                   </ScrollArea>
                 </Card>

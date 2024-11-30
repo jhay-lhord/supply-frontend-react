@@ -4,47 +4,57 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter
+  CardFooter,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-// import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import { RecentActivity } from "../shared/components/RecentActivity";
+import { RecentActivities } from "../shared/components/RecentActivities";
 import Layout from "./components/Layout/BACDashboardLayout";
 
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Loader2, TrendingUp } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { usePurchaseRequestInProgressCount } from "@/services/purchaseRequestServices";
+import { useRequestForQuotationCount } from "@/services/requestForQoutationServices";
+import { useAbstractOfQuotationCount } from "@/services/AbstractOfQuotationServices";
 
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import { useGetDailyReport } from "@/services/DailyReport";
 
-export const description = "A bar chart"
-const chartData = [
-  { month: "Monday", desktop: 10 },
-  { month: "Tuesday", desktop: 305 },
-  { month: "Wednesday", desktop: 237 },
-  { month: "Thursday", desktop: 73 },
-  { month: "Friday", desktop: 209 },
-  { month: "Saturday", desktop: 214 },
-  { month: "Sunday", desktop: 214 },
-]
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  total_approved: {
+    label: "Approved PR ",
     color: "hsl(var(--chart-1))",
   },
-} satisfies ChartConfig
-
+  total_quotation: {
+    label: "Quotation ",
+    color: "hsl(var(--chart-2))",
+  },
+  total_abstract: {
+    label: "Abstract ",
+    color: "hsl(var(--chart-3))",
+  },
+} satisfies ChartConfig;
 
 const BACDashboard: React.FC = () => {
+  const { inProgressCount, isLoading } = usePurchaseRequestInProgressCount();
+
+  const { requestForQuotationCount, isLoading: quotation_loading } =
+    useRequestForQuotationCount();
+
+  const { abstractCount, isLoading: abstract_loading } =
+    useAbstractOfQuotationCount();
+
+  const { data } = useGetDailyReport();
+
+  const chartData = data?.data;
+
+
   return (
     <Layout>
-      {/* <BACSidebar /> */}
-
-      {/* Main Content */}
       <ScrollArea className="w-full">
         <main className=" flex-grow">
           <div className="md:hidden"></div>
@@ -61,7 +71,7 @@ const BACDashboard: React.FC = () => {
                 <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-md font-medium">
-                      Active Bids
+                      Approved Purchase Request
                     </CardTitle>
                     <svg
                       width="20"
@@ -80,13 +90,19 @@ const BACDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
+                    <div className=" text-2xl font-bold">
+                      {isLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        inProgressCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-md font-medium">
-                      Bids for Evaluation
+                      Request for Quotation
                     </CardTitle>
                     <svg
                       width="20"
@@ -105,13 +121,19 @@ const BACDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
+                    <div className="text-2xl font-bold">
+                      {quotation_loading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        requestForQuotationCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card className="border-none bg-slate-100">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-md font-medium">
-                      Bids Awards
+                      Abstract of Quotation
                     </CardTitle>
                     <svg
                       width="20"
@@ -130,32 +152,28 @@ const BACDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
+                    <div className="text-2xl font-bold">
+                      {abstract_loading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        abstractCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
               <div className="grid grid-cols-3 gap-4 md:grid-cols-2 lg:grid-cols-7">
-                {/* <Card className="col-span-4  bg-slate-100">
-                  <CardHeader className=" border-none">
-                    <CardTitle>Active Bids</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pl-2">
-                   
-                    <DataTable />
-                  </CardContent>
-                </Card> */}
-
-                <Card className="col-span-4  bg-slate-100" >
+                <Card className="col-span-4  bg-slate-100">
                   <CardHeader>
-                    <CardTitle>Bar Chart</CardTitle>
-                    <CardDescription>January - June 2024</CardDescription>
+                    <CardTitle>Weekly Reports</CardTitle>
+                    <CardDescription>Monday - Sunday</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig}>
                       <BarChart accessibilityLayer data={chartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
-                          dataKey="month"
+                          dataKey="day"
                           tickLine={false}
                           tickMargin={10}
                           axisLine={false}
@@ -163,14 +181,27 @@ const BACDashboard: React.FC = () => {
                         />
                         <ChartTooltip
                           cursor={false}
-                          content={<ChartTooltipContent hideLabel />}
+                          content={<ChartTooltipContent indicator="dot" />}
                         />
                         <Bar
-                          dataKey="desktop"
-                          fill="var(--color-desktop)"
+                          dataKey="total_approved"
+                          fill="var(--color-total_approved)"
                           radius={10}
                           width={20}
-                          
+                        />
+
+                        <Bar
+                          dataKey="total_quotation"
+                          fill={"var(--color-total_quotation)"}
+                          radius={10}
+                          width={20}
+                        />
+
+                        <Bar
+                          dataKey="total_abstract"
+                          fill="var(--color-total_abstract)"
+                          radius={10}
+                          width={20}
                         />
                       </BarChart>
                     </ChartContainer>
@@ -192,7 +223,7 @@ const BACDashboard: React.FC = () => {
                   </CardHeader>
                   <ScrollArea className="h-96">
                     <CardContent className="">
-                      <RecentActivity />
+                      <RecentActivities />
                     </CardContent>
                   </ScrollArea>
                 </Card>
