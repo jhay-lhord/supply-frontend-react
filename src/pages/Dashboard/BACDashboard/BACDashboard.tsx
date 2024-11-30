@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { RecentActivities } from "../shared/components/RecentActivities";
 import Layout from "./components/Layout/BACDashboardLayout";
 
-import { Loader2, TrendingUp } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { usePurchaseRequestInProgressCount } from "@/services/purchaseRequestServices";
 import { useRequestForQuotationCount } from "@/services/requestForQoutationServices";
@@ -70,8 +70,8 @@ const BACDashboard: React.FC = () => {
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-md font-medium">
-                      Approved Purchase Request
+                    <CardTitle className="">
+                      <p className="text-base font-medium">Approved Purchase Request</p> 
                     </CardTitle>
                     <svg
                       width="20"
@@ -166,7 +166,7 @@ const BACDashboard: React.FC = () => {
                 <Card className="col-span-4  bg-slate-100">
                   <CardHeader>
                     <CardTitle>Weekly Reports</CardTitle>
-                    <CardDescription>Monday - Sunday</CardDescription>
+                    <CardDescription>Your Weekly Reports for the last 7 days</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig}>
@@ -207,13 +207,6 @@ const BACDashboard: React.FC = () => {
                     </ChartContainer>
                   </CardContent>
                   <CardFooter className="flex-col items-start gap-2 text-sm">
-                    <div className="flex gap-2 font-medium leading-none">
-                      Trending up by 5.2% this month{" "}
-                      <TrendingUp className="h-4 w-4" />
-                    </div>
-                    <div className="leading-none text-muted-foreground">
-                      Showing total visitors for the last 6 months
-                    </div>
                   </CardFooter>
                 </Card>
 
