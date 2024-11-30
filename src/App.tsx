@@ -27,6 +27,8 @@ import { BACItemList } from "./pages/Dashboard/BACDashboard/BACItemList";
 import Requisitioner from "./pages/Dashboard/AdminDashboard/Requisitioner";
 import CampusDirector from "./pages/Dashboard/AdminDashboard/CampusDirector";
 import BACmember from "./pages/Dashboard/AdminDashboard/BACmember";
+import { AllQuotations } from "./pages/Dashboard/BACDashboard/AllQuotations";
+import { AllAbstract } from "./pages/Dashboard/BACDashboard/AllAbstract";
 
 const App = () => {
   return (
@@ -79,6 +81,10 @@ const App = () => {
             element={<RequestForQuotation />}
           />
           <Route
+            path="/bac/request-for-quotations"
+            element={<AllQuotations title="All Request of Quotation" />}
+          />
+          <Route
             path="/bac/request-for-quotation/:pr_no"
             element={<QuotationList />}
           />
@@ -87,10 +93,17 @@ const App = () => {
             element={<AbstractList />}
           />
           <Route path="/bac/quotation/:rfq_no" element={<BACQuotation />} />
-          <Route path="/bac/abstract-item-list/:aoq_no" element={<BACItemList />} />
+          <Route
+            path="/bac/abstract-item-list/:aoq_no"
+            element={<BACItemList />}
+          />
           <Route
             path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
+          />
+          <Route
+            path="/bac/abstract-of-quotations"
+            element={<AllAbstract />}
           />
           <Route
             path="/bac/item-selected-quotation/:pr_no"
@@ -103,8 +116,8 @@ const App = () => {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/requisitioner" element={<Requisitioner />} />
-          <Route path="/admin/campus-director" element={<CampusDirector/>} />
-          <Route path="/admin/BACmembers" element ={<BACmember/>} />
+          <Route path="/admin/campus-director" element={<CampusDirector />} />
+          <Route path="/admin/BACmembers" element={<BACmember />} />
         </Routes>
       </Router>
     </>
