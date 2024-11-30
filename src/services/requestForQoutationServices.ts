@@ -34,6 +34,12 @@ export const useRequestForQoutation = () => {
   });
 };
 
+export const useRequestForQuotationCount = () => {
+  const { data, isLoading } = useRequestForQoutation()
+  const requestForQuotationCount = data?.data?.length ?? 0
+  return { requestForQuotationCount, isLoading}
+}
+
 export const getRequestForQuotation = async (
   rfq_no: string
 ): Promise<ApiResponse<quotationResponseType>> => {
