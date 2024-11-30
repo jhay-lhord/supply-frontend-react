@@ -78,10 +78,10 @@ export const AbstractItem = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className=" rounded relative">
+    <div className=" rounded relative w-full">
       <div className=" pb-8">
         <p className="text-xl"> All Abstract of Quotation</p>
-        <div className="grid grid-cols-3 gap-4 mt-8">
+        <div className="grid grid-cols-4 gap-4 mt-8 w-full">
           {abstract && abstract.length > 0 ? (
             abstract.map((data) => (
               <Card className="group border shadow-md rounded-lg">

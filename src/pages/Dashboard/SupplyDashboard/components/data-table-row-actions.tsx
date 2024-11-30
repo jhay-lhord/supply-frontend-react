@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { PurchaseOrderForm } from "./PurchaseOrderForm";
 
 interface DataTableRowActionsProps {
   pr_no: string;
@@ -28,6 +29,7 @@ export const DataTableRowActions = ({
   _data,
   pr_no,
 }: DataTableRowActionsProps) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const location = useLocation();
@@ -54,7 +56,7 @@ export const DataTableRowActions = ({
 
   const handleOpenDialog = (event: React.MouseEvent) => {
     event.stopPropagation();
-    setIsDialogOpen(true);
+    setIsDeleteDialogOpen(true);
   };
 
   const handleDeletePurchaseRequest = async () => {
@@ -64,6 +66,10 @@ export const DataTableRowActions = ({
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleOpenForm = () => {
+    setIsDialogOpen(true);
   };
 
   return (
@@ -103,19 +109,29 @@ export const DataTableRowActions = ({
           </div>
         </TooltipProvider>
       ) : (
-        <Button className="group">
-          <p className="px-2 text-base">Place Order</p>
-          <ArrowRightIcon
-            width={20}
-            height={20}
-            className="opacity-0 group-hover:opacity-100"
-          />
-        </Button>
+        <>
+         <Button className=" mx-2 gap-4" variant={"outline"} onClick={handleOpenForm}>
+            <p className="px-2 text-base">View</p>
+          </Button>
+          <Button className="group" onClick={handleOpenForm}>
+            <p className="px-2 text-base">Place Order</p>
+            <ArrowRightIcon
+              width={20}
+              height={20}
+              className="opacity-0 group-hover:opacity-100"
+            />
+          </Button>
+        </>
       )}
 
       <DeleteDialog
         onDeleteClick={handleDeletePurchaseRequest}
         message="Purchase Request"
+        isDialogOpen={isDeleteDialogOpen}
+        setIsDialogOpen={setIsDeleteDialogOpen}
+      />
+
+      <PurchaseOrderForm
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
       />

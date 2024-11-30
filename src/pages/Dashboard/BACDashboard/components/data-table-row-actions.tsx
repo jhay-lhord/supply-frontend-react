@@ -1,4 +1,4 @@
-import { ArrowTopRightIcon } from "@radix-ui/react-icons";
+import { ArrowTopRightIcon, PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/tooltip";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useNavigate } from "react-router-dom";
-import { FilePlusIcon } from "lucide-react";
 import { TwoStepRFQForm } from "./TwoStepRFQForm";
 import { useState } from "react";
 
@@ -43,7 +42,7 @@ export const DataTableRowActions = ({
                 variant="default"
                 className="flex data-[state=open]:bg-muted hover:rounded-full"
               >
-                <ArrowTopRightIcon className="h-4 w-4 text-gray-900" />
+                <p className="px-2">Open</p><ArrowTopRightIcon className="h-4 w-4 text-gray-900" />
                 <span className="sr-only">Open</span>
               </Button>
             </TooltipTrigger>
@@ -57,7 +56,7 @@ export const DataTableRowActions = ({
                 variant="outline"
                 className="flex data-[state=open]:bg-muted hover:rounded-full"
               >
-                <FilePlusIcon className="h-4 w-4 text-gray-900" />
+                <p className="px-2">Add</p><PlusIcon className="h-4 w-4 text-gray-900" />
                 <span className="sr-only">Create RFQ</span>
               </Button>
             </TooltipTrigger>

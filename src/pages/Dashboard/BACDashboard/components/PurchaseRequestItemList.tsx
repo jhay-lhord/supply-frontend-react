@@ -65,13 +65,13 @@ export default function PurchaseRequestItemList() {
     }
   }, [purchase_request, setValue]);
 
-  useEffect(()=> {
+  useEffect(() => {
     const fetchPdfUrl = async () => {
-      const url = await generateRFQPDF()
-      setPdfUrl(url)
-    }
-    fetchPdfUrl()
-  }, [])
+      const url = await generateRFQPDF();
+      setPdfUrl(url);
+    };
+    fetchPdfUrl();
+  }, []);
 
   const sortedItems = arraySort(items!, "stock_property_no");
 
@@ -81,7 +81,6 @@ export default function PurchaseRequestItemList() {
   const handleAddRFQ = () => {
     setIsDialogOpen(true);
   };
-
 
   const handlePrintCLick = async () => {
     return window.open(pdfUrl, "_blank");
@@ -101,7 +100,9 @@ export default function PurchaseRequestItemList() {
               variant="destructive"
               className="bg-orange-300 text-slate-950 hover:bg-orange-200"
             >
-              <p className="font-normal text-sm ">{purchase_request?.data?.status}</p>
+              <p className="font-normal text-sm ">
+                {purchase_request?.data?.status}
+              </p>
             </Badge>
           </p>
           <p>
@@ -116,13 +117,14 @@ export default function PurchaseRequestItemList() {
             <div className="relative">
               <div className="font-medium text-lg hover:cursor-pointer flex gap-2 items-center">
                 <p>Request of Qoutations:</p>
-                <OpenInNewWindowIcon
-                  width="25"
-                  height="25"
+                <Button
                   onClick={() =>
                     navigate(`/bac/request-for-quotation/${pr_no}`)
                   }
-                />
+                >
+                  <OpenInNewWindowIcon width="20" height="20"/>
+                  <p className="px-2"> View all</p>
+                </Button>
               </div>
             </div>
           </p>

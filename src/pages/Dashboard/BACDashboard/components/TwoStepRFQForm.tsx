@@ -54,8 +54,8 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
 
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const sortedItems = useMemo(() => {
-    return arraySort(items!, "stock_property_no")
-  },[items]);
+    return arraySort(items!, "stock_property_no");
+  }, [items]);
   const rfq_no = pr_no; //set the initial value rfq_no to pr_no and later in submit handler it have a random Letter
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string>("non-VAT");
@@ -92,25 +92,28 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   });
   const { fields } = useFieldArray({
     control,
-    name: "items", 
+    name: "items",
   });
 
   useEffect(() => {
     if (sortedItems.length > 0) {
-      setValue("items", sortedItems.map((item) => ({
-        item_quotation_no: "",
-        purchase_request: pr_no,
-        rfq: rfq_no,
-        item: item.item_no,
-        unit_price: 0,
-        brand_model: "",
-        is_low_price: false,
-      })));
+      setValue(
+        "items",
+        sortedItems.map((item) => ({
+          item_quotation_no: "",
+          purchase_request: pr_no,
+          rfq: rfq_no,
+          item: item.item_no,
+          unit_price: 0,
+          brand_model: "",
+          is_low_price: false,
+        }))
+      );
     }
   }, [isDialogOpen]);
 
-  console.log(fields)
-  console.log(sortedItems)
+  console.log(fields);
+  console.log(sortedItems);
 
   type RequestForQuotationField =
     | "purchase_request"
@@ -271,6 +274,13 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                         </div>
                       </RadioGroup>
                     </div>
+                    <div className="w-full flex justify-end">
+                      <TabsList className="bg-orange-200">
+                        <TabsTrigger className="bg-orange-200 text-gray-950" value="items">
+                          Next
+                        </TabsTrigger>
+                      </TabsList>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -341,6 +351,13 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                     ) : (
                       <Loading />
                     )}
+                     <div className="w-full flex justify-start">
+                      <TabsList className="bg-orange-200">
+                        <TabsTrigger className="bg-orange-200 text-gray-950" value="supplier">
+                          Back
+                        </TabsTrigger>
+                      </TabsList>
+                    </div>
 
                     <div className="fixed bottom-6 right-10">
                       <Button

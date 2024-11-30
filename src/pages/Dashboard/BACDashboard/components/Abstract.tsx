@@ -11,7 +11,12 @@ import {
 import { useEffect } from "react";
 import Loading from "../../shared/components/Loading";
 
-import { DownloadIcon, Printer, SendIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  Loader2,
+  Printer,
+  SendIcon,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipProvider,
@@ -20,16 +25,29 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { QuotationCard } from "./QuotationCard";
 import { AbstractForm } from "./AbstractForm";
-import { generateEmptyAOQPDF } from "@/services/AbstractOfQuotationServices";
+import {
+  generateEmptyAOQPDF,
+  useAbstractOfQuotation,
+  useAllItemSelectedQuote,
+} from "@/services/AbstractOfQuotationServices";
+import { generateAOQPDF } from "@/services/generateAOQPDF";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+
 
 export default function Abstract() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
 
   const { pr_no } = useParams();
+
+  const { data: abstract, isLoading: abstract_loading } =
+    useAbstractOfQuotation();
+  const { data: items, isLoading: item_loading } = useAllItemSelectedQuote();
+  console.log(abstract);
+
+  const abstractItems = items?.data?.map((data) => data);
   const {
     isLoading,
     data: purchase_request,
@@ -68,7 +86,7 @@ export default function Abstract() {
     }
   }, [purchase_request, setValue]);
 
-  if (isLoading) return <Loading />; 
+  if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
   const handleAddAOQ = () => {
@@ -76,11 +94,12 @@ export default function Abstract() {
   };
 
   const handlePrintClick = async () => {
-    window.open(pdfUrl, "_blank");
+    const url = await generateAOQPDF(abstractItems!);
+    window.open(url!, "_blank");
   };
 
   return (
-    <div className="bg-slate-100 rounded-md w-full">
+    <div className="w-full">
       <div className="flex place-content-between items-end py-2 rounded-md bg-orange-100">
         <div className="flex flex-col gap-1 p-8">
           <p>
@@ -88,12 +107,14 @@ export default function Abstract() {
             <span className="text-red-400">{pr_no}</span>
           </p>
           <p className="flex items-center gap-2">
-            <span className="font-medium text-lg">Status: </span>
+            <span className="font-medium text-lg">Status:</span>
             <Badge
               variant="destructive"
               className="bg-orange-300 text-slate-950 hover:bg-orange-200"
             >
-              <p className="font-normal text-sm">{purchase_request?.data?.status}</p>
+              <p className="font-normal text-sm">
+                {purchase_request?.data?.status}
+              </p>
             </Badge>
           </p>
           <p>
@@ -108,13 +129,15 @@ export default function Abstract() {
             <div className="relative">
               <div className="font-medium text-lg hover:cursor-pointer flex gap-2 items-center">
                 <p>Abstract of Qoutations:</p>
-                <OpenInNewWindowIcon
-                  width="25"
-                  height="25"
+
+                <Button
                   onClick={() =>
                     navigate(`/bac/item-selected-quotation/${pr_no}`)
                   }
-                />
+                >
+                  <p className="px-2">View all</p>
+                  <OpenInNewWindowIcon width="25" height="25" />
+                </Button>
               </div>
             </div>
           </p>
@@ -135,12 +158,15 @@ export default function Abstract() {
                   className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950"
                   onClick={handlePrintClick}
                 >
-                  <Printer strokeWidth={1.3} />
+                  {item_loading || abstract_loading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <Printer strokeWidth={1.3} />
+                  )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">Print Empty AOQ Form</TooltipContent>
+              <TooltipContent side="top">Print AOQ Form</TooltipContent>
             </Tooltip>
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950">
@@ -164,7 +190,7 @@ export default function Abstract() {
         </div>
       </div>
       <Separator className="" />
-      <div className="p-8">
+      <div className=" bg-slate-100 p-8 w-full">
         <QuotationCard isDeleteAllowed={false} title={"All Supplier"} />
       </div>
 

@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
 import { useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-
+import { Button } from "@/components/ui/button";
 
 const getLowPriceSummary = (
   items: ItemType[],
@@ -109,21 +109,27 @@ export const QuotationCard: React.FC<QuotationCardProps> = ({
           filteredQuotations.map((quotation) => (
             <Card className="group">
               <CardHeader>
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-center">
                   <div>
                     <p className="text-xl">{quotation.supplier_name}</p>
                     <p className="text-sm">
                       {formatDate(quotation.created_at)}
                     </p>
                   </div>
-                  <OpenInNewWindowIcon
-                    width={20}
-                    height={20}
-                    className="hover:cursor-pointer"
+
+                  <Button
                     onClick={() =>
                       navigate(`/bac/quotation/${quotation.rfq_no}`)
                     }
-                  />
+                  >
+                    <p className="px-2">View</p>
+
+                    <OpenInNewWindowIcon
+                      width={20}
+                      height={20}
+                      className="hover:cursor-pointer"
+                    />
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
