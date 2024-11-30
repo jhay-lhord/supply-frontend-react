@@ -69,51 +69,14 @@ export const po_columns: ColumnDef<abstractType_>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium hover:underline">
-            {row.getValue("afq_no")}
+            {/* {row.getValue("afq_no")} */}
+            4 Items
           </span>
         </div>
       );
     },
   },
-  // {
-  //   accessorKey: "status",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Status" />
-  //   ),
-  //   cell: ({ row }) => <div className="w-[80px]">{row.getValue("status")}</div>,
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
-  // {
-  //   accessorKey: "purpose",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Purpose" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     return (
-  //       <div className="flex space-x-2">
-  //         <span className="max-w-[500px] font-medium">
-  //           {row.getValue("purpose")}
-  //         </span>
-  //       </div>
-  //     );
-  //   },
-  // },
-  // {
-  //   accessorKey: "requested_by",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Requested By" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     return (
-  //       <div className="flex space-x-2">
-  //         <span className="max-w-[500px] truncate font-medium">
-  //           {row.getValue("requested_by")}
-  //         </span>
-  //       </div>
-  //     );
-  //   },
-  // },
+
   {
     accessorKey: "created_at",
     header: ({ column }) => (

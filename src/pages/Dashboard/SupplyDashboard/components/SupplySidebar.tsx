@@ -4,11 +4,13 @@ import {
   ShoppingCart,
   FileSpreadsheet,
   FileSymlink,
+  ChevronUp,
 } from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -18,6 +20,16 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Logo from "/public/CTU_new_logotransparent.svg";
+import { UserNav } from "../../shared/components/UserNav";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
+import { userEmail, userFullname } from "@/services/useProfile";
 
 const dashboard = [
   {
@@ -54,6 +66,12 @@ const inventory = [
 ];
 
 const SupplySidebar = () => {
+  const navigate = useNavigate();
+  const handleLogoutClick = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -110,6 +128,38 @@ const SupplySidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="">
+                  <UserNav />
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm">{userFullname}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {userEmail}
+                    </p>
+                  </div>
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem>
+                  <span>Account</span>
+                </DropdownMenuItem>
+                <Separator />
+                <DropdownMenuItem onClick={handleLogoutClick}>
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 };
