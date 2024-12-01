@@ -274,9 +274,13 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                         </div>
                       </RadioGroup>
                     </div>
-                    <div className="w-full flex justify-end">
+
+                    <div className="fixed bottom-6 right-10">
                       <TabsList className="bg-orange-200">
-                        <TabsTrigger className="bg-orange-200 text-gray-950" value="items">
+                        <TabsTrigger
+                          className="bg-orange-200 px-6 py-1 text-gray-950"
+                          value="items"
+                        >
                           Next
                         </TabsTrigger>
                       </TabsList>
@@ -351,9 +355,12 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                     ) : (
                       <Loading />
                     )}
-                     <div className="w-full flex justify-start">
+                    <div className="fixed bottom-6 left-10">
                       <TabsList className="bg-orange-200">
-                        <TabsTrigger className="bg-orange-200 text-gray-950" value="supplier">
+                        <TabsTrigger
+                          className="bg-orange-200 px-6 py-1 text-gray-950"
+                          value="supplier"
+                        >
                           Back
                         </TabsTrigger>
                       </TabsList>
