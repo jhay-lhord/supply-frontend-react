@@ -80,7 +80,6 @@ export const FilteredItemSelectedInPR = (
   data: itemSelectedType_[],
   pr_no: string
 ) => {
-  console.log(data);
   return data.filter((item) => item.pr_details.pr_no === pr_no);
 };
 
@@ -88,7 +87,7 @@ export const totalItemSelectedInAOQ = (
   data: itemSelectedType_[],
   aoq_no: string
 ) => {
-  return data.filter((item) => item.is_item_selected && item.afq === aoq_no)
+  return data.filter((item) => item.is_item_selected && item.aoq === aoq_no)
     .length;
 };
 
