@@ -75,7 +75,7 @@ export const DataTableRowActions = ({
         />
       ) : (
         <AbstractForm
-          pr_no={pr_no}
+          prNoFromProps={pr_no}
           isDialogOpen={isDialogOpen}
           setIsDialogOpen={setIsDialogOpen}
         />
