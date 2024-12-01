@@ -98,7 +98,8 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="Actions" />
     ),
     cell: ({row}) => (
-      <DataTableRowActions pr_no={row.getValue("pr_no")} _data={row.original} link={"purchase-request"} />
+      <DataTableRowActions pr_no={row.getValue("pr_no")} _data={row.original} link={"purchase-request"} form="Quotation"/>
     ),
   },
 ];
+

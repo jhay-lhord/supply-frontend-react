@@ -123,7 +123,7 @@ export const AbstractColumn: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="Actions" />
     ),
     cell: ({row}) => (
-      <DataTableRowActions pr_no={row.getValue("pr_no")} _data={row.original} link={"abstract-of-quotation"} />
+      <DataTableRowActions pr_no={row.getValue("pr_no")} _data={row.original} link={"abstract-of-quotation"} form="Abstract"/>
     ),
   },
 ];

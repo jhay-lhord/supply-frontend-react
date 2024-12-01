@@ -10,18 +10,20 @@ import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useNavigate } from "react-router-dom";
 import { TwoStepRFQForm } from "./TwoStepRFQForm";
 import { useState } from "react";
+import { AbstractForm } from "./AbstractForm";
 
 interface DataTableRowActionsProps {
   pr_no: string;
   _data: purchaseRequestType;
   link: string;
+  form: string;
 }
 
 export const DataTableRowActions = ({
   pr_no,
-  link
+  link,
+  form,
 }: DataTableRowActionsProps) => {
-
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -29,7 +31,6 @@ export const DataTableRowActions = ({
     event.stopPropagation();
     navigate(`/bac/${link}/${pr_no}`);
   };
-
 
   return (
     <>
@@ -42,7 +43,8 @@ export const DataTableRowActions = ({
                 variant="default"
                 className="flex data-[state=open]:bg-muted hover:rounded-full"
               >
-                <p className="px-2">Open</p><ArrowTopRightIcon className="h-4 w-4 text-gray-900" />
+                <p className="px-2">Open</p>
+                <ArrowTopRightIcon className="h-4 w-4 text-gray-900" />
                 <span className="sr-only">Open</span>
               </Button>
             </TooltipTrigger>
@@ -56,16 +58,28 @@ export const DataTableRowActions = ({
                 variant="outline"
                 className="flex data-[state=open]:bg-muted hover:rounded-full"
               >
-                <p className="px-2">Add</p><PlusIcon className="h-4 w-4 text-gray-900" />
-                <span className="sr-only">Create RFQ</span>
+                <p className="px-2">Add</p>
+                <PlusIcon className="h-4 w-4 text-gray-900" />
+                <span className="sr-only">Create {form}</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">Create RFQ</TooltipContent>
+            <TooltipContent side="top">Create {form}</TooltipContent>
           </Tooltip>
         </div>
       </TooltipProvider>
-
-      <TwoStepRFQForm isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}pr_no={pr_no} />
+      {form === "Quotation" ? (
+        <TwoStepRFQForm
+          isDialogOpen={isDialogOpen}
+          setIsDialogOpen={setIsDialogOpen}
+          pr_no={pr_no}
+        />
+      ) : (
+        <AbstractForm
+          pr_no={pr_no}
+          isDialogOpen={isDialogOpen}
+          setIsDialogOpen={setIsDialogOpen}
+        />
+      )}
     </>
   );
 };
