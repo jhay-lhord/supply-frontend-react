@@ -39,7 +39,7 @@ const Empty: React.FC<EmptyProps> = ({ query }) => (
   <div>
     <div className="grid place-items-center w-full h-96">
       <img src="/empty-box.svg" className="w-80 h-80" alt="Empty box" />
-      <p>{`No Request of Quotation Found of query ${query}`}</p>
+      <p>{`No Request of Quotation Found ${query}`}</p>
     </div>
   </div>
 );
@@ -57,7 +57,7 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
     useState<DropdownOption>("purchase_request");
 
   const { data } = useRequestForQoutation();
-  const { mutate } = useDeleteRequestForQuotation();
+  const { mutate, isSuccess } = useDeleteRequestForQuotation();
 
   const quotations = Array.isArray(data?.data) ? data?.data : [];
 
@@ -72,10 +72,12 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
 
   const handleDelete = () => {
     mutate(rfqNo!);
-    toast({
-      title: "Success",
-      description: "Request of Quotation Successfully deleted",
-    });
+    if (isSuccess) {
+      toast({
+        title: "Success",
+        description: "Request of Quotation Successfully deleted",
+      });
+    }
   };
 
   return (
@@ -154,7 +156,7 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
                 </CardContent>
                 <CardFooter>
                   <div className="flex justify-between  w-full">
-                    <p className="flex items-center rounded-full bg-green-200 px-2 py-1 text-xs">
+                    <p className="flex items-center rounded-full bg-green-200 px-2 py-0 text-xs">
                       {quotation.purchase_request}
                     </p>
 

@@ -19,22 +19,14 @@ import {
 import { formatDate } from "@/services/formatDate";
 import { Empty } from "../shared/components/Empty";
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-day-picker";
+import { Button } from "@/components/ui/button";
 import Layout from "./components/Layout/BACDashboardLayout";
-
+import Loading from "../shared/components/Loading";
 
 export const AllAbstract = () => {
-  const { data } = useAllItemSelectedQuote();
+  const { data, isLoading: item_selected_loading } = useAllItemSelectedQuote();
   const { data: aoq_data } = useAbstractOfQuotation();
   const navigate = useNavigate();
-
-  const records = Array.from({ length: 150 }, (_, i) => ({
-    id: 'id' + (i + 1),
-    text: `Item ${i + 1}`,
-  }));
-
-const fields = { text: 'text', value: 'id' };
-
   const abstract = Array.isArray(aoq_data?.data) ? aoq_data.data : [];
 
   const totalItemsCount = (aoqNo: string) => {
@@ -44,12 +36,9 @@ const fields = { text: 'text', value: 'id' };
 
   const totalAmount = (aoqNo: string) => {
     const items = Array.isArray(data?.data) ? data.data : [];
-    const filteredItems = items.filter(
-      (item) => item.afq === aoqNo && item.is_item_selected
-    );
-    return filteredItems.reduce(
-      (sum, item) => sum + Number(item.total_amount),
-      0
+    return (
+      items.length > 0 &&
+      items.filter((item) => item.aoq === aoqNo)[0].total_amount
     );
   };
 
@@ -58,8 +47,10 @@ const fields = { text: 'text', value: 'id' };
       <div className=" rounded relative w-full">
         <div className=" pb-8">
           <p className="text-xl"> All Abstract of Quotation</p>
-          <div className="grid grid-cols-4 gap-4 mt-8 w-full">
-            {abstract && abstract.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4 mt-8 w-full">
+            {item_selected_loading ? (
+              <Loading />
+            ) : abstract && abstract.length > 0 ? (
               abstract.map((data) => (
                 <Card className="group border shadow-md rounded-lg">
                   <CardHeader>
@@ -68,22 +59,21 @@ const fields = { text: 'text', value: 'id' };
                         <p className="text-xl font-semibold">
                           {data.rfq_details.supplier_name}
                         </p>
-                        <p className="text-sm text-gray-500">{data.afq_no}</p>
+                        <p className="text-sm text-gray-500">{data.aoq_no}</p>
                       </div>
 
                       <TooltipProvider>
                         <Tooltip>
-                          ``
                           <TooltipTrigger asChild>
                             <Button
                               className="bg-orange-200 p-2"
                               onClick={() =>
                                 navigate(
-                                  `/bac/abstract-item-list/${data.afq_no}`
+                                  `/bac/abstract-item-list/${data.aoq_no}`
                                 )
                               }
                             >
-                              <p>View</p>
+                              <p className="px-2">View</p>
                               <OpenInNewWindowIcon
                                 width={20}
                                 height={20}
@@ -117,11 +107,11 @@ const fields = { text: 'text', value: 'id' };
                         Quotation Summary
                       </p>
                       <p className="text-base text-gray-700">
-                        Total Items: {totalItemsCount(data.afq_no)}
+                        Total Items: {totalItemsCount(data.aoq_no)}
                       </p>
                       <p className="text-base text-gray-700"></p>
                       <p className="text-base text-green-600 font-medium">
-                        Total Price: {totalAmount(data.afq_no)}
+                        Total Price: {totalAmount(data.aoq_no)}
                       </p>
                     </div>
                   </CardContent>
