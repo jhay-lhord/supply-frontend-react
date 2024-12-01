@@ -1,5 +1,5 @@
 export type itemSelectedType_ = {
-  afq: string;
+  aoq: string;
   item_quote_no: string;
   pr_details: {
     pr_no:string;
@@ -10,7 +10,7 @@ export type itemSelectedType_ = {
     approved_by: string;
     created_at: Date;
   };
-  item_details: {
+  item_qoutation_details: {
     brand_model: string;
     is_low_price: string;
     item_details: {
@@ -40,7 +40,7 @@ export type itemSelectedType_ = {
 }
 
 export type abstractType_ = {
-  afq_no: string,
+  aoq_no: string,
   rfq_details: {
     is_VAT: boolean,
     purchase_request: string,
