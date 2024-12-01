@@ -11,7 +11,7 @@ export const generateAOQNo = (data: abstractType_[], pr_no: string): string => {
   // Sort by created_at in descending order (latest first)
   abstractHasSamePr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  const latestAOQNo = abstractHasSamePr[0].afq_no;
+  const latestAOQNo = abstractHasSamePr[0].aoq_no ?? "";
   const lastChar = latestAOQNo.slice(-1);
 
   // Increment the letter
