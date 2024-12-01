@@ -56,7 +56,7 @@ export const BACSidebarFooter = () => {
             <span>Account</span>
           </DropdownMenuItem>
           <Separator />
-          <DropdownMenuItem onClick={Logout}>
+          <DropdownMenuItem onClick={() => Logout()}>
             <span>Sign out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

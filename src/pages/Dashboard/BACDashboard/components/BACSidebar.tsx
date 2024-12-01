@@ -34,7 +34,7 @@ const dashboard = [
   },
 ];
 
-const purchase_request = [
+const purchaseRequest = [
   {
     title: "Approved PR",
     url: "/bac/purchase-request",
@@ -48,7 +48,7 @@ const quotation = {
   icon: FileTextIcon,
 };
 
-const quotation_sub = [
+const quotationSub = [
   {
     title: "List of all RFQs",
     url: "/bac/request-for-quotations",
@@ -56,18 +56,19 @@ const quotation_sub = [
   },
 ];
 
+const prWithRFQ = {
+  title: "Purchase Request with RFQ",
+  url: "/bac/abstract-of-quotation",
+  icon: FileTextIcon,
+};
+
 const abstract = {
   title: "Abstract Of Quotation",
   url: "",
   icon: FileTextIcon,
 };
 
-const abstract_sub = [
-  {
-    title: "Purchase Request with RFQ",
-    url: "/bac/abstract-of-quotations",
-    icon: FileTextIcon,
-  },
+const abstractSub = [
   {
     title: "List of all AOQs",
     url: "/bac/abstract-of-quotations",
@@ -118,7 +119,7 @@ const BACSidebar = () => {
             </SidebarMenu>
             <SidebarGroupLabel>Purchase Request</SidebarGroupLabel>
             <SidebarMenu>
-              {purchase_request.map((item) => (
+              {purchaseRequest.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
@@ -143,7 +144,7 @@ const BACSidebar = () => {
                       className="px-3 py-5  hover:bg-orange-100"
                       isActive={location.pathname === quotation.url}
                     >
-                      <div className="flex justify-between"> 
+                      <div className="flex justify-between">
                         <div className="flex gap-2">
                           <quotation.icon />
                           <p>{quotation.title}</p>
@@ -154,7 +155,7 @@ const BACSidebar = () => {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {quotation_sub.map((data) => (
+                      {quotationSub.map((data) => (
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             asChild
@@ -171,6 +172,20 @@ const BACSidebar = () => {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
+              <SidebarMenu>
+              <SidebarMenuItem key={prWithRFQ.title}>
+                <SidebarMenuButton
+                  asChild
+                  className="px-3 py-5  hover:bg-orange-100"
+                  isActive={location.pathname === prWithRFQ.url}
+                >
+                  <a href={prWithRFQ.url}>
+                    <prWithRFQ.icon />
+                    <p>{prWithRFQ.title}</p>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
@@ -189,7 +204,7 @@ const BACSidebar = () => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {abstract_sub.map((data) => (
+                    {abstractSub.map((data) => (
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
                           asChild
