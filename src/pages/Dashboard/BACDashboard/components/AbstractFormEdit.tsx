@@ -36,8 +36,8 @@ import {
 } from "@/components/ui/tooltip";
 import Loading from "../../shared/components/Loading";
 import {
-  abstractOfQuotationSchema,
-  abstractOfQuotationType,
+  abstractSchema,
+  abstractType,
 } from "@/types/request/abstract_of_quotation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -100,7 +100,7 @@ export const AbstractFormEdit: React.FC<AbstractFormEditProps> = ({
   const { mutate: addItemSelectedMutation } = useAddItemSelectedQuote();
 
   const { control, handleSubmit, reset, setValue, watch } = useForm({
-    resolver: zodResolver(abstractOfQuotationSchema),
+    resolver: zodResolver(abstractSchema),
     defaultValues: {
       afq_no: uuidv4(),
       rfq: rfqNo,
@@ -158,11 +158,11 @@ export const AbstractFormEdit: React.FC<AbstractFormEditProps> = ({
 
   const { fields } = useFieldArray({ control, name: "items" });
 
-  const onSubmit = async (data: abstractOfQuotationType) => {
+  const onSubmit = async (data: abstractType) => {
     setIsLoading(true);
     try {
       let isSuccess: boolean;
-      const result = abstractOfQuotationSchema.safeParse(data);
+      const result = abstractSchema.safeParse(data);
       if (!result.success) {
         console.error("Validation failed:", result.error);
         return;
