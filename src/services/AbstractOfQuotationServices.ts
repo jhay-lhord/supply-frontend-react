@@ -1,4 +1,5 @@
 import api from "@/api";
+import { useToast } from "@/hooks/use-toast";
 import {
   abstractType,
   itemSelectedQuoteType,
@@ -150,11 +151,13 @@ export const deleteAbstractOfQuoutation = async (
 
 export const useDeleteAbstractOfQuotation = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast()
   return useMutation({
     mutationFn: deleteAbstractOfQuoutation,
     mutationKey: ["abstract-of-quotations"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
+      toast({title: "Success", description: "Abstract of Quotation Successfully Deleted"})
     },
   });
 };

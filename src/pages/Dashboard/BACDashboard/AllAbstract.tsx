@@ -2,8 +2,9 @@ import {
   totalItemSelectedInAOQ,
   useAbstractOfQuotation,
   useAllItemSelectedQuote,
+  useDeleteAbstractOfQuotation,
 } from "@/services/AbstractOfQuotationServices";
-import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { OpenInNewWindowIcon, TrashIcon } from "@radix-ui/react-icons";
 import {
   Tooltip,
   TooltipProvider,
@@ -22,10 +23,17 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "./components/Layout/BACDashboardLayout";
 import Loading from "../shared/components/Loading";
+import { useState } from "react";
+import { DeleteDialog } from "../shared/components/DeleteDialog";
 
 export const AllAbstract = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false) 
+  const [aoqNo, setAoqNo] = useState<string | null >(null)
+
   const { data, isLoading: item_selected_loading } = useAllItemSelectedQuote();
   const { data: aoq_data } = useAbstractOfQuotation();
+  const { mutate } = useDeleteAbstractOfQuotation()
+
   const navigate = useNavigate();
   const abstract = Array.isArray(aoq_data?.data) ? aoq_data.data : [];
 
@@ -36,11 +44,18 @@ export const AllAbstract = () => {
 
   const totalAmount = (aoqNo: string) => {
     const items = Array.isArray(data?.data) ? data.data : [];
-    return (
-      items.length > 0 &&
-      items.filter((item) => item.aoq === aoqNo)[0].total_amount
-    );
+    const matchingItem = items.find((item) => item.aoq === aoqNo);
+    return matchingItem?.total_amount || 0;
   };
+
+  const handleOpenDialog = (aoq_no:string) => {
+    setIsDialogOpen(true)
+    setAoqNo(aoq_no)
+  }
+
+  const handleDelete = () => {
+    mutate(aoqNo!)
+  }
 
   return (
     <Layout>
@@ -117,10 +132,20 @@ export const AllAbstract = () => {
                   </CardContent>
 
                   <CardFooter className="mt-2 border-t pt-2">
-                    <div className="w-full flex justify-between items-center">
-                      <p className="text-sm text-gray-500 italic">
-                        {formatDate(data.created_at)}
-                      </p>
+                    <div className="w-full flex items-center">
+                      <div className="w-full flex justify-between items-center">
+                        <p className="text-sm text-gray-500 italic">
+                          {formatDate(data.created_at)}
+                        </p>
+                      </div>
+                      <div className="bg-red-200 rounded-full p-2 opacity-0 group-hover:opacity-100 ease-in-out cursor-pointer">
+                        <TrashIcon
+                          className=""
+                          width={20}
+                          height={20}
+                          onClick={() => handleOpenDialog(data.aoq_no)}
+                        />
+                      </div>
                     </div>
                   </CardFooter>
                 </Card>
@@ -130,6 +155,12 @@ export const AllAbstract = () => {
             )}
           </div>
         </div>
+        <DeleteDialog
+          isDialogOpen={isDialogOpen}
+          setIsDialogOpen={setIsDialogOpen}
+          message="Abstarct of Quotation"
+          onDeleteClick={handleDelete}
+        />
       </div>
     </Layout>
   );
