@@ -166,7 +166,7 @@ const BACDashboard: React.FC = () => {
                 <Card className="col-span-4  bg-slate-100">
                   <CardHeader>
                     <CardTitle>Weekly Reports</CardTitle>
-                    <CardDescription>Your Weekly Reports for the last 7 days</CardDescription>
+                    <CardDescription>My Weekly Reports for the last 7 days</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig}>

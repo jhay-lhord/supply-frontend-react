@@ -1,33 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "../components/data-table-column-header";
 import { DataTableRowActions } from "../components/data-table-row-actions";
 import { abstractType_ } from "@/types/response/abstract-of-quotation";
 export const po_columns: ColumnDef<abstractType_>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+
   {
     accessorKey: "pr_details.pr_no",
     header: ({ column }) => (
@@ -46,7 +22,7 @@ export const po_columns: ColumnDef<abstractType_>[] = [
     },
   },
   {
-    accessorKey: "afq_no",
+    accessorKey: "aoq_no",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="AOQ No." />
     ),
@@ -54,7 +30,7 @@ export const po_columns: ColumnDef<abstractType_>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("afq_no")}
+            {row.getValue("aoq_no")}
           </span>
         </div>
       );
@@ -106,7 +82,7 @@ export const po_columns: ColumnDef<abstractType_>[] = [
       <DataTableColumnHeader column={column} title="Actions" />
     ),
     cell: ({row}) => (
-      <DataTableRowActions pr_no={row.original.pr_details.pr_no} _data={row.original} />
+      <DataTableRowActions aoq_no={row.original.aoq_no} pr_no={row.original.pr_details.pr_no} _data={row.original} />
     ),
   },
 ];
