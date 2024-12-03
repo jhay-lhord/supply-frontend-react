@@ -18,7 +18,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Logo from "/public/CTU_new_logotransparent.svg";
-import { BACSidebarFooter } from "./BACSidebarFooter";
+import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
 import { useLocation } from "react-router-dom";
 import {
   Collapsible,
@@ -54,13 +54,12 @@ const quotationSub = [
     url: "/bac/request-for-quotations",
     icon: FileTextIcon,
   },
+  {
+    title: "Purchase Request with RFQ",
+    url: "/bac/abstract-of-quotation",
+    icon: FileTextIcon,
+  },
 ];
-
-const prWithRFQ = {
-  title: "Purchase Request with RFQ",
-  url: "/bac/abstract-of-quotation",
-  icon: FileTextIcon,
-};
 
 const abstract = {
   title: "Abstract Of Quotation",
@@ -172,20 +171,7 @@ const BACSidebar = () => {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              <SidebarMenu>
-              <SidebarMenuItem key={prWithRFQ.title}>
-                <SidebarMenuButton
-                  asChild
-                  className="px-3 py-5  hover:bg-orange-100"
-                  isActive={location.pathname === prWithRFQ.url}
-                >
-                  <a href={prWithRFQ.url}>
-                    <prWithRFQ.icon />
-                    <p>{prWithRFQ.title}</p>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+              <SidebarMenu></SidebarMenu>
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
@@ -225,7 +211,7 @@ const BACSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <BACSidebarFooter />
+        <CustomSidebarFooter />
       </SidebarFooter>
     </Sidebar>
   );

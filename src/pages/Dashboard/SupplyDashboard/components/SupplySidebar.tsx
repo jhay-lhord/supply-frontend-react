@@ -4,7 +4,6 @@ import {
   ShoppingCart,
   FileSpreadsheet,
   FileSymlink,
-  ChevronUp,
 } from "lucide-react";
 
 import {
@@ -18,18 +17,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Logo from "/public/CTU_new_logotransparent.svg";
-import { UserNav } from "../../shared/components/UserNav";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
-import { userEmail, userFullname } from "@/services/useProfile";
+import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
 
 const dashboard = [
   {
@@ -43,6 +34,11 @@ const procurement = [
   {
     title: "Purchase Request",
     url: "/supply/purchase-request",
+    icon: FileText,
+  },
+  {
+    title: "Abstract of Quotation",
+    url: "/supply/abstract-of-quotation",
     icon: FileText,
   },
   {
@@ -66,22 +62,24 @@ const inventory = [
 ];
 
 const SupplySidebar = () => {
-  const navigate = useNavigate();
-  const handleLogoutClick = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  const { open } = useSidebar();
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <img
-          src={Logo}
-          alt="Logo"
-          width={50}
-          height={50}
-          style={{ display: "block" }}
-        />
+      <SidebarHeader className="flex flex-row items-center">
+        {open ? (
+          <div className="flex gap-2 items-center rounded-md shadow-sm p-2 w-full">
+            <img src={Logo} alt="Logo" width={50} height={50} />
+            <div>
+              <p className="text-xl">CTU-AC</p>
+              <p className="text-xs text-orange-400">
+                SUPPLY MANAGEMENT SYSTEM
+              </p>
+            </div>
+          </div>
+        ) : (
+          <img src={Logo} alt="Logo" width={50} height={50} />
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -90,7 +88,7 @@ const SupplySidebar = () => {
             <SidebarMenu>
               {dashboard.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6">
+                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
                     <a href={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
@@ -103,7 +101,7 @@ const SupplySidebar = () => {
             <SidebarMenu>
               {procurement.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6">
+                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
                     <a href={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
@@ -116,7 +114,7 @@ const SupplySidebar = () => {
             <SidebarMenu>
               {inventory.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6">
+                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
                     <a href={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
@@ -129,36 +127,7 @@ const SupplySidebar = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="">
-                  <UserNav />
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm">{userFullname}</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail}
-                    </p>
-                  </div>
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <Separator />
-                <DropdownMenuItem onClick={handleLogoutClick}>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <CustomSidebarFooter />
       </SidebarFooter>
     </Sidebar>
   );

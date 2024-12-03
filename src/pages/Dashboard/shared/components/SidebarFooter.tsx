@@ -14,11 +14,18 @@ import {
 } from "@/services/useProfile";
 import { ChevronsUpDownIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Logout } from "@/components/Auth/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { logoutUser } from "@/services/LogoutUserServices";
+import { useNavigate } from "react-router-dom";
 
-export const BACSidebarFooter = () => {
+export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
+  const navigate = useNavigate()
+
+  const handleLogoutUser = () => {
+    logoutUser()
+    navigate("/login")
+  }
 
   return (
     <div>
@@ -56,7 +63,7 @@ export const BACSidebarFooter = () => {
             <span>Account</span>
           </DropdownMenuItem>
           <Separator />
-          <DropdownMenuItem onClick={() => Logout()}>
+          <DropdownMenuItem onClick={handleLogoutUser}>
             <span>Sign out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
