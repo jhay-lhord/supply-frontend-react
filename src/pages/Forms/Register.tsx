@@ -16,11 +16,10 @@ import {
   registerFormSchema,
   type RegisterInputData,
 } from "@/types/request/input";
-import api from "@/api";
-import { toast } from "sonner";
+import { useRegisterUser } from "@/services/registerUserServices";
 
 const Register = () => {
-  const [loading, setIsloading] = useState<boolean>(false);
+  const [isloading, setIsloading] = useState<boolean>(false);
   const [role, setRole] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false); // State for password visibility
@@ -28,6 +27,7 @@ const Register = () => {
     useState<boolean>(false); // State for confirm password visibility
 
   const navigate = useNavigate();
+  const { mutate } = useRegisterUser();
 
   const {
     register,
@@ -42,30 +42,16 @@ const Register = () => {
     setIsloading(true);
     setEmailError("");
 
-    api
-      .post("api/user/register/", {
-        first_name: data.first_name,
-        last_name: data.last_name,
-        role: data.role,
-        email: data.email,
-        password: data.password,
-        password2: data.password2,
-      })
-      .then((response) => {
-        console.log(response);
-        navigate("/");
-        toast("Account created successfully!", {
-          description:
-            "Your account is pending activation by an administrator. You’ll be notified once it’s activated.",
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        setEmailError(error?.response?.data?.email || "An error occurred");
-      })
-      .finally(() => {
-        setIsloading(false);
+    const result = registerFormSchema.safeParse(data);
+
+    if (result.success) {
+      mutate(data, {
+        onSuccess: () => {
+          setIsloading(false);
+          navigate("/");
+        },
       });
+    }
   };
 
   const handleRoleChange = (roleValue: string) => {
@@ -83,18 +69,15 @@ const Register = () => {
 
   return (
     <div className="relative flex h-screen justify-center items-center">
-      {/* Background Image with Blur Effect */}
       <div
         className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
         style={{
-          backgroundImage: "url('/image2.jpg')", // Replace with your image path
-          filter: "blur(8px)", // Adjust the blur value if necessary
+          backgroundImage: "url('/image2.jpg')",
+          filter: "blur(8px)",
         }}
       ></div>
 
-      {/* Content Section */}
       <div className="relative flex border border-slate rounded-lg w-[800px] shadow-lg border-[#FDE3CF] bg-white z-10">
-        {/* Image Section */}
         <div className="flex justify-center items-center w-1/2 border-r border-slate p-5 shadow-lg border-[#FDE3CF] bg-blue-50">
           <img
             src="CTU_new_logotransparent.svg"
@@ -103,20 +86,24 @@ const Register = () => {
           />
         </div>
 
-        {/* Form Section */}
         <div className="flex justify-center items-center w-1/2 p-7">
           <form
             className="w-full flex flex-col justify-between space-y-4"
             onSubmit={handleSubmit(onSubmit)}
           >
-            {/* Error Display */}
             {emailError && <p className="text-red-500">{emailError}</p>}
 
             <p className="font-normal text-3xl mt-0 mb-6 text-gray-900 text-center">
               Create an Account
             </p>
 
-            {/* First Name and Last Name inputs */}
+            <div>
+              <Input placeholder="Employee ID" {...register("employee_id")} />
+              {errors.employee_id && (
+                <p className="text-red-500">{errors.employee_id.message}</p>
+              )}
+            </div>
+
             <div className="flex gap-4">
               <div className="w-full">
                 <Input placeholder="First Name" {...register("first_name")} />
@@ -132,7 +119,6 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Email and Role Selection */}
             <div className="flex gap-4">
               <div className="w-full">
                 <Input placeholder="email@gmail.com" {...register("email")} />
@@ -159,7 +145,6 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Password and Confirm Password inputs */}
             <div className="flex gap-4">
               <div className="relative w-full">
                 <Input
@@ -208,7 +193,7 @@ const Register = () => {
             </div>
 
             <Button type="submit" className="w-full mt-4">
-              {loading ? <Loader2 className="animate-spin" /> : "Register"}
+              {isloading ? <Loader2 className="animate-spin" /> : "Register"}
             </Button>
 
             <p className="mt-4 text-center">

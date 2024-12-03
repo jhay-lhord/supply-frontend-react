@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const registerFormSchema = z
   .object({
+    employee_id: z.string(),
     first_name: z.string(),
     last_name: z.string(),
     role: z.string(),
