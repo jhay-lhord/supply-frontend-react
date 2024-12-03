@@ -21,11 +21,13 @@ import { toast } from "sonner";
 import { PurchaseOrderForm } from "./PurchaseOrderForm";
 
 interface DataTableRowActionsProps {
+  aoq_no:string
   pr_no: string;
   _data: purchaseRequestType;
 }
 
 export const DataTableRowActions = ({
+  aoq_no,
   _data,
   pr_no,
 }: DataTableRowActionsProps) => {
@@ -81,26 +83,25 @@ export const DataTableRowActions = ({
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleViewClick}
-                  variant="ghost"
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+                  className=" px-2 bg-orange-200 data-[state=open]:bg-muted hover:rounded-full"
                 >
-                  <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
+                  <p className="mx-1">Open</p><ArrowTopRightIcon className="h-4 w-4" />
                   <span className="sr-only">Open</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">Open</TooltipContent>
             </Tooltip>
 
-            <Separator className="h-8" orientation="vertical" decorative />
+            <Separator className="h-10" orientation="vertical" decorative />
 
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleOpenDialog}
-                  variant="ghost"
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+                  variant="outline"
+                  className="flex data-[state=open]:bg-muted hover:rounded-full bg- hover:bg-red-400 hover:text-gray-100"
                 >
-                  <TrashIcon className="h-4 w-4" />
+                  <p className="mx-1">Delete</p><TrashIcon className="h-4 w-4" />
                   <span className="sr-only">Delete</span>
                 </Button>
               </TooltipTrigger>
@@ -132,6 +133,8 @@ export const DataTableRowActions = ({
       />
 
       <PurchaseOrderForm
+        aoq_no={aoq_no}
+        pr_no={pr_no}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
       />
