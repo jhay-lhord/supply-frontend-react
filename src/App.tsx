@@ -29,6 +29,7 @@ import CampusDirector from "./pages/Dashboard/AdminDashboard/CampusDirector";
 import BACmember from "./pages/Dashboard/AdminDashboard/BACmember";
 import { AllQuotations } from "./pages/Dashboard/BACDashboard/AllQuotations";
 import { AllAbstract } from "./pages/Dashboard/BACDashboard/AllAbstract";
+import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/AbstractOfquotation";
 
 const App = () => {
   return (
@@ -62,6 +63,10 @@ const App = () => {
           <Route
             path="/supply/in-progress"
             element={<PurchaseRequestInProgress />}
+          />
+          <Route
+            path="/supply/abstract-of-quotation/"
+            element={<SupplyAOQ />}
           />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />

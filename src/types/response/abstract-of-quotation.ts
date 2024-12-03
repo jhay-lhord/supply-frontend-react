@@ -1,6 +1,6 @@
 export type itemSelectedType_ = {
   aoq: string;
-  item_quote_no: string;
+  item_selected_no: string;
   pr_details: {
     pr_no:string;
     res_center_code: string;

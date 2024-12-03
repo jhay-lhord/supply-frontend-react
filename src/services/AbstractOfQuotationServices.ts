@@ -31,6 +31,9 @@ export const useAbstractOfQuotation = () => {
   return useQuery<ApiResponse<abstractType_[]>, Error>({
     queryKey: ["abstract-of-quotations"],
     queryFn: getAllAbstractOfQuotation,
+    refetchInterval: 5000,
+    refetchOnMount: true, 
+    refetchOnWindowFocus: true 
   });
 };
 
