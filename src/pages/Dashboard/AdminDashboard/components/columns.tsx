@@ -125,12 +125,16 @@ export const columns: ColumnDef<UsersType>[] = [
       <DataTableColumnHeader column={column} title="Last Login" />
     ),
     cell: ({ row }) => {
-      const lastLogin = new Date(row.getValue("last_login") as string | number);
+      const lastLogin = row.getValue("last_login")
+      const lastLoginNum =  new Date(row.getValue("last_login") as string | number);
       const now = new Date();
   
-      const diffInSeconds = Math.floor((now.getTime() - lastLogin.getTime()) / 1000);
+      const diffInSeconds = Math.floor((now.getTime() - lastLoginNum.getTime()) / 1000);
   
       let timeAgo = "";
+      console.log(row.getValue("last_login"))
+      if(lastLogin === null || lastLogin === undefined) return timeAgo = ""
+
       if (diffInSeconds < 60) {
         timeAgo = `${diffInSeconds} seconds ago`;
       } else if (diffInSeconds < 3600) {
