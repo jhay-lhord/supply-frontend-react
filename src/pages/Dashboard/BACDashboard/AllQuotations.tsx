@@ -5,7 +5,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import {
-  ChevronDownIcon,
   OpenInNewWindowIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
@@ -19,14 +18,9 @@ import { Button } from "@/components/ui/button";
 import Layout from "./components/Layout/BACDashboardLayout";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DeleteDialog } from "../shared/components/DeleteDialog";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface QuotationCardProps {
   title: string;
@@ -86,28 +80,18 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
         <div className="flex justify-between ">
           <p className="text-xl">{title}</p>
           <div className="flex">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex gap-1 items-center bg-orange-200 rounded-l-md p-2">
-                Search By <ChevronDownIcon />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem
-                  onSelect={() => setSelectedDropdown("purchase_request")}
-                >
-                  Purchase Request
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSelectedDropdown("supplier_name")}
-                >
-                  Supplier Name
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSelectedDropdown("supplier_address")}
-                >
-                  Supplier Address
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Select  onValueChange={(value: DropdownOption) => setSelectedDropdown(value)}>
+              <SelectTrigger className="w-[180px] bg-orange-200 active:focus-none">
+                <SelectValue placeholder="Search By..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="purchase_request">Purchase Request</SelectItem>
+                  <SelectItem value="supplier_name">Supplier Name</SelectItem>
+                  <SelectItem value="supplier_address">Supplier Address</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <Input
               type="search"
               className="w-60"
