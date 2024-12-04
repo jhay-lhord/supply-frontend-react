@@ -38,6 +38,7 @@ import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
+import { formatTIN } from "@/services/formatTIN";
 
 interface TwoStepRFQFormProps {
   isDialogOpen: boolean;
@@ -131,19 +132,37 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
     errors: FieldErrors<requestForQoutationType>;
   }
 
-  const renderField = ({ label, field_name, errors }: RenderFieldProps) => (
-    <div className="w-full">
-      <Label>{label}</Label>
-      <Input {...register(field_name)} />
-      {errors && errors[field_name as keyof typeof errors] && (
-        <span className="text-xs text-red-500">
-          {errors[field_name as keyof typeof errors]?.message}
-        </span>
-      )}
-    </div>
-  );
+  const renderField = ({ label, field_name, errors }: RenderFieldProps) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (field_name === "tin") {
+        // Apply formatting only for TIN field
+        const formattedTIN = formatTIN(e.target.value);
+        e.target.value = formattedTIN;
+      }
+    };
+    
+
+    return (
+      <div className="w-full">
+        <Label>{label}</Label>
+        <Input
+          {...register(field_name)}
+          onChange={(e) => {
+            handleInputChange(e);
+            register(field_name).onChange(e);
+          }}
+        />
+        {errors && errors[field_name as keyof typeof errors] && (
+          <span className="text-xs text-red-500">
+            {errors[field_name as keyof typeof errors]?.message}
+          </span>
+        )}
+      </div>
+    );
+  };
 
   const onSubmit = async (data: requestForQoutationType) => {
+    console.log(data)
     setIsLoading(true);
     try {
       const result = requestForQoutationSchema.safeParse(data);

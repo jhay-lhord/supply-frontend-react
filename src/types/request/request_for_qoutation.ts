@@ -13,12 +13,13 @@ export const itemQuotationSchema = z.object({
     })
   ),
 });
+
 export const quotationSchema = z.object({
   rfq_no: z.string().min(1, "Required"),
   purchase_request: z.string().min(1, "Required"),
   supplier_name: z.string().min(1, "Required"),
   supplier_address: z.string().min(1, "Required"),
-  tin: z.string().min(1, "Required"),
+  tin: z.string().regex(/^\d{3}-\d{3}-\d{3}-\d{3}$/, "TIN must be in the format XXX-XXX-XXX-XXX."),
   is_VAT: z.boolean(),
 });
 
