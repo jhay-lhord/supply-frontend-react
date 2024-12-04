@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
+
 import { RecentActivities } from "../shared/components/RecentActivities";
 
 import { useBACmemberCount } from "@/services/BACmemberServices";
@@ -15,8 +15,9 @@ import { useCampusDirectorCount } from "@/services/campusDirectorServices";
 import { useRequisitionerCount } from "@/services/requisitionerServices";
 import { useUserCount } from "@/services/userServices";
 
-import AdminSidebar from "./components/AdminSidebar";
+
 import { Loader2, UserIcon, UsersIcon, UsersRoundIcon } from "lucide-react";
+import Layout from "./components/Layout/AdminDashboardLayout";
 
 const AdminDashboard: React.FC = () => {
   const { BACmemberCount, isLoading: isBACmemberLoading } = useBACmemberCount();
@@ -29,10 +30,10 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <DashboardLayout>
-      <AdminSidebar />
+    <Layout>
+    
       {/* Main Content */}
-      <ScrollArea className="w-full mt-14">
+      <ScrollArea className="w-full">
         <main className=" flex-grow">
           <div className="md:hidden"></div>
           <div className="hidden flex-col md:flex">
@@ -87,7 +88,7 @@ const AdminDashboard: React.FC = () => {
 
                   <Card
                     className="bg-slate-100 border-none hover:cursor-pointer"
-                    onClick={() => navigate("/admin/campus-directorr")}
+                    onClick={() => navigate("/admin/campus-director")}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-2xl font-semibold">
@@ -96,7 +97,7 @@ const AdminDashboard: React.FC = () => {
                       <UserIcon />
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl text-orange-300">
+                      <div className="text-3xl text-orange-300 ">
                         {isCampusDirectorLoading ? (
                           <Loader2 className="animate-spin" />
                         ) : (
@@ -149,7 +150,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         </main>
       </ScrollArea>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

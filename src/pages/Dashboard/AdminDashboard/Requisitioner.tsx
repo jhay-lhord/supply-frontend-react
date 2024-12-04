@@ -1,15 +1,16 @@
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import AdminSidebar from "./components/AdminSidebar";
+
+
 import RequisitionerForm from "./components/requisitionerForm";
+import Layout from "./components/Layout/AdminDashboardLayout";
 
 const Requisitioner: React.FC = () => {
   return (
-    <DashboardLayout>
-      <AdminSidebar />
-      <div className="pt-16 w-full">
+    <Layout>
+      
+      <div className=" w-full">
         <RequisitionerForm />
       </div>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

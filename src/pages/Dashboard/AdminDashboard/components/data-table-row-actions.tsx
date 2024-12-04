@@ -132,19 +132,22 @@ export const DataTableRowActions = ({
         </TooltipProvider>
       ) : (
         <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-          <div className="flex gap-4 bg-orange-200 rounded p-1 items-center justify-center">
+          <div className="flex gap-11 bg-orange-200 rounded p-1 items-center justify-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                 
                   onClick={handleEditOpenDialog}
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+                  className="flex  h-8 w-8 p-0 hover:bg-orange-200"
                 >
-                  <Pencil1Icon className="h-4 w-4 text-orange-400" />
-                  <span className="sr-only">Edit</span>
+                  <div className="flex items-center justify-center gap-1 ml-11 ">
+                    Edit
+                  <Pencil1Icon className="h-5 w-5" />
+                  
+                  </div>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">Edit</TooltipContent>
+       
             </Tooltip>
 
             <Separator className="h-8" orientation="vertical" decorative />
@@ -152,15 +155,17 @@ export const DataTableRowActions = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+           
                   onClick={handleOpenDialog}
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+                  className="flex  h-8 w-8 p-0 hover:bg-orange-200"
                 >
-                  <TrashIcon className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
+                  <div className="flex items-center justify-center gap-1 mr-10">
+                  <TrashIcon className="h-5 w-5" />
+                  Delete
+                  </div>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">Delete</TooltipContent>
+            
             </Tooltip>
           </div>
         </TooltipProvider>

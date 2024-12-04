@@ -25,45 +25,51 @@ import { Loader2 } from "lucide-react";
 import { useActivateUser } from "@/services/userServices";
 import { useLocation } from "react-router-dom";
 import { DeleteDialog } from "./DeleteDialog";
-import { CampusDirectorType } from "@/types/request/campus-director";
-import { useDeleteCampusDirector } from "@/services/campusDirectorServices";
-import EditCDForm from "./EditCDForm";
+
+
+import { RequisitionerType } from "@/types/request/requisitioner";
+
+
+import { useDeleteRequisitioner } from "@/services/requisitionerServices";
+
+
+import EditRequisitionerForm from "./EditRequisitionerForm";
 
 //Step 5: define the data props to users Type
 
-interface CDDataTableRowActionsProps {
+interface RequisitionerDataTableRowActionsProps {
   id: string | undefined;
-  _data: UsersType | CampusDirectorType;
+  _data: UsersType | RequisitionerType;
 }
 
-export const CDDataTableRowActions = ({
+export const BACDataTableRowActions = ({
   id,
   _data,
-}: CDDataTableRowActionsProps) => {
+}: RequisitionerDataTableRowActionsProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const [isEditDialogOpen, setIsEditDialogOpen ] =  useState<boolean>(false);
-  const [cdId, setcdId] = useState<string>("");
+  const [requisitionId, setRequisitionerId] = useState<string>("");
   const location = useLocation();
   const usersPath = "/admin/users";
-  const {mutate:cdMutation} = useDeleteCampusDirector()
+  const {mutate:RequisitionerMutation} = useDeleteRequisitioner()
 
   const handleOpenDropdown = () => {
     setIsDropdownOpen(true);
   };
   const handleDelete = () => {
-    cdMutation(id!)
+    RequisitionerMutation(id!)
   };
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
-   
+  
   };
 
   const handleEditOpenDialog = () => {
     setIsEditDialogOpen(true);
-    setcdId(id!);
-   
+    setRequisitionerId(id!);
+  
   };
 
   const buttonLabel = (_data as UsersType).is_active
@@ -131,18 +137,18 @@ export const CDDataTableRowActions = ({
         </TooltipProvider>
       ) : (
         <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-          <div className="flex gap-1 bg-orange-200 rounded p-1 items-center justify-center">
+          <div className="flex gap-1  bg-orange-200 rounded p-1 items-center justify-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  
+                  variant="ghost"
                   onClick={handleEditOpenDialog}
                   className="flex  h-8 w-8 p-0  hover:bg-orange-200 bg-orange-200 "
                 >
-                  <div className ="flex items-center justify-cente gap-5 mr-20">
-                    Edit
-                  <Pencil1Icon className="h-5 w-5" />
-                 
+                 <div className ="flex items-center justify-cente gap-5 mr-20">
+                  Edit
+                  <Pencil1Icon className="h-5 w-5 " />
+                  
                   </div>
                 </Button>
               </TooltipTrigger>
@@ -156,16 +162,17 @@ export const CDDataTableRowActions = ({
                 <Button
                   
                   onClick={handleOpenDialog}
-                  className= "flex  h-8 w-8 p-0 hover:bg-orange-200"
+                  className="flex  h-8 w-8 p-0 hover:bg-orange-200"
                 >
-                  <div className="flex items-center justify-center gap-5 ml-20">
-                  <TrashIcon className="h-5 w-5" />
+                  <div className = "flex items-center justify-center gap-5 ml-20 ">
                   
+                  <TrashIcon className="h-5 w-5" />
+                 
                   Delete
                   </div>
                 </Button>
               </TooltipTrigger>
-           
+              
             </Tooltip>
           </div>
         </TooltipProvider>
@@ -175,16 +182,16 @@ export const CDDataTableRowActions = ({
       <DeleteDialog
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
-        message="Campus Director"
+        message="requisitioner"
         onDeleteClick={handleDelete}
       />
 
-      <EditCDForm 
+      <EditRequisitionerForm 
        isEditDialogOpen={isEditDialogOpen}
        setIsEditDialogOpen={setIsEditDialogOpen}
-       cd_id={cdId}
+       requisition_id={requisitionId}
 
-      />
+      /> 
 
     </>
 

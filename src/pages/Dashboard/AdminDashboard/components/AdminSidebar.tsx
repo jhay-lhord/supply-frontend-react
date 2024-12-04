@@ -1,53 +1,103 @@
-import { User2Icon, LayoutDashboard, Users} from "lucide-react";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { SideNav } from "@/pages/Dashboard/shared/components/SideNav";
+import {
+  LayoutDashboard,
+  Users,
+  User2Icon,
+} from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import Logo from "/public/CTU_new_logotransparent.svg";
+import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
+
+
+const AdminNav = [
+  {
+    title: "Dashboard",
+    url: "/admin/dashboard",
+    icon: LayoutDashboard,
+   
+  },
+  {
+    title: "Users",
+    url: "/admin/users",
+    icon: Users,
+    
+  },
+  {
+    title: "Requisitioner",
+    url: "/admin/requisitioner",
+    icon: Users,
+   
+  },
+  {
+    title: "Campus Director",
+    url: "/admin/campus-director",
+    icon: User2Icon,
+   
+  },
+  {
+    title: "BAC Members",
+    url: "/admin/BACmembers",
+    icon: Users,
+    
+  },
+];
+
+
 
 const AdminSidebar = () => {
+  const { open } = useSidebar();
+
   return (
-    <TooltipProvider>
-      <aside className="hidden md:flex flex-col w-auto h-screen p-2 border-r border-gray-200 sticky top-0 pt-16">
-        <SideNav
-          isCollapsed={false}
-          links={[
-            {
-              title: "Dashboard",
-              label: "",
-              link_to: "/admin/dashboard",
-              icon: LayoutDashboard,
-              variant: "default",
-            },
-            {
-              title: "Users",
-              label: "",
-              link_to: "/admin/users",
-              icon: Users,
-              variant: "default",
-            },
-            {
-              title: "Requisitioner",
-              label: "",
-              link_to: "/admin/requisitioner",
-              icon: Users,
-              variant: "default",
-            },
-            {
-              title: "Campus Director",
-              label: "",
-              link_to: "/admin/campus-director",
-              icon: User2Icon,
-              variant: "default",
-            },
-            {
-              title: "BAC Members",
-              label: "",
-              link_to: "/admin/BACmembers",
-              icon: Users,
-              variant: "default",
-            },
-          ]}
-        />
-      </aside>
-    </TooltipProvider>
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="flex flex-row items-center">
+        {open ? (
+          <div className="flex gap-2 items-center rounded-md shadow-sm p-2 w-full">
+            <img src={Logo} alt="Logo" width={50} height={50} />
+            <div>
+              <p className="text-xl">CTU-AC</p>
+              <p className="text-xs text-orange-400">
+                SUPPLY MANAGEMENT SYSTEM
+              </p>
+            </div>
+          </div>
+        ) : (
+          <img src={Logo} alt="Logo" width={50} height={50} />
+        )}
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+       
+            <SidebarMenu>
+              {AdminNav.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
+                    <a href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <CustomSidebarFooter />
+      </SidebarFooter>
+    </Sidebar>
   );
 };
 
