@@ -45,10 +45,10 @@ const AdminDashboard: React.FC = () => {
                 <div className="lg:col-span-4 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
                   <Card
                     className="bg-slate-100 border-none hover:cursor-pointer"
-                    onClick={() => navigate("/supply/purchase-request")}
+                    onClick={() => navigate("/admin/users")}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-md font-medium">
+                      <CardTitle className="text-2xl font-semibold">
                         Users
                       </CardTitle>
                       <UserIcon />
@@ -66,10 +66,10 @@ const AdminDashboard: React.FC = () => {
 
                   <Card
                     className="bg-slate-100 border-none hover:cursor-pointer"
-                    onClick={() => navigate("/supply/in-progress")}
+                    onClick={() => navigate("/admin/requisitioner")}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-md font-medium">
+                      <CardTitle className="text-2xl font-semibold">
                         Requisitioners
                       </CardTitle>
                       <UsersIcon />
@@ -87,10 +87,10 @@ const AdminDashboard: React.FC = () => {
 
                   <Card
                     className="bg-slate-100 border-none hover:cursor-pointer"
-                    onClick={() => navigate("/supply/purchase-order")}
+                    onClick={() => navigate("/admin/campus-directorr")}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-md font-medium">
+                      <CardTitle className="text-2xl font-semibold">
                         Campus Director
                       </CardTitle>
                       <UserIcon />
@@ -108,10 +108,10 @@ const AdminDashboard: React.FC = () => {
 
                   <Card
                     className="bg-slate-100 border-none hover:cursor-pointer"
-                    onClick={() => navigate("/supply/purchase-order")}
+                    onClick={() => navigate("/admin/BACmembers")}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-md font-medium">
+                      <CardTitle className="text-2xl font-semibold">
                         BAC Members
                       </CardTitle>
                       <UsersRoundIcon />

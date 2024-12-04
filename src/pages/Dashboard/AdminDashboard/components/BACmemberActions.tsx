@@ -134,7 +134,7 @@ export const BACDataTableRowActions = ({
         </TooltipProvider>
       ) : (
         <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-          <div className="flex gap-4 bg-orange-200 rounded p-1 items-center justify-center">
+          <div className="flex gap-4 w-40 bg-orange-200 rounded p-1 items-center justify-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

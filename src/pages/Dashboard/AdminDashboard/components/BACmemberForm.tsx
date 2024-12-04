@@ -90,7 +90,7 @@ const BACmemberForm = () => {
               {isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                "Add Campus Director"
+                "Add BAC Member"
               )}
             </Button>
           </div>
