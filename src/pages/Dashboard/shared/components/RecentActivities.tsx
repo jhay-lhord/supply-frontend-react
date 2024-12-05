@@ -4,13 +4,16 @@ import { TimeAgo } from "./GetTimeAgo";
 import { extractModelName } from "@/services/extractModelName";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trimmedUserRole } from "@/services/useProfile";
+import Loading from "./Loading";
 
 export const RecentActivities = () => {
-  const { data } = useGetAllRecentActivities();
+  const { data, isLoading } = useGetAllRecentActivities();
   const recentActivites = useMemo(() => {
     const _data = Array.isArray(data?.data) ? data.data : [];
     return _data;
   }, [data]);
+
+  if(isLoading) return <Loading/>
 
   return (
     <div>
