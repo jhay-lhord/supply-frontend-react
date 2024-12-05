@@ -34,33 +34,31 @@ export default function CancelOrderDialog({
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Cancel Order</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to cancel this order? This action cannot be
-              undone.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsCancelDialogOpen(false)}
-            >
-              No, go back
-            </Button>
-            <Button variant="destructive" onClick={handleCancelOrder}>
-              {isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Yes, cancel order"
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+    <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Cancel Order</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to cancel this order? This action cannot be
+            undone.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsCancelDialogOpen(false)}
+          >
+            No, go back
+          </Button>
+          <Button variant="destructive" onClick={handleCancelOrder}>
+            {isPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Yes, cancel order"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -54,10 +54,10 @@ export default function PurchaseOrderCompleted() {
               <div className="flex flex-col items-center justify-center space-y-3">
                 <PackageOpen className="h-8 w-8 text-gray-400" />
                 <div className="text-lg font-medium text-gray-900">
-                  No Orders in Progress
+                  No Orders Completed
                 </div>
                 <div className="text-sm text-gray-500">
-                  There are currently no orders in progress.
+                  There are currently no orders completed.
                 </div>
               </div>
             </TableCell>

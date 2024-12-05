@@ -68,7 +68,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const [aoqNo, setAoqNo] = useState<string>("");
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
   const [itemSelected, setItemSelected] = useState<string[]>([]);
-  const [totalUnitPrice, setTotalUnitPrice] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const { pr_no } = useParams();
 
@@ -113,23 +113,24 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   }, [rfqs?.data, purchaseNumber]);
 
   const { mutate: addAOQMutation } = useAddAbstractOfQuotation();
-  const { mutate: addItemSelectedMutation, isPending } =
+  const { mutate: addItemSelectedMutation } =
     useAddItemSelectedQuote();
 
-  const { control, handleSubmit, setValue } = useForm({
+  const { handleSubmit, setValue } = useForm({
     resolver: zodResolver(abstractSchema),
     defaultValues: {
       aoq_no: aoqNo,
       rfq: rfqNo,
       purchase_request: pr_no,
       item_quotation: "",
+      total_amount: totalAmount.toString()
     },
   });
 
   useEffect(() => {
     if (!isDialogOpen) {
       setItemSelected([]);
-      setTotalUnitPrice(0);
+      setTotalAmount(0);
     }
   }, [isDialogOpen]);
 
@@ -145,9 +146,10 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         setValue("rfq", rfqNo!);
         setValue("purchase_request", purchaseNumber);
         setValue("item_quotation", item.item_quotation_no);
+        setValue("total_amount", totalAmount.toString())
       });
     }
-  }, [isDialogOpen, setValue, rfqNo, itemQuotation, purchaseNumber, aoqNo]);
+  }, [isDialogOpen, setValue, rfqNo, itemQuotation, purchaseNumber, aoqNo, totalAmount]);
 
   const handleToggle = (supplier: qoutationType) => {
     setSelectedSupplier(
@@ -160,13 +162,10 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     );
   };
 
-  // const { fields } = useFieldArray({ control, name: "item_quotation" });
 
   const onSubmit = async (data: abstractType) => {
     setIsLoading(true);
     try {
-      console.log(isLoading);
-      console.log(isPending);
       const result = abstractSchema.safeParse(data);
       if (!result.success) {
         return;
@@ -183,7 +182,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
               rfq: rfqNo!,
               item_qoutation: item,
               is_item_selected: true,
-              total_amount: totalUnitPrice.toString(),
+              total_amount: totalAmount.toString(),
             };
           });
 
@@ -205,7 +204,8 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const handleCheckBoxChange = (
     item_quotation_no: string,
     isChecked: boolean,
-    unitPrice: number
+    unitPrice: number,
+    quantity: number,
   ) => {
     setItemSelected((prevItemSelected) => {
       if (isChecked) {
@@ -214,11 +214,11 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         return prevItemSelected.filter((item) => item !== item_quotation_no);
       }
     });
-    setTotalUnitPrice((prevTotal) => {
+    setTotalAmount((prevTotal) => {
       if (isChecked) {
-        return prevTotal + unitPrice;
+        return prevTotal + (unitPrice * quantity);
       } else {
-        return prevTotal - unitPrice;
+        return prevTotal - (unitPrice * quantity);
       }
     });
   };
@@ -391,12 +391,13 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                                 <Checkbox
                                   checked={itemSelected.includes(
                                     item.item_quotation_no
-                                  )} // Set the controlled state
+                                  )}
                                   onCheckedChange={(isChecked) => {
                                     handleCheckBoxChange(
                                       item.item_quotation_no,
                                       isChecked as boolean,
-                                      Number(item.unit_price)
+                                      Number(item.unit_price),
+                                      Number(item.item_details.quantity)
                                     );
                                   }}
                                 />

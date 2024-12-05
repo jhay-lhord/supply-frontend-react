@@ -37,11 +37,6 @@ const procurement = [
     icon: FileText,
   },
   {
-    title: "Abstract of Quotation",
-    url: "/supply/abstract-of-quotation",
-    icon: FileText,
-  },
-  {
     title: "Purchase Order",
     url: "/supply/purchase-order",
     icon: ShoppingCart,
