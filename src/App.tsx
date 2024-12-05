@@ -29,7 +29,7 @@ import CampusDirector from "./pages/Dashboard/AdminDashboard/CampusDirector";
 import BACmember from "./pages/Dashboard/AdminDashboard/BACmember";
 import { AllQuotations } from "./pages/Dashboard/BACDashboard/AllQuotations";
 import { AllAbstract } from "./pages/Dashboard/BACDashboard/AllAbstract";
-import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/AbstractOfquotation";
+import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/components/AbstractOfQuotation";
 
 const App = () => {
   return (
@@ -106,10 +106,7 @@ const App = () => {
             path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
           />
-          <Route
-            path="/bac/abstract-of-quotations"
-            element={<AllAbstract />}
-          />
+          <Route path="/bac/abstract-of-quotations" element={<AllAbstract />} />
           <Route
             path="/bac/item-selected-quotation/:pr_no"
             element={<AbstractItemList />}

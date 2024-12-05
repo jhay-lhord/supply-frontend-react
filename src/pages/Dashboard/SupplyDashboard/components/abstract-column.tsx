@@ -1,17 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "../components/data-table-column-header";
-import { DataTableRowActions } from "../components/data-table-row-actions";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
 import { abstractType_ } from "@/types/response/abstract-of-quotation";
-export const po_columns: ColumnDef<abstractType_>[] = [
 
+export const abstract_columns: ColumnDef<abstractType_>[] = [
   {
     accessorKey: "pr_details.pr_no",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="PR No." />
     ),
     cell: ({ row }) => {
-      const prNo = row.original.pr_details?.pr_no;
-      console.log(prNo)
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
@@ -45,8 +43,7 @@ export const po_columns: ColumnDef<abstractType_>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium hover:underline">
-            {/* {row.getValue("afq_no")} */}
-            4 Items
+            {/* {row.getValue("afq_no")} */}4 Items
           </span>
         </div>
       );
@@ -61,12 +58,12 @@ export const po_columns: ColumnDef<abstractType_>[] = [
     cell: ({ row }) => {
       const createdAt = row.getValue("created_at") as string | number;
       const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short", 
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
@@ -81,8 +78,12 @@ export const po_columns: ColumnDef<abstractType_>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Actions" />
     ),
-    cell: ({row}) => (
-      <DataTableRowActions aoq_no={row.original.aoq_no} pr_no={row.original.pr_details.pr_no} _data={row.original} />
+    cell: ({ row }) => (
+      <DataTableRowActions
+        aoq_no={row.original.aoq_no}
+        pr_no={row.original.pr_details.pr_no}
+        _data={row.original}
+      />
     ),
   },
 ];

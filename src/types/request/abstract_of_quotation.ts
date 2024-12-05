@@ -15,6 +15,7 @@ export const abstractSchema = z.object({
   rfq: z.string(),
   purchase_request: z.string(),
   item_quotation: z.string(),
+  total_amount:z.string(),
 });
 
 export type abstractType = z.infer<typeof abstractSchema>;

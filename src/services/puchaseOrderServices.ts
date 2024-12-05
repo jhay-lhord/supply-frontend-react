@@ -4,10 +4,11 @@ import { purchaseOrderItemType, purchaseOrderType } from "@/types/request/purcha
 import api from "@/api";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { purchaseOrdertype_ } from "@/types/response/purchase-order";
 
-export const getAllPurchaseOrder = async ():Promise<ApiResponse<purchaseOrderType[]>> => {
+export const getAllPurchaseOrder = async ():Promise<ApiResponse<purchaseOrdertype_[]>> => {
   try {
-    const response = await api.get<purchaseOrderType[]>("api/purchase-order/")
+    const response = await api.get<purchaseOrdertype_[]>("api/purchase-order/")
     return handleSucess(response)
   } catch (error) {
     return handleError(error)
@@ -16,7 +17,7 @@ export const getAllPurchaseOrder = async ():Promise<ApiResponse<purchaseOrderTyp
 
 
 export const useGetAllPurchaseOrder = () => {
-  return useQuery<ApiResponse<purchaseOrderType[]>, Error>({
+  return useQuery<ApiResponse<purchaseOrdertype_[]>, Error>({
     queryFn: getAllPurchaseOrder,
     queryKey: ["purchase-orders"]
   })
@@ -30,7 +31,6 @@ export const useGetPurchaseOrder = () => {
   }).filter(data => {
     return data.status === "Ready for Purchase Order"
   })
-  console.log(purchase_order)
   return {purchase_order, isLoading}
 };
 
@@ -43,10 +43,8 @@ export const usePurchaseOrderCount = () => {
 export const addPurchaseOrder = async (data: purchaseOrderType):Promise<ApiResponse<purchaseOrderType>> => {
   try {
     const response = await api.post<purchaseOrderType>("api/purchase-order/", data);
-    console.log(response)
     return handleSucess(response)
   } catch (error) {
-    console.log(error)
     return handleError(error) 
   }
 }
@@ -64,10 +62,8 @@ export const useAddPurchaseOrder = () => {
 export const addPurchaseOrderItem = async (data:purchaseOrderItemType):Promise<ApiResponse<purchaseOrderItemType>> => {
   try {
     const response = await api.post<purchaseOrderItemType>("api/purchase-order-item/", data);
-    console.log(response)
     return handleSucess(response)
   } catch (error) {
-    console.log(error)
     return handleError(error)
   }
 }
@@ -79,5 +75,20 @@ export const useAddPurchaseOrderItem = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
     },
+  })
+}
+
+export const updatePurchaseOrderStatus = async ({po_no, status}:{po_no:string, status:string}) => {
+  try {
+    const response = await api.patch(`api/purchase-order/${po_no}/update-status/`, {status})
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useUpdatePurchaseOrderStatus = () => {
+  return useMutation<ApiResponse<unknown>, Error, { po_no: string; status: string }>({
+    mutationFn: ({po_no, status}) => updatePurchaseOrderStatus({po_no, status})
   })
 }

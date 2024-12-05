@@ -57,5 +57,6 @@ export type abstractType_ = {
     requested_by:string,
     approved_by: string,
   }
+  total_amount: string,
   created_at: Date
 }
