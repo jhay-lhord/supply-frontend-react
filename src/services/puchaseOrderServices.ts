@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/response/api-response";
 import { usePurchaseRequest } from "./purchaseRequestServices";
-import { purchaseOrderItemType, purchaseOrderType } from "@/types/request/purchase-order";
+import { inspectionType, itemsDeliveredType, purchaseOrderItemType, purchaseOrderType } from "@/types/request/purchase-order";
 import api from "@/api";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +14,6 @@ export const getAllPurchaseOrder = async ():Promise<ApiResponse<purchaseOrdertyp
     return handleError(error)
   }
 }
-
 
 export const useGetAllPurchaseOrder = () => {
   return useQuery<ApiResponse<purchaseOrdertype_[]>, Error>({
@@ -55,6 +54,7 @@ export const useAddPurchaseOrder = () => {
     mutationFn: (data) => addPurchaseOrder(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
+      queryClient.invalidateQueries({queryKey: ["purchase-orders"]})
     },
   });
 }
@@ -74,6 +74,7 @@ export const useAddPurchaseOrderItem = () => {
     mutationFn: (data) => addPurchaseOrderItem(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
+      queryClient.invalidateQueries({queryKey: ["purchase-orders"]})
     },
   })
 }
@@ -88,7 +89,44 @@ export const updatePurchaseOrderStatus = async ({po_no, status}:{po_no:string, s
 }
 
 export const useUpdatePurchaseOrderStatus = () => {
+  const queryClient = useQueryClient()
   return useMutation<ApiResponse<unknown>, Error, { po_no: string; status: string }>({
-    mutationFn: ({po_no, status}) => updatePurchaseOrderStatus({po_no, status})
+    mutationFn: ({po_no, status}) => updatePurchaseOrderStatus({po_no, status}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["purchase-orders"]})
+    }
+  })
+}
+
+export const addInspectionReport = async (data: inspectionType):Promise<ApiResponse<inspectionType>> => {
+  try {
+    const response = await api.post<inspectionType>("api/inspection-report/", data)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useAddInspectionReport = () => {
+  return useMutation<ApiResponse<inspectionType>, Error, inspectionType>({
+    mutationFn: addInspectionReport,
+    mutationKey: ["inspection-reports"]
+  })
+}
+
+
+export const addItemsDelivered= async (data: itemsDeliveredType):Promise<ApiResponse<itemsDeliveredType>> => {
+  try {
+    const response = await api.post<itemsDeliveredType>("api/items-delivered/", data)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useAddItemsDelivered = () => {
+  return useMutation<ApiResponse<itemsDeliveredType>, Error, itemsDeliveredType>({
+    mutationFn: addItemsDelivered,
+    mutationKey: ["inspection-reports"]
   })
 }

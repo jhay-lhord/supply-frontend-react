@@ -12,7 +12,7 @@ export type itemSelectedType_ = {
   };
   item_qoutation_details: {
     brand_model: string;
-    is_low_price: string;
+    is_low_price: boolean;
     item_details: {
       item_no: string
       unit: string;
@@ -31,7 +31,7 @@ export type itemSelectedType_ = {
     supplier_name: string;
     supplier_address: string;
     tin: string;
-    is_VAT: string;
+    is_VAT: boolean;
     rfq_no: string;
   };
   is_item_selected: boolean;

@@ -12,17 +12,16 @@ import { formatDate } from "@/utils/formateDate";
 import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
 
-export default function PurchaseOrderCompleted() {
+export default function PurchaseOrderLacked() {
 
   const { data, isLoading } = useGetAllPurchaseOrder();
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
-  const completedOrders = purchaseOrderData.filter(
-    (order) => order.status === "Completed"
+  const lackingOrders = purchaseOrderData.filter(
+    (order) => order.status === "Lacking"
   );
 
   if (isLoading) return <Loading />;
-
 
   return (
     <Table>
@@ -37,8 +36,8 @@ export default function PurchaseOrderCompleted() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {completedOrders.length > 0 ? (
-          completedOrders.map((order) => (
+        {lackingOrders.length > 0 ? (
+          lackingOrders.map((order) => (
             <TableRow key={order.po_no}>
               <TableCell className="font-medium">{order.po_no}</TableCell>
               <TableCell>{order.aoq_details.aoq_no}</TableCell>
@@ -61,7 +60,7 @@ export default function PurchaseOrderCompleted() {
                   No Orders Completed
                 </div>
                 <div className="text-sm text-gray-500">
-                  There are currently no orders completed.
+                  There are currently no orders lacking.
                 </div>
               </div>
             </TableCell>

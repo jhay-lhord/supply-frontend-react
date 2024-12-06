@@ -2,13 +2,13 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RecentActivities } from "../shared/components/RecentActivities";
-import { DataTable } from "../shared/components/DataTable";
 import {
   usePurchaseRequestCount,
   usePurchaseRequestInProgressCount,
@@ -16,6 +16,24 @@ import {
 import { usePurchaseOrderCount } from "@/services/puchaseOrderServices";
 import { Loader2 } from "lucide-react";
 import Layout from "./components/Layout/SupplyDashboardLayout";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { useGetSupplyDailyReport } from "@/services/DailyReport";
+
+const chartConfig = {
+  total_active_pr: {
+    label: "All Purchase Request",
+    color: "hsl(var(--chart-1))",
+  },
+  total_inprogress_pr: {
+    label: "Purchase Request In Progress ",
+    color: "hsl(var(--chart-2))",
+  },
+  total_inprogress_po: {
+    label: "Purchase Order In Progress ",
+    color: "hsl(var(--chart-3))",
+  },
+} satisfies ChartConfig;
 
 const SupplyDashboard: React.FC = () => {
   const { purchase_order_count, isLoading: isPurchaseOrderLoading } =
@@ -28,6 +46,10 @@ const SupplyDashboard: React.FC = () => {
     usePurchaseRequestInProgressCount();
 
   const navigate = useNavigate();
+
+  const { data } = useGetSupplyDailyReport();
+
+  const chartData = data?.data;
 
   return (
     <Layout>
@@ -150,14 +172,51 @@ const SupplyDashboard: React.FC = () => {
                 </Card>
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 ">
-                <Card className="col-span-4 bg-slate-100 border-none">
-                  <CardHeader className="flex">
-                    <CardTitle>Purchase Request</CardTitle>
+              <Card className="col-span-4  bg-slate-100">
+                  <CardHeader>
+                    <CardTitle>Weekly Reports</CardTitle>
+                    <CardDescription>My Weekly Reports for the last 7 days</CardDescription>
                   </CardHeader>
-                  <CardContent className="pl-2">
-                    {/* <Overview /> */}
-                    <DataTable />
+                  <CardContent>
+                    <ChartContainer config={chartConfig}>
+                      <BarChart accessibilityLayer data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="day"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          tickFormatter={(value) => value.slice(0, 3)}
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent indicator="dot" />}
+                        />
+                        <Bar
+                          dataKey="total_active_pr"
+                          fill="var(--color-total_active_pr)"
+                          radius={10}
+                          width={20}
+                        />
+
+                        <Bar
+                          dataKey="total_inprogress_pr"
+                          fill={"var(--color-total_inprogress_pr)"}
+                          radius={10}
+                          width={20}
+                        />
+
+                        <Bar
+                          dataKey="total_inprogress_po"
+                          fill="var(--color-total_inprogress_po)"
+                          radius={10}
+                          width={20}
+                        />
+                      </BarChart>
+                    </ChartContainer>
                   </CardContent>
+                  <CardFooter className="flex-col items-start gap-2 text-sm">
+                  </CardFooter>
                 </Card>
                 <Card className="col-span-3 bg-slate-100 border-none">
                   <CardHeader className="sticky top-0 rounded-m z-50">

@@ -53,7 +53,7 @@ export default function PurchaseOrderCancelled() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatDate(order.created_at.toString())}
+                    {formatDate(order.created_at)}
                   </TableCell>
                 </TableRow>
               ))

@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -20,35 +20,120 @@ import { Package, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { purchaseOrdertype_ } from "@/types/response/purchase-order";
 import { itemSelectedType_ } from "@/types/response/abstract-of-quotation";
-import { useUpdatePurchaseOrderStatus } from "@/services/puchaseOrderServices";
-
-interface OrderReceivedFormData {
-  [key: string]: number;
-}
+import {
+  useAddInspectionReport,
+  useAddItemsDelivered,
+  useUpdatePurchaseOrderStatus,
+} from "@/services/puchaseOrderServices";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { deliveredSchema, deliveredType } from "@/types/request/purchase-order";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 interface OrderReceivedDialogProps {
+  po_no: string;
+  aoq_no: string;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
-  items: itemSelectedType_[];
+  items_: itemSelectedType_[];
   orderData: purchaseOrdertype_[];
 }
 
+const areAllItemsFullyDelivered = (items: deliveredType) => {
+  return items.items.every((item) => {
+    const orderedQuantity = parseInt(
+      item.item_qoutation_details.item_details.quantity || "0",
+      10
+    );
+    const deliveredQuantity = item.quantity_delivered || 0;
+
+    return deliveredQuantity >= orderedQuantity;
+  });
+};
+
 export function OrderReceivedDialog({
-  items,
-  orderData,
+  po_no,
+  aoq_no,
+  items_,
   isDialogOpen,
-  setIsDialogOpen
+  setIsDialogOpen,
 }: OrderReceivedDialogProps) {
-  const {
-    formState: { isSubmitting },
-  } = useForm<OrderReceivedFormData>();
+  const [filteredItems, setFilteredItems] = useState<itemSelectedType_[]>();
 
-  const poNo = orderData.length > 0 ? orderData[0].po_no : ""
-  const { mutate } = useUpdatePurchaseOrderStatus()
+  const { mutate: updateStatusMutation, isPending: updateStatusPending } =
+    useUpdatePurchaseOrderStatus();
+  const { mutate: addInspectionMutation, isPending: addInspectionPending } =
+    useAddInspectionReport();
+  const { mutate: addItemsDeliveredMutation, isPending: addItemsPending } =
+    useAddItemsDelivered();
 
-  const handleStatusUpdate = () => {
-    mutate({po_no:poNo, status:"Completed"})
-  }
+  const isLoading =
+    updateStatusPending || addInspectionPending || addItemsPending;
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      const filteredItems = items_.filter((item) => item.aoq === aoq_no);
+      setFilteredItems(filteredItems);
+    }
+  }, [items_, aoq_no, isDialogOpen]);
+
+  const form = useForm<deliveredType>({
+    resolver: zodResolver(deliveredSchema),
+    defaultValues: {
+      items: [],
+    },
+  });
+
+  const { fields, append } = useFieldArray({
+    name: "items",
+    control: form.control,
+  });
+
+  useEffect(() => {
+    form.reset({ items: [] });
+    filteredItems?.forEach((item) => append(item));
+  }, [filteredItems, append, form]);
+
+  const onSubmit = (values: deliveredType) => {
+    const allItemsDelivered = areAllItemsFullyDelivered(values);
+    const inspectionData = {
+      inspection_no: uuidv4(),
+      purchase_request: values.items[0].pr_details.pr_no,
+      purchase_order: po_no,
+    };
+    addInspectionMutation(inspectionData, {
+      onSuccess: async (inspectionResponse) => {
+        const inspectionNo = inspectionResponse.data?.inspection_no;
+
+        const itemDeliveredData = values.items.map((data) => {
+          return {
+            inspection: inspectionNo!,
+            items: data.item_selected_no!,
+            quantity_delivered: data.quantity_delivered!,
+          };
+        });
+
+        await Promise.all(
+          itemDeliveredData.map((data) => {
+            addItemsDeliveredMutation(data);
+          })
+        );
+        updateStatusMutation({
+          po_no: po_no,
+          status: `${allItemsDelivered ? "Completed" : "Lacking"}`,
+        });
+      },
+    });
+
+    // if(!isLoading) return setIsDialogOpen(false) 
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -57,9 +142,9 @@ export function OrderReceivedDialog({
           <DialogTitle className="text-2xl font-bold">
             Order Received
           </DialogTitle>
-          <p>{poNo}</p>
+          <p>{po_no}</p>
         </DialogHeader>
-        {items.length === 0 ? (
+        {items_.length === 0 ? (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
@@ -69,56 +154,99 @@ export function OrderReceivedDialog({
           </Alert>
         ) : (
           <div>
-            <ScrollArea className="h-[30vh] mt-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead>Ordered Quantity</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead>Delivered Quantity</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.item_selected_no}>
-                      <TableCell>
-                        {
-                          item.item_qoutation_details.item_details
-                            .item_description
-                        }
-                      </TableCell>
-                      <TableCell>
-                        {item.item_qoutation_details.item_details.quantity}
-                      </TableCell>
-                      <TableCell>
-                        {item.item_qoutation_details.item_details.unit}
-                      </TableCell>
-                      <TableCell>
-                        <Input />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-            <div className="mt-6 flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
               >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting} onClick={handleStatusUpdate}>
-                {isSubmitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <Package className="w-4 h-4 mr-2" />
-                )}
-                {isSubmitting ? "Processing..." : "Confirm Receipt"}
-              </Button>
-            </div>
+                <ScrollArea className="h-[30vh] mt-4">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Description</TableHead>
+                          <TableHead className="w-[150px]">
+                            Ordered Quantity
+                          </TableHead>
+                          <TableHead className="w-[150px]">Unit Cost</TableHead>
+                          <TableHead className="w-[200px]">
+                            Quantity Delivered
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {fields.map((field, index) => (
+                          <TableRow key={field.id}>
+                            <TableCell>
+                              {
+                                field.item_qoutation_details.item_details
+                                  .item_description
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {
+                                field.item_qoutation_details.item_details
+                                  .quantity
+                              }
+                            </TableCell>
+                            <TableCell>
+                              ₱
+                              {parseFloat(
+                                field.item_qoutation_details.unit_price
+                              ).toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              <FormField
+                                control={form.control}
+                                name={`items.${index}.quantity_delivered`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="number"
+                                        onChange={(e) => {
+                                          const value =
+                                            e.target.value === ""
+                                              ? undefined
+                                              : parseInt(e.target.value, 10);
+                                          field.onChange(value);
+                                        }}
+                                        className="w-20"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>
+                <div className="mt-6 flex justify-end space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <Package className="w-4 h-4 mr-2" />
+                    )}
+                    {isLoading
+                      ? "Processing..."
+                      : "Confirm Receipt"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
         )}
       </DialogContent>

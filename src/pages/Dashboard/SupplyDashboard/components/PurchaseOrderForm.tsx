@@ -29,7 +29,7 @@ import { v4 as uuidv4 } from "uuid";
 interface PurchaseOrderFormProps {
   aoq_no: string;
   pr_no: string;
-  total_amount: string;
+  total_amount: number;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
 }
@@ -70,8 +70,6 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   const abstractWithSamePR = abstracts.find(
     (data) => data.pr_details.pr_no === pr_no
   );
-
-  const totalAmount = abstracts.length > 0 && abstracts[0].total_amount
 
   const rfq_no = abstractWithSamePR?.rfq_details.rfq_no;
 
@@ -177,13 +175,13 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                 <div className="col-span-2">Unit Cost</div>
               </div>
               <ScrollArea className="h-[150px] pr-4">
-                {itemQuotation.map((item, index) => ( 
+                {filteredItemQuotation.map((item, index) => ( 
                   <div key={index} className="grid grid-cols-12 gap-4 text-sm py-2 border-t border-border">
                     <div className="col-span-1">{index + 1}</div>
                     <div className="col-span-1">{item.item_qoutation_details.item_details.unit}</div>
                     <div className="col-span-6">{item.item_qoutation_details.item_details.item_description}</div>
                     <div className="col-span-2">{item.item_qoutation_details.item_details.quantity}</div>
-                    <div className="col-span-2">php{Number(item.item_qoutation_details.item_details.unit_cost).toFixed(2)}</div>
+                    <div className="col-span-2">₱{Number(item.item_qoutation_details.unit_price).toFixed(2)}</div>
                   </div>
                 ))}
               </ScrollArea>
@@ -191,7 +189,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           </div>
           <div className="mt-2 flex justify-end">
             <div className="bg-muted p-2 rounded-lg">
-              <p className="text-lg font-semibold">Total Amount: {totalAmount}</p>
+              <p className="text-lg font-semibold">Total Amount: ₱{total_amount}</p>
             </div>
           </div>
           <DialogFooter className="mt-4">

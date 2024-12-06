@@ -3,7 +3,7 @@ import {
   useAllItemSelectedQuote,
 } from "@/services/AbstractOfQuotationServices";
 import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import Loading from "../../shared/components/Loading";
 export default function SupplyAOQ() {
   const [aoqNo, setAoq] = useState<string>("");
   const [prNo, setPrNo] = useState<string>("");
-  const [totalAmount, setTotalAmount] = useState<string>("");
+  const [totalAmount, setTotalAmount] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const { data, isLoading } = useAbstractOfQuotation();
@@ -29,7 +29,10 @@ export default function SupplyAOQ() {
   const { data: items } = useAllItemSelectedQuote();
 
   const itemsData = Array.isArray(items?.data) ? items.data : [];
-  const itemCount = itemsData.length > 0 ? itemsData.length : 0;
+  const itemCount = (aoq_no:string) => (
+    itemsData.filter(item => item.aoq === aoq_no).length
+  )
+
   const purchaseOrderData = Array.isArray(purchase_order?.data)
     ? purchase_order.data
     : [];
@@ -46,13 +49,20 @@ export default function SupplyAOQ() {
   const handleOpenForm = (
     aoq_no: string,
     pr_no: string,
-    total_amount: string
+    total_amount: number
   ) => {
     setIsDialogOpen(true);
     setAoq(aoq_no);
     setPrNo(pr_no);
     setTotalAmount(total_amount);
   };
+
+  useEffect(() => {
+    if(!isDialogOpen){
+      setAoq("")
+      setTotalAmount(0)
+    }
+  }, [isDialogOpen])
 
   if (isLoading) return <Loading />;
 
@@ -74,10 +84,10 @@ export default function SupplyAOQ() {
             <TableRow key={abstract.aoq_no}>
               <TableCell>{abstract.pr_details.pr_no}</TableCell>
               <TableCell>{abstract.rfq_details.supplier_name}</TableCell>
-              <TableCell>{itemCount} Items </TableCell>
-              <TableCell>{abstract.total_amount}</TableCell>
+              <TableCell>{itemCount(abstract.aoq_no)} Items </TableCell>
+              <TableCell>₱{abstract.total_amount}</TableCell>
               <TableCell>
-                {formatDate(abstract.created_at.toString())}
+                {formatDate(abstract.created_at)}
               </TableCell>
               <TableCell>
                 <Button
@@ -85,7 +95,7 @@ export default function SupplyAOQ() {
                     handleOpenForm(
                       abstract.aoq_no,
                       abstract.pr_details.pr_no,
-                      abstract.total_amount
+                      Number(abstract.total_amount)
                     )
                   }
                 >

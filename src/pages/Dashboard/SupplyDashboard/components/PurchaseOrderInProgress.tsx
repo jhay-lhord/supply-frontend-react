@@ -27,12 +27,19 @@ import CancelOrderDialog from "./cancelOrder";
 
 export default function PurchaseOrderInProgess() {
   const [poNo, setPoNo] = useState<string>("");
+  const [aoqNo, setAoqNo] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState<boolean>(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({})
 
   const { data, isLoading } = useGetAllPurchaseOrder();
   const { data: item_selected_quote } = useAllItemSelectedQuote();
+
+  const { data: items } = useAllItemSelectedQuote();
+  const itemsData = Array.isArray(items?.data) ? items.data : [];
+  const itemCount = (aoq_no:string) => (
+    itemsData.filter(item => item.aoq === aoq_no).length
+  )
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
   const inProgressOrders = purchaseOrderData.filter(
@@ -42,16 +49,24 @@ export default function PurchaseOrderInProgess() {
     ? item_selected_quote.data
     : [];
 
-  const handleOpenOrderRecieveForm = () => {
+  const handleOpenOrderRecieveForm = (aoq_no:string) => {
     setIsDialogOpen(true);
-    setIsDropdownOpen(false);
+    setAoqNo(aoq_no)
+    setOpenDropdowns({[aoq_no]: false})
+    setPoNo(aoq_no)
   };
 
   const handleCancelOrder = (po_no: string) => {
     setIsCancelDialogOpen(true);
-    setIsDropdownOpen(false);
     setPoNo(po_no);
   };
+
+  const toggleDropdown = (poNo: string) => {
+    setOpenDropdowns(prev => ({
+      ...prev,
+      [poNo]: !prev[poNo]
+    }))
+  }
 
   if (isLoading) return <Loading />;
 
@@ -62,7 +77,6 @@ export default function PurchaseOrderInProgess() {
           <TableHeader>
             <TableRow>
               <TableHead>PO Number</TableHead>
-              <TableHead>AOQ No</TableHead>
               <TableHead>Items</TableHead>
               <TableHead>Total Amount</TableHead>
               <TableHead>Status</TableHead>
@@ -75,10 +89,9 @@ export default function PurchaseOrderInProgess() {
               inProgressOrders.map((order) => (
                 <TableRow key={order.po_no}>
                   <TableCell>{order.po_no}</TableCell>
-                  <TableCell>{order.aoq_details.aoq_no}</TableCell>
-                  <TableCell>{4}</TableCell>
+                  <TableCell>{itemCount(order.aoq_details.aoq_no)}</TableCell>
                   <TableCell>
-                    php {Number(order.total_amount).toFixed(2)}
+                  ₱{Number(order.total_amount).toFixed(2)}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="capitalize">
@@ -86,12 +99,12 @@ export default function PurchaseOrderInProgess() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatDate(order.created_at.toString())}
+                    {formatDate(order.created_at)}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu
-                      open={isDropdownOpen}
-                      onOpenChange={setIsDropdownOpen}
+                       open={openDropdowns[order.po_no]}
+                       onOpenChange={() => toggleDropdown(order.po_no)}
                     >
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -102,7 +115,7 @@ export default function PurchaseOrderInProgess() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                          onClick={handleOpenOrderRecieveForm}
+                          onClick={() => handleOpenOrderRecieveForm(order.aoq_details.aoq_no)}
                           className="bg-green-200"
                         >
                           <CheckCircle className="mr-2 h-4 w-4" />
@@ -140,7 +153,9 @@ export default function PurchaseOrderInProgess() {
         </Table>
       </div>
       <OrderReceivedDialog
-        items={itemSelectedData}
+        po_no={poNo}
+        aoq_no={aoqNo}
+        items_={itemSelectedData}
         orderData={inProgressOrders}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
