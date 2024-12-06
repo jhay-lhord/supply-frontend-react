@@ -22,7 +22,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useGetDailyReport } from "@/services/DailyReport";
+import { useGetBACDailyReport } from "@/services/DailyReport";
 
 const chartConfig = {
   total_approved: {
@@ -48,7 +48,7 @@ const BACDashboard: React.FC = () => {
   const { abstractCount, isLoading: abstract_loading } =
     useAbstractOfQuotationCount();
 
-  const { data } = useGetDailyReport();
+  const { data } = useGetBACDailyReport();
 
   const chartData = data?.data;
 
