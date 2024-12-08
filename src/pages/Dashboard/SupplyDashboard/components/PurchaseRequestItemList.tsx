@@ -4,9 +4,11 @@ import {
   FilteredItemInPurchaseRequest,
   arraySort,
 } from "@/services/itemServices";
-import { usePurchaseRequestList } from "@/services/purchaseRequestServices";
+import {
+  usePurchaseRequestActions,
+  usePurchaseRequestList,
+} from "@/services/purchaseRequestServices";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
@@ -25,13 +27,6 @@ import {
 import { TrashIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PurchaseRequestForm from "./PurchaseRequestForm";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import { itemType } from "@/types/response/item";
 import { useEffect } from "react";
 import ItemForm from "./ItemForm";
@@ -39,15 +34,33 @@ import { toast } from "sonner";
 import { DeleteDialog } from "./DeleteDialog";
 import Loading from "../../shared/components/Loading";
 import EditItemForm from "./EditItemForm";
-import { useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
-import { Loader2 } from "lucide-react";
+import {
+  CalendarIcon,
+  CheckCircleIcon,
+  CircleMinusIcon,
+  CircleXIcon,
+  FileTextIcon,
+  Loader2,
+  PencilLineIcon,
+  UserIcon,
+} from "lucide-react";
 import { generatePDF } from "@/services/purchaseRequestServices";
 import { useNavigate } from "react-router-dom";
-
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/services/formatDate";
+import EditPRForm from "./EditPRForm";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const {
@@ -56,14 +69,19 @@ export default function PurchaseRequestItemList() {
     error,
   } = usePurchaseRequestList(pr_no!);
 
-  const navigate = useNavigate()
-
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<PurchaseRequestData>({
+    handleApprove,
+    handleReject,
+    handleCancel,
+    isPendingApprove,
+    isPendingReject,
+    isPendingCancel,
+  } = usePurchaseRequestActions();
+  const purchaseData = purchase_request?.data;
+
+  const navigate = useNavigate();
+
+  const { setValue } = useForm<PurchaseRequestData>({
     resolver: zodResolver(purchaseRequestFormSchema),
     defaultValues: {
       pr_no: pr_no,
@@ -74,8 +92,6 @@ export default function PurchaseRequestItemList() {
       approved_by: purchase_request?.data?.approved_by,
     },
   });
-
-  const { mutate, isPending } = useUpdatePurchaseRequest();
 
   useEffect(() => {
     if (purchase_request?.data) {
@@ -92,27 +108,15 @@ export default function PurchaseRequestItemList() {
     sortedItems = arraySort(items!, "stock_property_no");
   }
 
-  const onSubmit = (data: PurchaseRequestData) => {
-    const result = purchaseRequestFormSchema.safeParse(data);
-
-    if (result.success) {
-      mutate(data);
-      setIsDialogOpen(false);
-      setIsEditMode(false);
-    }
-    setIsDialogOpen(false);
-    if (!isPending) setIsEditMode(false);
-  };
-
-  const handleEditClick = () => setIsEditMode(true);
-  const handleCancelClick = () => setIsEditMode(false);
+  const handleOpenEditForm = () => setIsEditDialogOpen(true);
 
   const handleGeneratePDF = async () => {
-    const purchaseRequestData = purchase_request?.data
-    const itemsData = items ? items : []
+    const purchaseRequestData = purchase_request?.data;
+    const itemsData = items ? items : [];
     const pdfURL = await generatePDF(itemsData, purchaseRequestData!);
-    return itemsData.length != 0 ? window.open(pdfURL!, "_blank") : navigate("/supply/not-found")
-    
+    return itemsData.length != 0
+      ? window.open(pdfURL!, "_blank")
+      : navigate("/supply/not-found");
   };
 
   if (isLoading) return <Loading />;
@@ -120,108 +124,118 @@ export default function PurchaseRequestItemList() {
 
   return (
     <div className="m-8">
-      <div className="flex place-content-between items-center py-2 ">
-        <div>
-          <p>
-            <span className="font-bold text-lg">PR Number: </span> {pr_no}
-          </p>
-          <p>
-            <span className="font-bold text-lg">Status: </span>
-            {purchase_request?.data?.status}
-          </p>
-        </div>
-        <Button
-          onClick={handleGeneratePDF}
-          className="px-7 bg-orange-200 hover:bg-orange-300 text-slate-950"
-        >
-          Generate PR
-        </Button>
-      </div>
-      <form
-        onSubmit={handleSubmit((data) => onSubmit(data))}
-        className="border-none bg-slate-100 rounded p-8"
-      >
-        <div className="flex gap-4 py-2">
-          <InputField
-            label="Res Center Code"
-            name="res_center_code"
-            disabled={!isEditMode}
-            register={register}
-            error={errors.res_center_code}
-          />
-          <InputField
-            label="Purpose"
-            name="purpose"
-            disabled={!isEditMode}
-            register={register}
-            error={errors.purpose}
-          />
-          <InputField
-            label="Requested By"
-            name="requested_by"
-            disabled={!isEditMode}
-            register={register}
-            error={errors.requested_by}
-          />
-          <InputField
-            label="Approved By"
-            name="approved_by"
-            disabled={!isEditMode}
-            register={register}
-            error={errors.approved_by}
-          />
-          <SelectField
-            label="Status"
-            name="status"
-            options={[
-              { value: "Ready for Canvassing", label: "Ready for Canvassing" },
-              {
-                value: "Ready for Purchase Order",
-                label: "Ready for Purchase Order",
-              },
-              {
-                value: "Forwarded to Procurement",
-                label: "Forwarded to Procurement",
-              },
-            ]}
-            disabled={!isEditMode}
-            defaultValue={purchase_request?.data?.status}
-            setValue={setValue}
-            error={errors.status}
-          />
-        </div>
-        {isEditMode ? (
-          <div className="flex gap-2 mt-4">
-            <Button
-              type="button"
-              className="border-2 bg-white text-slate-900 border-slate-500 hover:text-slate-50"
-              onClick={handleCancelClick}
+      <Card className="w-full bg-slate-100">
+        <CardHeader className="flex flex-col">
+          <CardTitle className="flex justify-between items-start">
+            <div>
+              <div className="flex items-center gap-2">
+                <p>{purchaseData?.pr_no}</p>{" "}
+                <Button
+                  type="button"
+                  className=" bg-orange-200 hover:bg-orange-300 text-slate-950"
+                  onClick={handleOpenEditForm}
+                >
+                  <PencilLineIcon className=" w-4 h-4 mr-2" /> Edit
+                </Button>
+              </div>
+              <span className="flex items-center">
+                <CalendarIcon className="w-3 h-3 mr-1" />
+                <p className="text-sm font-thin">
+                  {purchaseData?.created_at &&
+                    formatDate(purchaseData?.created_at)}
+                </p>
+              </span>
+              <span className="flex items-center pt-6">
+                <UserIcon className="w-6 h-6 mr-1" />
+                <p className=" font-thin">{purchaseData?.requested_by}</p>
+              </span>
+            </div>
+            <Badge
+              className={
+                purchaseData?.status === "Approved"
+                  ? "bg-green-200 hover:bg-green-300 text-green-500"
+                  : purchaseData?.status === "Cancelled"
+                  ? "bg-red-100 hover:bg-red-200 text-red-400"
+                  : "bg-orange-100 text-orange-400"
+              }
             >
-              Cancel
+              {purchaseData?.status}
+            </Badge>
+          </CardTitle>
+          <div className="flex justify-between pt-8 pb-2">
+            <Button variant="outline" onClick={handleGeneratePDF}>
+              <FileTextIcon className="w-4 h-4 mr-2" />
+              Generate PDF
             </Button>
-            <Button
-              type="submit"
-              className={`bg-green-500 ${isPending && "px-14"}`}
-            >
-              {isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            className="mt-4 bg-orange-200 hover:bg-orange-300 text-slate-950"
-            onClick={handleEditClick}
-          >
-            <Pencil1Icon className="mr-2" /> Edit
-          </Button>
-        )}
-      </form>
+            <div className="flex gap-1">
+              <>
+                {purchaseData?.status !== "Cancelled" && (
+                  <>
+                    {purchaseData?.status !== "Approved" &&
+                      purchaseData?.status !== "Rejected" && (
+                        <Button
+                          className="bg-green-400 hover:bg-green-500 text-white"
+                          onClick={() => handleApprove(pr_no!)}
+                          disabled={isPendingApprove}
+                        >
+                          <CheckCircleIcon className="w-4 h-4 mr-2" />
+                          {isPendingApprove ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            "Approve"
+                          )}
+                        </Button>
+                      )}
 
-      <ItemList sortedItems={sortedItems!} />
+                    {purchaseData?.status !== "Approved" &&
+                      purchaseData?.status !== "Rejected" &&
+                      purchaseData?.status !== "Cancelled" && (
+                        <Button
+                          className="bg-red-400 hover:bg-red-500 text-white"
+                          onClick={() => handleReject(pr_no!)}
+                          disabled={isPendingReject}
+                        >
+                          <CircleXIcon className="w-4 h-4 mr-2" />
+                          {isPendingReject ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            "Reject"
+                          )}
+                        </Button>
+                      )}
+
+                    {purchaseData?.status !== "Rejected" && (
+                      <Button
+                        className="bg-orange-300 hover:bg-orange-400 text-white"
+                        onClick={() => handleCancel(pr_no!)}
+                        disabled={isPendingCancel}
+                      >
+                        <CircleMinusIcon className="w-4 h-4 mr-2" />
+                        {isPendingCancel ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          "Cancel"
+                        )}
+                      </Button>
+                    )}
+                  </>
+                )}
+              </>
+            </div>
+          </div>
+          <Separator className="pt-0" />
+        </CardHeader>
+        <CardContent>
+          <ItemList sortedItems={sortedItems!} />
+        </CardContent>
+        <CardFooter className="flex justify-between"></CardFooter>
+      </Card>
+
+      <EditPRForm
+        isEditDialogOpen={isEditDialogOpen}
+        setIsEditDialogOpen={setIsEditDialogOpen}
+        pr_no={purchaseData?.pr_no ?? ""}
+      />
 
       <PurchaseRequestForm
         isDialogOpen={isDialogOpen}
@@ -231,72 +245,6 @@ export default function PurchaseRequestItemList() {
     </div>
   );
 }
-
-const ErrorMessage = ({ message }: { message?: string }) =>
-  message ? <p className="text-red-500 text-sm mt-1">{message}</p> : null;
-
-const InputField = ({
-  label,
-  name,
-  disabled,
-  register,
-  error,
-}: {
-  label: string;
-  name: string;
-  register: any;
-  disabled: boolean;
-  error?: { message?: string };
-}) => (
-  <div>
-    <Label className="text-base">{label}</Label>
-    <Input
-      className="mt-4"
-      {...register(name)}
-      placeholder={label}
-      disabled={disabled}
-    />
-    <ErrorMessage message={error?.message} />
-  </div>
-);
-
-const SelectField = ({
-  label,
-  name,
-  options,
-  disabled,
-  defaultValue,
-  setValue,
-  error,
-}: {
-  label: string;
-  name: keyof PurchaseRequestData;
-  options: { value: string; label: string }[];
-  disabled: boolean;
-  defaultValue: string | undefined;
-  setValue: (name: keyof PurchaseRequestData, value: any) => void;
-  error?: { message?: string };
-}) => (
-  <div>
-    <Label className="text-base">{label}</Label>
-    <Select
-      disabled={disabled}
-      onValueChange={(value) => setValue(name, value)}
-    >
-      <SelectTrigger className="w-[250px] mt-4">
-        <SelectValue placeholder={defaultValue} />
-      </SelectTrigger>
-      <SelectContent defaultValue={defaultValue}>
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-    <ErrorMessage message={error?.message} />
-  </div>
-);
 
 const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -319,7 +267,7 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
     deleteItemMutation.mutate(selectedItemNo!);
   };
   return (
-    <div className="border-none bg-slate-100 rounded mt-4 p-8">
+    <div className="border-none">
       <ItemForm pr_no={pr_no!} />
       <p className="font-bold pt-5">Items</p>
       <div className="grid grid-cols-7 gap-2 mb-4 items-center border-b-2 py-4">

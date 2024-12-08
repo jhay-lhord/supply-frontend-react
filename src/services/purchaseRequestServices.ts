@@ -5,9 +5,12 @@ import { purchaseRequestType } from "@/types/response/puchase-request";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation } from "@tanstack/react-query";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { toast } from "sonner";
 import { ItemType } from "@/types/request/item";
-import { PurchaseRequestData } from "@/types/request/purchase-request";
+import {
+  EditPRFormType,
+  PurchaseRequestData,
+} from "@/types/request/purchase-request";
+import { useState } from "react";
 
 export const GetPurchaseRequest = async (): Promise<
   ApiResponse<purchaseRequestType[]>
@@ -15,7 +18,7 @@ export const GetPurchaseRequest = async (): Promise<
   try {
     const response = await api.get<purchaseRequestType[]>(
       "/api/purchase-request/"
-    )
+    );
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
@@ -35,14 +38,7 @@ export const GetPurchaseRequestList = async (
   }
 };
 
-export const AddPurchaseRequest = async (data: {
-  pr_no: string;
-  res_center_code: string;
-  purpose: string;
-  pr_status: string;
-  requested_by: string;
-  approved_by: string;
-}) => {
+export const AddPurchaseRequest = async (data: PurchaseRequestData) => {
   try {
     const response = await api.post("api/purchase-request/", data);
     console.log(response);
@@ -52,11 +48,22 @@ export const AddPurchaseRequest = async (data: {
   }
 };
 
-export const UpdatePurchaseRequest = async (data: PurchaseRequestData) => {
+export const updatePurchaseRequest = async ({
+  pr_no,
+  data,
+}: {
+  pr_no: string;
+  data: EditPRFormType;
+}) => {
   try {
-    const response = await api.put(`api/purchase-request/${data.pr_no}`, data);
+    const response = await api.patch(
+      `api/purchase-request/${pr_no}/edit/`,
+      data
+    );
+    console.log(response);
     return handleSucess(response);
   } catch (error) {
+    console.log(error);
     return handleError(error);
   }
 };
@@ -64,16 +71,14 @@ export const UpdatePurchaseRequest = async (data: PurchaseRequestData) => {
 export const useUpdatePurchaseRequest = () => {
   const queryClient = useQueryClient();
   return useMutation<
-    ApiResponse<PurchaseRequestData>,
+    ApiResponse<unknown>,
     Error,
-    PurchaseRequestData
+    { pr_no: string; data: EditPRFormType }
   >({
-    mutationFn: UpdatePurchaseRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["purchase_request"] });
-      toast.success("Edit Successfully", {
-        description: "Item Purchase Request Successfully",
-      });
+    mutationFn: ({ pr_no, data }) => updatePurchaseRequest({ pr_no, data }),
+    onSuccess: (_, variables) => {
+      const { pr_no } = variables;
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", pr_no] });
     },
   });
 };
@@ -108,7 +113,7 @@ export const usePurchaseRequestInProgressCount = () => {
 export const usePurchaseRequestInProgress = () => {
   const { data, isLoading } = usePurchaseRequest();
 
-  const inProgress = Array.isArray(data?.data) ? data.data : []
+  const inProgress = Array.isArray(data?.data) ? data.data : [];
 
   const purchaseRequestInProgress = inProgress
     ?.map((data) => {
@@ -120,13 +125,15 @@ export const usePurchaseRequestInProgress = () => {
 
   return { purchaseRequestInProgress, isLoading };
 };
+
 export const usePurchaseRequestList = (pr_no: string) => {
   return useQuery<ApiResponse<purchaseRequestType>, Error>({
-    queryKey: ["purchase_request", pr_no],
+    queryKey: ["purchase-request", pr_no],
     queryFn: () => GetPurchaseRequestList(pr_no!),
     enabled: !!pr_no,
   });
 };
+
 export const GetPurchaseRequestItem = async (): Promise<
   ApiResponse<purchaseRequestType[]>
 > => {
@@ -150,8 +157,109 @@ export const deletePurchaseRequest = async (pr_no: string) => {
   }
 };
 
+export const updatePurchaseRequestStatus = async ({
+  pr_no,
+  status,
+}: {
+  pr_no: string;
+  status: PurchaseRequestStatus;
+}) => {
+  try {
+    const response = await api.patch(
+      `api/purchase-request/${pr_no}/update-status/`,
+      { status }
+    );
+    console.log(response);
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error);
+    return handleError(error);
+  }
+};
+
+export const useUpdatePurchaseRequestStatus = () => {
+  const queryClient = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
+
+  const mutation = useMutation<
+    ApiResponse<unknown>,
+    Error,
+    { pr_no: string; status: PurchaseRequestStatus }
+  >({
+    mutationFn: ({ pr_no, status }) =>
+      updatePurchaseRequestStatus({ pr_no, status }),
+    onMutate: () => {
+      setIsPending(true);
+    },
+    onSuccess: (_, variables) => {
+      const { pr_no } = variables;
+
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", pr_no] });
+      queryClient.invalidateQueries({ queryKey: ["purchase-requests"] });
+    },
+    onError: () => {
+      setIsPending(false);
+    },
+    onSettled: () => {
+      setIsPending(false);
+    },
+  });
+
+  return {
+    ...mutation,
+    isPending,
+  };
+};
+
+type PurchaseRequestStatus = "Approved" | "Rejected" | "Cancelled" | "Forwarded to Procurement";
+
+export const usePurchaseRequestActions = () => {
+  const mutation = useUpdatePurchaseRequestStatus();
+  const [isPendingApprove, setIsPendingApprove] = useState(false);
+  const [isPendingReject, setIsPendingReject] = useState(false);
+  const [isPendingCancel, setIsPendingCancel] = useState(false);
+  const [isPendingForward, setIsPendingForward] = useState(false);
+
+  const handleAction = async (status: PurchaseRequestStatus, pr_no: string) => {
+    let setPendingState = (state: boolean) => {}; // Default no-op function
+
+    switch (status) {
+      case "Approved":
+        setPendingState = setIsPendingApprove;
+        break;
+      case "Rejected":
+        setPendingState = setIsPendingReject;
+        break;
+      case "Cancelled":
+        setPendingState = setIsPendingCancel;
+        break;
+      case "Forwarded to Procurement":
+        setPendingState = setIsPendingForward;
+        break;
+    }
+
+    setPendingState(true);
+
+    try {
+      await mutation.mutateAsync({ pr_no, status });
+    } finally {
+      setPendingState(false);
+    }
+  };
+
+  return {
+    handleApprove: (pr_no: string) => handleAction("Approved", pr_no),
+    handleReject: (pr_no: string) => handleAction("Rejected", pr_no),
+    handleCancel: (pr_no: string) => handleAction("Cancelled", pr_no),
+    handleForward: (pr_no: string) => handleAction("Forwarded to Procurement", pr_no),
+    isPendingApprove,
+    isPendingReject,
+    isPendingCancel,
+    isPendingForward
+  };
+};
+
 export const generateEditablePDF = async () => {
-  console.log("clicked");
   // Create a new PDF document
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([612, 792]); // 8.5 inches x 11 inches in points

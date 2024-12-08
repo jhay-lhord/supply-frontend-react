@@ -1,9 +1,10 @@
 import {
-  LayoutDashboard,
-  FileText,
   ShoppingCart,
-  FileSpreadsheet,
-  FileSymlink,
+  Layers,
+  Clipboard,
+  ClipboardList,
+  ClipboardPenLine,
+  LayoutGrid,
 } from "lucide-react";
 
 import {
@@ -26,7 +27,7 @@ const dashboard = [
   {
     title: "Dashboard",
     url: "/",
-    icon: LayoutDashboard,
+    icon: LayoutGrid,
   },
 ];
 
@@ -34,7 +35,7 @@ const procurement = [
   {
     title: "Purchase Request",
     url: "/supply/purchase-request",
-    icon: FileText,
+    icon: ClipboardPenLine,
   },
   {
     title: "Purchase Order",
@@ -45,14 +46,19 @@ const procurement = [
 
 const inventory = [
   {
-    title: "Manage Inventory",
+    title: "Stocks",
+    url: "/supply/stocks",
+    icon: Layers,
+  },
+  {
+    title: "Inventory",
     url: "/supply/inventory",
-    icon: FileSymlink,
+    icon: Clipboard,
   },
   {
     title: "Reports",
     url: "/supply/reports",
-    icon: FileSpreadsheet,
+    icon: ClipboardList,
   },
 ];
 
