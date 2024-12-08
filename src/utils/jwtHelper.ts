@@ -1,6 +1,5 @@
 import { jwtDecode } from "jwt-decode";
 
-const token = localStorage.getItem("access");
 
 export const getRoleFromToken = (access_token: string): string => {
   if (access_token) {
@@ -10,17 +9,17 @@ export const getRoleFromToken = (access_token: string): string => {
   return "";
 };
 
-export const getEmailFromToken = (): string => {
-  if (token) {
-    const decodedToken = jwtDecode<any>(token);
+export const getEmailFromToken = (access_token:string): string => {
+  if (access_token) {
+    const decodedToken = jwtDecode<any>(access_token);
     return decodedToken.email;
   }
   return "";
 };
 
-export const getFullnameFromToken = (): string => {
-  if (token) {
-    const decodedToken = jwtDecode<any>(token);
+export const getFullnameFromToken = (access_token:string): string => {
+  if (access_token) {
+    const decodedToken = jwtDecode<any>(access_token);
     return decodedToken.fullname;
   }
   return "";

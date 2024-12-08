@@ -7,8 +7,8 @@ import {
 
 const access_token = localStorage.getItem(ACCESS_TOKEN);
 export const userRole = getRoleFromToken(access_token!);
-export const userEmail = getEmailFromToken();
-export const userFullname = getFullnameFromToken();
+export const userEmail = getEmailFromToken(access_token!);
+export const userFullname = getFullnameFromToken(access_token!);
 export const trimmedUserRole = (user_role: string) => {
   return (
     user_role &&
