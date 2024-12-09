@@ -16,10 +16,10 @@ import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generatePrNo } from "@/services/generatePrNo";
 import { toast } from "sonner";
-import { campusDirector } from "../data/campus-director";
 import AsyncSelect from "react-select/async";
 import { getAllRequisitioner } from "@/services/requisitionerServices";
 import { Loader2 } from "lucide-react";
+import { getAllCampusDirector } from "@/services/campusDirectorServices";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -27,7 +27,7 @@ interface PurchaseRequestFormProps {
   lastPrNo: string | undefined;
 }
 
-type requisitionerOption = {
+type option = {
   value: string;
   label: string;
 };
@@ -37,8 +37,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
   setIsDialogOpen,
   lastPrNo,
 }) => {
-  const [requisitioner, setRequisitioner] =
-    useState<requisitionerOption | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const currentPurchaseNumber = lastPrNo && lastPrNo;
   const queryClient = useQueryClient();
@@ -53,9 +51,9 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     resolver: zodResolver(purchaseRequestFormSchema),
   });
 
-  const loadOptions = async (
+  const loadRequisitionerOptions = async (
     inputValue: string
-  ): Promise<requisitionerOption[]> => {
+  ): Promise<option[]> => {
     try {
       const requisitioners = await getAllRequisitioner();
       return (
@@ -64,8 +62,29 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
             requisitioner.name.toLowerCase().includes(inputValue.toLowerCase())
           )
           .map((requisitioner) => ({
-            value: requisitioner.name,
+            value: requisitioner.requisition_id,
             label: requisitioner.name,
+          })) || []
+      );
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
+  const loadCampusDirectorOptions = async (
+    inputValue: string
+  ): Promise<option[]> => {
+    try {
+      const campus_directors = await getAllCampusDirector();
+      return (
+        campus_directors.data
+          ?.filter((campus_director) =>
+            campus_director.name.toLowerCase().includes(inputValue.toLowerCase())
+          )
+          .map((campus_director) => ({
+            value: campus_director.cd_id,
+            label: campus_director.name,
           })) || []
       );
     } catch (error) {
@@ -85,10 +104,14 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     },
   });
 
-  const handleChange = (selectedOption: requisitionerOption | null) => {
-    setRequisitioner(selectedOption);
-    setValue("requested_by", selectedOption?.label ?? "");
+  const handleRequisitionerChange = (selectedOption: option | null) => {
+    setValue("requisitioner", selectedOption?.value ?? "");
   };
+
+  const handleCampusDirectorChange = (selectedOption: option | null) => {
+    setValue("campus_director", selectedOption?.value ?? "");
+  };
+
 
   const onSubmit = async (data: PurchaseRequestData) => {
     setIsLoading(true);
@@ -96,8 +119,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
       setIsDialogOpen(false);
       addPurchaseRequestMutation.mutate({
         ...data,
-        approved_by: campusDirector.name,
-        requested_by: requisitioner?.label ?? "",
       });
     }
     if (addPurchaseRequestMutation.isSuccess) {
@@ -148,22 +169,24 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
               )}
               {renderField(
                 "Requested By",
-                "requested_by",
+                "requisitioner",
                 <AsyncSelect
                   defaultOptions
-                  loadOptions={loadOptions}
-                  onChange={handleChange}
+                  loadOptions={loadRequisitionerOptions}
+                  onChange={handleRequisitionerChange}
                   placeholder="Search for a Requisitioner..."
                   className="mb-4 text-sm"
                 />
               )}
               {renderField(
                 "Approved By",
-                "approved_by",
-                <Input
-                  {...register("approved_by")}
-                  defaultValue={campusDirector.name}
-                  readOnly
+                "campus_director",
+                <AsyncSelect
+                  defaultOptions
+                  loadOptions={loadCampusDirectorOptions}
+                  onChange={handleCampusDirectorChange}
+                  placeholder="Search for a Campus Director..."
+                  className="mb-4 text-sm"
                 />
               )}
               <div className="mt-6 fixed bottom-6 right-10">
