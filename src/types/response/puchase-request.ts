@@ -5,7 +5,15 @@ export type purchaseRequestType = {
   res_center_code: string,
   purpose: string,
   status: string,
-  requested_by?: string,
-  approved_by?: string,
+  requisitioner_details: {
+    name: string
+    designation: string
+    department: string;
+  },
+  campus_director_details: {
+    name: string
+    designation: string
+    department: string;
+  },
   created_at: Date,
 }

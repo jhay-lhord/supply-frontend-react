@@ -53,7 +53,7 @@ const SupplyDashboard: React.FC = () => {
 
   return (
     <Layout>
-      <ScrollArea className="w-full">
+      <ScrollArea className="w-full p-6">
         <main className=" flex-grow">
           <div className="md:hidden"></div>
           <div className="hidden flex-col md:flex">

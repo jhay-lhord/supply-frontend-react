@@ -5,8 +5,9 @@ export const purchaseRequestFormSchema = z.object({
   res_center_code: z.string().min(1, 'Required'),
   purpose: z.string().min(1, 'Required'),
   status: z.string().min(1, 'Required').default("Not Approved"),
-  requested_by: z.string().min(1, 'Required'),
-  approved_by: z.string().min(1, 'Required'),
+  mode_of_procurement: z.string().default("Direct Contracting"),
+  requisitioner: z.string().min(1, 'Required'),
+  campus_director: z.string().min(1, 'Required'),
 });
 
 export type PurchaseRequestData = z.infer<typeof purchaseRequestFormSchema>;

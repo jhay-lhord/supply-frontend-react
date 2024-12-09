@@ -87,23 +87,23 @@ export default function PurchaseRequestItemList() {
     resolver: zodResolver(purchaseRequestFormSchema),
     defaultValues: {
       pr_no: pr_no,
-      purpose: purchase_request?.data?.purpose,
-      status: purchase_request?.data?.status,
-      res_center_code: purchase_request?.data?.res_center_code,
-      requested_by: purchase_request?.data?.requested_by,
-      approved_by: purchase_request?.data?.approved_by,
+      purpose: purchaseData?.purpose,
+      status: purchaseData?.status,
+      res_center_code: purchaseData?.res_center_code,
+      requisitioner: purchaseData?.requisitioner_details.name,
+      campus_director: purchaseData?.campus_director_details.name,
     },
   });
 
   useEffect(() => {
-    if (purchase_request?.data) {
-      setValue("purpose", purchase_request.data.purpose || "");
-      setValue("res_center_code", purchase_request.data.res_center_code || "");
-      setValue("requested_by", purchase_request.data.requested_by || "");
-      setValue("approved_by", purchase_request.data.approved_by || "");
-      setValue("status", purchase_request.data.status);
+    if (purchaseData) {
+      setValue("purpose", purchaseData?.purpose || "");
+      setValue("res_center_code", purchaseData?.res_center_code || "");
+      setValue("requisitioner", purchaseData?.requisitioner_details.name || "");
+      setValue("campus_director", purchaseData?.campus_director_details.name || "");
+      setValue("status", purchaseData?.status);
     }
-  }, [purchase_request, setValue]);
+  }, [purchaseData, setValue]);
 
   useEffect(() => {
     setStatus(purchaseData?.status);
@@ -124,8 +124,6 @@ export default function PurchaseRequestItemList() {
     const purchaseRequestData = purchase_request?.data;
     const itemsData = items ? items : [];
 
-    console.log(purchaseRequestData);
-    console.log(itemsData);
     const pdfURL = await generatePRPDF(purchaseRequestData!, itemsData);
     return itemsData.length != 0
       ? window.open(pdfURL!, "_blank")
@@ -170,7 +168,7 @@ export default function PurchaseRequestItemList() {
                 <div className="flex items-center">
                   <UserIcon className="w-4 h-4 mr-1" />
                   <p className="text-lg font-thin">
-                    {purchaseData?.requested_by}
+                    {purchaseData?.requisitioner_details.name}
                   </p>
                 </div>
                 <Separator orientation="vertical" className="h-6"/>

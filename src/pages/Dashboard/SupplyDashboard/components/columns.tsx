@@ -74,7 +74,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
     },
   },
   {
-    accessorKey: "requested_by",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Requested By" />
     ),
@@ -82,7 +82,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            <p className="font-thin text-sm">{row.getValue("requested_by")}</p>
+            <p className="font-thin text-sm">{row.getValue("name")}</p>
           </span>
         </div>
       );

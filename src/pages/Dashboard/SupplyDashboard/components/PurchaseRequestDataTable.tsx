@@ -22,7 +22,13 @@ export default function PurchaseRequestDataTable() {
 
   const sortedPurchaseRequestData = arraySort(purchaseRequestData, "pr_no");
 
-  console.log(purchaseRequestData);
+  const flattenedPurchaseData = sortedPurchaseRequestData.map(purchase_request => ({
+    ...purchase_request,
+    name: purchase_request.requisitioner_details.name,
+    designation: purchase_request.requisitioner_details.designation,
+    department: purchase_request.requisitioner_details.department
+  }))
+
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
@@ -48,7 +54,7 @@ export default function PurchaseRequestDataTable() {
           setIsDialogOpen={setIsDialogOpen}
           lastPrNo={lastPrNo?.toString()}
         />
-        <DataTable data={sortedPurchaseRequestData} columns={columns} />
+        <DataTable data={flattenedPurchaseData} columns={columns} />
       </div>
     </>
   );
