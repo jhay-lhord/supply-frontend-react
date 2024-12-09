@@ -3,9 +3,14 @@ export type purchaseOrdertype_ = {
   status: string,
   pr_details: {
     pr_no:string
+    mode_of_procurement: string
   }
   rfq_details: {
     rfq_no: string
+    supplier_name: string
+    supplier_address: string
+    is_VAT: string
+    tin: string
   },
   aoq_details: {
     aoq_no: string

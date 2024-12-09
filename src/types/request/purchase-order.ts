@@ -94,6 +94,7 @@ export type _itemsDeliveredType = {
         unit: string
         unit_cost:string
       }
+      unit_price: string
     }
   }
   quantity_delivered: string
