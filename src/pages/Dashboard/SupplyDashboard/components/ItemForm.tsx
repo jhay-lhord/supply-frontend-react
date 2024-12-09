@@ -11,6 +11,8 @@ import { Loader2 } from "lucide-react";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import { arraySort } from "@/services/itemServices";
 import { v4 as uuidv4 } from "uuid";
+import useStatusStore from "@/store";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 interface ItemFormProps {
   pr_no: string;
 }
@@ -48,6 +50,12 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   }, [nextStockNo, item_no, setValue]);
 
   const { mutate, isPending } = useAddItem();
+  const { status } = useStatusStore()
+
+  const addItemDisabled =
+  status === "Rejected" ||
+  status === "Cancelled" ||
+  status === "Forwarded to Procurement";
 
   const onSubmit = async (data: ItemType) => {
     try {
@@ -146,12 +154,26 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
             readOnly
           />
 
-          <Button
-            className="text-slate-950 bg-orange-200 hover:bg-orange-300"
-            type="submit"
-          >
-            {isPending ? <Loader2 className="animate-spin" /> : "Add Item"}
-          </Button>
+           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <Button
+                      disabled={addItemDisabled}
+                      className="flex bg-orange-200 hover:rounded-full text-gray-950"
+                    >
+                      <p className="mx-1 text-sm font-thin">{isPending ? <Loader2 className="animate-spin" /> : "Add Item"}</p>
+                      <span className="sr-only">Add Items</span>
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {addItemDisabled
+                    ? `You cannot add new items to this purchase request because it has already been ${status}`
+                    : "Click to add Items"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
         </div>
       </div>
     </form>

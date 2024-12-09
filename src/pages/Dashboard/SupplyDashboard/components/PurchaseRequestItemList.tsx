@@ -44,7 +44,6 @@ import {
   PencilLineIcon,
   UserIcon,
 } from "lucide-react";
-import { generatePDF } from "@/services/purchaseRequestServices";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -56,12 +55,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/services/formatDate";
 import EditPRForm from "./EditPRForm";
+import { generatePRPDF } from "@/services/generatePRPDF";
+import useStatusStore from "@/store";
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
 
   const { pr_no } = useParams();
+  const { setStatus } = useStatusStore();
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const {
     isLoading,
@@ -103,6 +105,14 @@ export default function PurchaseRequestItemList() {
     }
   }, [purchase_request, setValue]);
 
+  useEffect(() => {
+    setStatus(purchaseData?.status);
+
+    return () => {
+      setStatus("idle");
+    };
+  }, [setStatus, purchaseData]);
+
   let sortedItems;
   if (!isLoading) {
     sortedItems = arraySort(items!, "stock_property_no");
@@ -113,7 +123,10 @@ export default function PurchaseRequestItemList() {
   const handleGeneratePDF = async () => {
     const purchaseRequestData = purchase_request?.data;
     const itemsData = items ? items : [];
-    const pdfURL = await generatePDF(itemsData, purchaseRequestData!);
+
+    console.log(purchaseRequestData);
+    console.log(itemsData);
+    const pdfURL = await generatePRPDF(purchaseRequestData!, itemsData);
     return itemsData.length != 0
       ? window.open(pdfURL!, "_blank")
       : navigate("/supply/not-found");
@@ -126,104 +139,133 @@ export default function PurchaseRequestItemList() {
     <div className="m-8">
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
-          <CardTitle className="flex justify-between items-start">
+          <CardTitle className="">
             <div>
-              <div className="flex items-center gap-2">
-                <p>{purchaseData?.pr_no}</p>{" "}
-                <Button
-                  type="button"
-                  className=" bg-orange-200 hover:bg-orange-300 text-slate-950"
-                  onClick={handleOpenEditForm}
+              <div className="flex items-center justify-between"> 
+                <div className="flex items-center gap-2">
+                  <p className="font-thin">{purchaseData?.pr_no}</p>
+                  <Button
+                    type="button"
+                    className=" bg-orange-200 hover:bg-orange-300 text-slate-950"
+                    onClick={handleOpenEditForm}
+                  >
+                    <PencilLineIcon className=" w-4 h-4 mr-2" /> Edit
+                  </Button>
+                </div>
+
+                <Badge
+                  className={
+                    purchaseData?.status === "Approved"
+                      ? "bg-green-200 hover:bg-green-300 text-green-500"
+                      : purchaseData?.status === "Cancelled"
+                      ? "bg-red-100 hover:bg-red-200 text-red-400"
+                      : "bg-orange-100 text-orange-400"
+                  }
                 >
-                  <PencilLineIcon className=" w-4 h-4 mr-2" /> Edit
-                </Button>
+                  {purchaseData?.status}
+                </Badge>
               </div>
-              <span className="flex items-center">
-                <CalendarIcon className="w-3 h-3 mr-1" />
-                <p className="text-sm font-thin">
-                  {purchaseData?.created_at &&
-                    formatDate(purchaseData?.created_at)}
-                </p>
-              </span>
-              <span className="flex items-center pt-6">
-                <UserIcon className="w-6 h-6 mr-1" />
-                <p className=" font-thin">{purchaseData?.requested_by}</p>
-              </span>
+              <Separator className="mt-3"/>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center">
+                  <UserIcon className="w-4 h-4 mr-1" />
+                  <p className="text-lg font-thin">
+                    {purchaseData?.requested_by}
+                  </p>
+                </div>
+                <Separator orientation="vertical" className="h-6"/>
+                <div className="flex items-center">
+                  <CalendarIcon className="w-4 h-4 mr-1" />
+                  <p className="text-lg font-thin">
+                    {purchaseData?.created_at &&
+                      formatDate(purchaseData?.created_at)}
+                  </p>
+                </div>
+              </div>
             </div>
-            <Badge
-              className={
-                purchaseData?.status === "Approved"
-                  ? "bg-green-200 hover:bg-green-300 text-green-500"
-                  : purchaseData?.status === "Cancelled"
-                  ? "bg-red-100 hover:bg-red-200 text-red-400"
-                  : "bg-orange-100 text-orange-400"
-              }
-            >
-              {purchaseData?.status}
-            </Badge>
           </CardTitle>
           <div className="flex justify-between pt-8 pb-2">
-            <Button variant="outline" onClick={handleGeneratePDF}>
-              <FileTextIcon className="w-4 h-4 mr-2" />
-              Generate PDF
-            </Button>
+            <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <Button
+                      variant="outline"
+                      disabled={items?.length === 0}
+                      onClick={handleGeneratePDF}
+                      className="flex data-[state=open]:bg-muted hover:rounded-full bg- hover:bg-green-300 hover:border-none text-gray-950"
+                    >
+                      <p className="mx-1 text-sm font-thin">Generate PDF</p>
+                      <FileTextIcon className="w-4 h-4 mr-2" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {items?.length === 0
+                    ? "Please add Items to generate PDF"
+                    : "Click to generate PDF"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <div className="flex gap-1">
               <>
-                {purchaseData?.status !== "Cancelled" && (
-                  <>
-                    {purchaseData?.status !== "Approved" &&
-                      purchaseData?.status !== "Rejected" && (
-                        <Button
-                          className="bg-green-400 hover:bg-green-500 text-white"
-                          onClick={() => handleApprove(pr_no!)}
-                          disabled={isPendingApprove}
-                        >
-                          <CheckCircleIcon className="w-4 h-4 mr-2" />
-                          {isPendingApprove ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            "Approve"
-                          )}
-                        </Button>
-                      )}
-
-                    {purchaseData?.status !== "Approved" &&
-                      purchaseData?.status !== "Rejected" &&
-                      purchaseData?.status !== "Cancelled" && (
-                        <Button
-                          className="bg-red-400 hover:bg-red-500 text-white"
-                          onClick={() => handleReject(pr_no!)}
-                          disabled={isPendingReject}
-                        >
-                          <CircleXIcon className="w-4 h-4 mr-2" />
-                          {isPendingReject ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            "Reject"
-                          )}
-                        </Button>
-                      )}
-
-                    {purchaseData?.status !== "Rejected" && (
-                      <Button
-                        className="bg-orange-300 hover:bg-orange-400 text-white"
-                        onClick={() => handleCancel(pr_no!)}
-                        disabled={isPendingCancel}
-                      >
-                        <CircleMinusIcon className="w-4 h-4 mr-2" />
-                        {isPendingCancel ? (
-                          <Loader2 className="animate-spin" />
-                        ) : (
-                          "Cancel"
+                {purchaseData?.status !== "Cancelled" &&
+                  purchaseData?.status !== "Forwarded to Procurement" && (
+                    <>
+                      {purchaseData?.status !== "Approved" &&
+                        purchaseData?.status !== "Rejected" && (
+                          <Button
+                            className="bg-green-400 hover:bg-green-500 text-white"
+                            onClick={() => handleApprove(pr_no!)}
+                            disabled={isPendingApprove}
+                          >
+                            <CheckCircleIcon className="w-4 h-4 mr-2" />
+                            {isPendingApprove ? (
+                              <Loader2 className="animate-spin" />
+                            ) : (
+                              "Approve"
+                            )}
+                          </Button>
                         )}
-                      </Button>
-                    )}
-                  </>
-                )}
+
+                      {purchaseData?.status !== "Approved" &&
+                        purchaseData?.status !== "Rejected" &&
+                        purchaseData?.status !== "Cancelled" && (
+                          <Button
+                            className="bg-red-400 hover:bg-red-500 text-white"
+                            onClick={() => handleReject(pr_no!)}
+                            disabled={isPendingReject}
+                          >
+                            <CircleXIcon className="w-4 h-4 mr-2" />
+                            {isPendingReject ? (
+                              <Loader2 className="animate-spin" />
+                            ) : (
+                              "Reject"
+                            )}
+                          </Button>
+                        )}
+
+                      {purchaseData?.status !== "Rejected" && (
+                        <Button
+                          className="bg-orange-300 hover:bg-orange-400 text-white"
+                          onClick={() => handleCancel(pr_no!)}
+                          disabled={isPendingCancel}
+                        >
+                          <CircleMinusIcon className="w-4 h-4 mr-2" />
+                          {isPendingCancel ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            "Cancel"
+                          )}
+                        </Button>
+                      )}
+                    </>
+                  )}
               </>
             </div>
           </div>
-          <Separator className="pt-0" />
+          <Separator className="pt-0 text-orange-300 bg-orange-200" />
         </CardHeader>
         <CardContent>
           <ItemList sortedItems={sortedItems!} />
