@@ -77,3 +77,24 @@ export const itemsDeliveredSchema = z.object({
 })
 
 export type itemsDeliveredType = z.infer<typeof itemsDeliveredSchema>
+
+export type _itemsDeliveredType = {
+  inspection_details: {
+    po_details: {
+      po_no: string
+      status: string
+      total_amount: string
+    }
+  }
+  item_details: {
+    item_qoutation_details: {
+      item_details: {
+        item_description: string
+        quantity: string
+        unit: string
+        unit_cost:string
+      }
+    }
+  }
+  quantity_delivered: string
+}

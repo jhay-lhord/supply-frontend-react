@@ -33,7 +33,7 @@ export default function PurchaseOrderCompleted() {
           <TableHead>Items</TableHead>
           <TableHead>Total Amount</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Created At</TableHead>
+          <TableHead>Updated At</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -49,7 +49,7 @@ export default function PurchaseOrderCompleted() {
                   {order.status}
                 </Badge>
               </TableCell>
-              <TableCell>{formatDate(order.created_at)}</TableCell>
+              <TableCell>{formatDate(order.updated_at)}</TableCell>
             </TableRow>
           ))
         ) : (

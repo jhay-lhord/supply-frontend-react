@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/response/api-response";
 import { usePurchaseRequest } from "./purchaseRequestServices";
-import { inspectionType, itemsDeliveredType, purchaseOrderItemType, purchaseOrderType } from "@/types/request/purchase-order";
+import { _itemsDeliveredType, inspectionType, itemsDeliveredType, purchaseOrderItemType, purchaseOrderType } from "@/types/request/purchase-order";
 import api from "@/api";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -128,5 +128,22 @@ export const useAddItemsDelivered = () => {
   return useMutation<ApiResponse<itemsDeliveredType>, Error, itemsDeliveredType>({
     mutationFn: addItemsDelivered,
     mutationKey: ["inspection-reports"]
+  })
+}
+
+export const getItemsDelivered= async ():Promise<ApiResponse<_itemsDeliveredType[]>> => {
+  try {
+    const response = await api.get<_itemsDeliveredType[]>("api/items-delivered/")
+    console.log(response)
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useGetItemsDelivered = () => {
+  return useQuery<ApiResponse<_itemsDeliveredType[]>, Error>({
+    queryFn: getItemsDelivered,
+    queryKey: ["items-delivered"]
   })
 }

@@ -22,9 +22,17 @@ import {
   purchaseOrderType,
 } from "@/types/request/purchase-order";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, CreditCard, FileText, Loader2, ShoppingCart } from "lucide-react";
+import {
+  Building2,
+  CreditCard,
+  FileText,
+  Loader2,
+  MapPinIcon,
+  ShoppingCart,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 interface PurchaseOrderFormProps {
   aoq_no: string;
@@ -41,11 +49,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   isDialogOpen,
   setIsDialogOpen,
 }) => {
-  const {
-    handleSubmit,
-    reset,
-    setValue,
-  } = useForm({
+  const { handleSubmit, reset, setValue } = useForm({
     resolver: zodResolver(purchaseOrderSchema),
     defaultValues: {
       po_no: "",
@@ -61,6 +65,8 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   const { data: item_quotation } = useAllItemSelectedQuote();
   const { mutate } = useAddPurchaseOrder();
   const { mutate: addPRItemMutation } = useAddPurchaseOrderItem();
+
+  const navigate = useNavigate()
 
   const abstracts = Array.isArray(data?.data) ? data.data : [];
   const filteredAbstract = abstracts.filter(
@@ -126,38 +132,57 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   };
 
   return (
-
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-4xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Confirm Order</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
+              Confirm Order
+            </DialogTitle>
           </DialogHeader>
           <div className="mt-4 space-y-6">
             {filteredAbstract.map((data, index) => (
               <div key={index} className="bg-muted p-4 rounded-lg space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold">{data.pr_details.pr_no}</h3>
-                    <p className="text-sm text-muted-foreground">Requested by: {data.pr_details.requested_by}</p>
+                    <h3 className="text-lg font-semibold">
+                      {data.pr_details.pr_no}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Requested by: {data.pr_details.requested_by}
+                    </p>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" onClick={()=> navigate(`/supply/purchase-request/${data.pr_details.pr_no}`)}>
                     <FileText className="w-4 h-4 mr-2" />
                     View PR
                   </Button>
                 </div>
                 <Separator />
-                <div className="space-y-2">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center space-x-2">
                     <Building2 className="w-4 h-4 text-muted-foreground" />
-                    <p className="text-sm font-medium">{data.rfq_details.supplier_name}</p>
+                    <p className="text-sm font-medium">
+                      {data.rfq_details.supplier_name}
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground">{data.rfq_details.supplier_address}</p>
+                  <Separator orientation="vertical" className="h-8"/>
                   <div className="flex items-center space-x-2">
-                    <CreditCard className="w-4 h-4 text-muted-foreground" />
-                    <p className="text-sm">TIN: {data.rfq_details.tin}</p>
+                    <MapPinIcon className="w-4 h-4 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      {data.rfq_details.supplier_address}
+                    </p>
                   </div>
-                  <Badge variant={data.rfq_details.is_VAT ? "default" : "secondary"}>
+                  <Separator orientation="vertical" className="h-8"/>
+
+                  <div className="flex items-center space-x-2">
+                    <CreditCard className="w-4 h-4 font-medium" />
+                    <p className="text-sm font-medium">TIN: {data.rfq_details.tin}</p>
+                  </div>
+                  <Separator orientation="vertical" className="h-8"/>
+
+                  <Badge
+                    variant={data.rfq_details.is_VAT ? "default" : "secondary"}
+                  >
                     {data.rfq_details.is_VAT ? "VAT" : "Non-VAT"}
                   </Badge>
                 </div>
@@ -175,13 +200,30 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                 <div className="col-span-2">Unit Cost</div>
               </div>
               <ScrollArea className="h-[150px] pr-4">
-                {filteredItemQuotation.map((item, index) => ( 
-                  <div key={index} className="grid grid-cols-12 gap-4 text-sm py-2 border-t border-border">
+                {filteredItemQuotation.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-12 gap-4 text-sm py-2 border-t border-border"
+                  >
                     <div className="col-span-1">{index + 1}</div>
-                    <div className="col-span-1">{item.item_qoutation_details.item_details.unit}</div>
-                    <div className="col-span-6">{item.item_qoutation_details.item_details.item_description}</div>
-                    <div className="col-span-2">{item.item_qoutation_details.item_details.quantity}</div>
-                    <div className="col-span-2">₱{Number(item.item_qoutation_details.unit_price).toFixed(2)}</div>
+                    <div className="col-span-1">
+                      {item.item_qoutation_details.item_details.unit}
+                    </div>
+                    <div className="col-span-6">
+                      {
+                        item.item_qoutation_details.item_details
+                          .item_description
+                      }
+                    </div>
+                    <div className="col-span-2">
+                      {item.item_qoutation_details.item_details.quantity}
+                    </div>
+                    <div className="col-span-2">
+                      ₱
+                      {Number(item.item_qoutation_details.unit_price).toFixed(
+                        2
+                      )}
+                    </div>
                   </div>
                 ))}
               </ScrollArea>
@@ -189,7 +231,9 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           </div>
           <div className="mt-2 flex justify-end">
             <div className="bg-muted p-2 rounded-lg">
-              <p className="text-lg font-semibold">Total Amount: ₱{total_amount}</p>
+              <p className="text-lg font-semibold">
+                Total Amount: ₱{total_amount}
+              </p>
             </div>
           </div>
           <DialogFooter className="mt-4">
@@ -202,7 +246,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
               ) : (
                 <ShoppingCart className="w-4 h-4 mr-2" />
               )}
-              {isLoading ? 'Processing...' : 'Confirm Order'}
+              {isLoading ? "Processing..." : "Confirm Order"}
             </Button>
           </DialogFooter>
         </form>

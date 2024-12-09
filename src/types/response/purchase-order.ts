@@ -12,4 +12,5 @@ export type purchaseOrdertype_ = {
   },
   total_amount: string
   created_at: Date;
+  updated_at:Date;  
 }
