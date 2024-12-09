@@ -30,6 +30,8 @@ import BACmember from "./pages/Dashboard/AdminDashboard/BACmember";
 import { AllQuotations } from "./pages/Dashboard/BACDashboard/AllQuotations";
 import { AllAbstract } from "./pages/Dashboard/BACDashboard/AllAbstract";
 import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/components/AbstractOfQuotation";
+import Stocks from "./pages/Dashboard/SupplyDashboard/Stocks";
+import PurchaseOrderItemList from "./pages/Dashboard/SupplyDashboard/components/PurchaseOrderItemList";
 
 const App = () => {
   return (
@@ -70,6 +72,8 @@ const App = () => {
           />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />
+
+          <Route path="/supply/stocks" element={<Stocks />} />
           <Route path="/supply/not-found" element={<ItemNotFound />} />
 
           {/* Pages in BAC Dashboard */}
@@ -80,6 +84,10 @@ const App = () => {
           <Route
             path="/bac/purchase-request/:pr_no"
             element={<BACPurchaseRequestList />}
+          />
+          <Route
+            path="/bac/purchase-order/:po_no"
+            element={<PurchaseOrderItemList />}
           />
           <Route
             path="/bac/request-for-quotation"
