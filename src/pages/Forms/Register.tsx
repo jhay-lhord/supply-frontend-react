@@ -20,7 +20,6 @@ import { useRegisterUser } from "@/services/registerUserServices";
 
 const Register = () => {
   const [isloading, setIsloading] = useState<boolean>(false);
-  const [role, setRole] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false); // State for password visibility
   const [showConfirmPassword, setShowConfirmPassword] =
@@ -55,7 +54,6 @@ const Register = () => {
   };
 
   const handleRoleChange = (roleValue: string) => {
-    setRole(roleValue);
     setValue("role", roleValue);
   };
 
@@ -80,7 +78,7 @@ const Register = () => {
       <div className="relative flex border border-slate rounded-lg w-[800px] shadow-lg border-[#FDE3CF] bg-white z-10">
         <div className="flex justify-center items-center w-1/2 border-r border-slate p-5 shadow-lg border-[#FDE3CF] bg-blue-50">
           <img
-            src="CTU_new_logotransparent.svg"
+            src="/CTU_new_logotransparent.svg"
             alt="Illustration"
             className="w-full h-auto object-contain"
           />

@@ -16,7 +16,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import Logo from "/public/CTU_new_logotransparent.svg";
 import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
 
 
@@ -63,7 +62,7 @@ const AdminSidebar = () => {
       <SidebarHeader className="flex flex-row items-center">
         {open ? (
           <div className="flex gap-2 items-center rounded-md shadow-sm p-2 w-full">
-            <img src={Logo} alt="Logo" width={50} height={50} />
+            <img src="/CTU_new_logotransparent.svg" alt="Logo" width={50} height={50} />
             <div>
               <p className="text-xl">CTU-AC</p>
               <p className="text-xs text-orange-400">
@@ -72,7 +71,7 @@ const AdminSidebar = () => {
             </div>
           </div>
         ) : (
-          <img src={Logo} alt="Logo" width={50} height={50} />
+          <img src="/CTU_new_logotransparent.svg" alt="Logo" width={50} height={50} />
         )}
       </SidebarHeader>
       <SidebarContent>

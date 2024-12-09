@@ -112,7 +112,7 @@ const Login = () => {
       <div className="relative flex border border-[#FDE3CF] rounded-lg w-[800px] shadow-lg bg-white z-10">
         <div className="flex justify-center items-center w-1/2 border-r border-[#FDE3CF] p-5 shadow-lg bg-blue-50">
           <img
-            src="CTU_new_logotransparent.svg"
+            src="/CTU_new_logotransparent.svg"
             alt="Illustration"
             className="w-full h-auto object-contain"
           />
