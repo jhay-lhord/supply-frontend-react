@@ -4,10 +4,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  OpenInNewWindowIcon,
-  TrashIcon,
-} from "@radix-ui/react-icons";
+import { OpenInNewWindowIcon, TrashIcon } from "@radix-ui/react-icons";
 import {
   useDeleteRequestForQuotation,
   useRequestForQoutation,
@@ -20,7 +17,17 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { DeleteDialog } from "../shared/components/DeleteDialog";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BuildingIcon, CalendarIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface QuotationCardProps {
   title: string;
@@ -80,15 +87,23 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
         <div className="flex justify-between ">
           <p className="text-xl">{title}</p>
           <div className="flex">
-            <Select  onValueChange={(value: DropdownOption) => setSelectedDropdown(value)}>
+            <Select
+              onValueChange={(value: DropdownOption) =>
+                setSelectedDropdown(value)
+              }
+            >
               <SelectTrigger className="w-[180px] bg-orange-200 active:focus-none">
                 <SelectValue placeholder="Search By..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="purchase_request">Purchase Request</SelectItem>
+                  <SelectItem value="purchase_request">
+                    Purchase Request
+                  </SelectItem>
                   <SelectItem value="supplier_name">Supplier Name</SelectItem>
-                  <SelectItem value="supplier_address">Supplier Address</SelectItem>
+                  <SelectItem value="supplier_address">
+                    Supplier Address
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -108,10 +123,16 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-xl">{quotation.supplier_name}</p>
-                      <p className="text-sm">
-                        {formatDate(quotation.created_at)}
-                      </p>
+                      <div className="flex gap-2 items-center">
+                        <BuildingIcon className="h-5 w-5" />
+                        <p className="text-xl">{quotation.supplier_name}</p>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <CalendarIcon className="h-4 w-4" />
+                        <p className="text-sm">
+                          {formatDate(quotation.created_at)}
+                        </p>
+                      </div>
                     </div>
 
                     <Button
@@ -128,15 +149,20 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
                       />
                     </Button>
                   </div>
+                  <Separator/>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-base">
-                    Supplier Address: {quotation.supplier_address}
-                  </p>
-                  <p className="text-base">TIN: {quotation.tin}</p>
-                  <p className="text-base">
+                  <div className="flex gap-2 items-center">
+                    <MapPinIcon className="h-4 w-4" />
+                    <p className="text-base">{quotation.supplier_address}</p>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <CreditCardIcon className="w-4 h-4"/>
+                  <p className="text-base">{quotation.tin}</p>
+                  </div>
+                  <Badge variant={"outline"}>
                     {quotation.is_VAT ? "VAT" : "non-VAT"}
-                  </p>
+                  </Badge>
                 </CardContent>
                 <CardFooter>
                   <div className="flex justify-between  w-full">

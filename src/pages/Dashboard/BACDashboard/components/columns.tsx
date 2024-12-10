@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ColumnDef } from "@tanstack/react-table";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { DataTableColumnHeader } from "../components/data-table-column-header";
@@ -12,12 +13,10 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     accessorKey: "pr_no",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Purchase Number" />
+      <DataTableColumnHeader column={column} title="PO No." />
     ),
     cell: ({ row }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       const rfqCount = useRequestForQoutationCount(row.getValue("pr_no"))
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       const navigate = useNavigate()
       const pr_no = row.getValue("pr_no")
       return (
@@ -55,7 +54,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
     },
   },
   {
-    accessorKey: "requested_by",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Requested By" />
     ),
@@ -63,7 +62,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("requested_by")}
+            {row.getValue("name")}
           </span>
         </div>
       );

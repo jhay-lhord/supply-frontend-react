@@ -22,6 +22,7 @@ import PurchaseOrderCompleted from "./components/PurchaseOrderCompleted";
 import PurchaseOrderCancelled from "./components/PurchaseOrderCancelled";
 import { useMemo } from "react";
 import PurchaseOrderLacked from "./components/PurchaseOrderLacked";
+import { Badge } from "@/components/ui/badge";
 
 const PurchaseOrder: React.FC = () => {
   const { data: purchaseOrdersResponse } = useGetAllPurchaseOrder();
@@ -106,9 +107,9 @@ const PurchaseOrder: React.FC = () => {
                 >
                   <span>{tab.label}</span>
                   {tab.count !== 0 && (
-                    <span className="ml-2 bg-orange-300 text-gray-700 px-2 py-1 rounded-full text-xs">
+                    <Badge className="h-6 w-6 flex items-center justify-center ">
                       {tab.count}
-                    </span>
+                    </Badge>
                   )}
                 </TabsTrigger>
               ))}

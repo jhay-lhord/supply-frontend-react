@@ -56,6 +56,11 @@ export type abstractType_ = {
     purpose: string,
     requested_by:string,
     approved_by: string,
+    requisitioner_details: {
+      name: string
+      department: string
+      designation: string
+    }
   }
   total_amount: string,
   created_at: Date

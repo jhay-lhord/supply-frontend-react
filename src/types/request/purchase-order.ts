@@ -24,9 +24,9 @@ const itemSchema = z.object({
     pr_no: z.string(),
     res_center_code: z.string(),
     status: z.string(),
-    requested_by: z.string(),
+    requisitioner: z.string(),
     purpose: z.string(),
-    approved_by: z.string(),
+    campus_director: z.string(),
   }),
   item_qoutation_details: z.object({
     brand_model: z.string(),

@@ -26,6 +26,14 @@ import { DeleteDialog } from "../../shared/components/DeleteDialog";
 import { useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import {
+  BuildingIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  MapPinIcon,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 const getLowPriceSummary = (
   items: ItemType[],
@@ -111,10 +119,16 @@ export const QuotationCard: React.FC<QuotationCardProps> = ({
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-xl">{quotation.supplier_name}</p>
-                    <p className="text-sm">
-                      {formatDate(quotation.created_at)}
-                    </p>
+                    <div className="flex gap-1 items-center">
+                      <BuildingIcon className="h-4 w-4" />
+                      <p className="text-2xl">{quotation.supplier_name}</p>
+                    </div>
+                    <div className="flex gap-1 items-center">
+                      <CalendarIcon className="h-3 w-3" />
+                      <p className="text-sm">
+                        {formatDate(quotation.created_at)}
+                      </p>
+                    </div>
                   </div>
 
                   <Button
@@ -131,15 +145,20 @@ export const QuotationCard: React.FC<QuotationCardProps> = ({
                     />
                   </Button>
                 </div>
+                <Separator />
               </CardHeader>
               <CardContent>
-                <p className="text-base">
-                  Supplier Address: {quotation.supplier_address}
-                </p>
-                <p className="text-base">TIN: {quotation.tin}</p>
-                <p className="text-base">
+                <div className="flex gap-2 py-2 items-center">
+                  <MapPinIcon className="h-4 w-4" />
+                  <p>{quotation.supplier_address}</p>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <CreditCardIcon className="h-4 w-4" />
+                  <p className="text-base">TIN: {quotation.tin}</p>
+                </div>
+                <Badge className="mt-2" variant={"outline"}>
                   {quotation.is_VAT ? "VAT" : "non-VAT"}
-                </p>
+                </Badge>
               </CardContent>
               <CardFooter>
                 <div className="w-full flex justify-between items-center">

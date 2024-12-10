@@ -18,7 +18,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Collapsible,
   CollapsibleContent,
@@ -107,10 +107,10 @@ const BACSidebar = () => {
                     className="px-3 py-5 "
                     isActive={location.pathname === item.url}
                   >
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -124,10 +124,10 @@ const BACSidebar = () => {
                     className="px-3 py-5  hover:bg-orange-100"
                     isActive={location.pathname === item.url}
                   >
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -160,9 +160,9 @@ const BACSidebar = () => {
                             className="px-3 py-5  hover:bg-orange-100"
                             isActive={location.pathname === data.url}
                           >
-                            <a href={data.url}>
+                            <Link to={data.url}>
                               <p>{data.title}</p>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -196,9 +196,9 @@ const BACSidebar = () => {
                           className="px-3 py-5  hover:bg-orange-100"
                           isActive={location.pathname === data.url}
                         >
-                          <a href={data.url}>
+                          <Link to={data.url}>
                             <p>{data.title}</p>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

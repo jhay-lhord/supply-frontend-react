@@ -149,7 +149,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                       {data.pr_details.pr_no}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Requested by: {data.pr_details.requested_by}
+                      Requested by: {data.pr_details.requisitioner_details.name}
                     </p>
                   </div>
                   <Button variant="outline" onClick={()=> navigate(`/supply/purchase-request/${data.pr_details.pr_no}`)}>

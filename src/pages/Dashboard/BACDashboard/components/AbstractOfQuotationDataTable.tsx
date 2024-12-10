@@ -15,13 +15,19 @@ export default function AbstractOfQuotationDataTable() {
 
     return purchaseRequestInProgress.filter(data => prNos.includes(data.pr_no))
   }, [data?.data, purchaseRequestInProgress])
+
+  const flattenedData = dataHasRFQ.map(data => ({
+    ...data,
+    name: data.requisitioner_details.name
+  }))
+
   if(isLoading) return <Loading/>
 
   return (
     <>
       <div className="hidden w-full flex-col space-y-8 md:flex">
 
-        <DataTable data={dataHasRFQ!} columns={AbstractColumn} />
+        <DataTable data={flattenedData!} columns={AbstractColumn} />
       </div>
     </>
   );

@@ -113,9 +113,6 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
     }
   }, [isDialogOpen]);
 
-  console.log(fields);
-  console.log(sortedItems);
-
   type RequestForQuotationField =
     | "purchase_request"
     | "items"
@@ -135,7 +132,6 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
   const renderField = ({ label, field_name, errors }: RenderFieldProps) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (field_name === "tin") {
-        // Apply formatting only for TIN field
         const formattedTIN = formatTIN(e.target.value);
         e.target.value = formattedTIN;
       }
@@ -177,7 +173,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
         supplier_name: data.supplier_name ?? "",
         supplier_address: data.supplier_address ?? "",
         tin: data.tin ?? "",
-        is_VAT: data.is_VAT ?? "",
+        is_VAT: selectedOption === "vat" ? true : false,
       };
 
       addRFQMutation(quotationData, {
@@ -198,7 +194,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
               unit_price: item.unit_price ?? 0,
               brand_model: item.brand_model ?? "",
               is_low_price: sortedItem
-                ? Number(item.unit_price) < Number(sortedItem.unit_cost)
+                ? Number(item.unit_price) <= Number(sortedItem.unit_cost)
                 : false,
             };
           });
@@ -227,6 +223,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
       console.error("Error saving items:", error);
     }
   };
+
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

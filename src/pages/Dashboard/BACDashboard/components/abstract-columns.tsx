@@ -1,48 +1,23 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { DataTableColumnHeader } from "../components/data-table-column-header";
 import { DataTableRowActions } from "../components/data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { useRequestForQoutationCount } from "@/services/requestForQoutationServices";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "@/services/formatDate";
 
 
 
 export const AbstractColumn: ColumnDef<purchaseRequestType>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     accessorKey: "pr_no",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Purchase Number" />
+      <DataTableColumnHeader column={column} title="PO. No" />
     ),
     cell: ({ row }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       const rfqCount = useRequestForQoutationCount(row.getValue("pr_no"))
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       const navigate = useNavigate()
       const pr_no = row.getValue("pr_no")
       return (
@@ -80,7 +55,7 @@ export const AbstractColumn: ColumnDef<purchaseRequestType>[] = [
     },
   },
   {
-    accessorKey: "requested_by",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Requested By" />
     ),
@@ -88,7 +63,7 @@ export const AbstractColumn: ColumnDef<purchaseRequestType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("requested_by")}
+            {row.getValue("name")}
           </span>
         </div>
       );
@@ -100,18 +75,10 @@ export const AbstractColumn: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => {
-      const createdAt = row.getValue("created_at") as string | number;
-      const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short", 
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {formattedDate}
+            {formatDate(row.getValue("created_at"))}
           </span>
         </div>
       );

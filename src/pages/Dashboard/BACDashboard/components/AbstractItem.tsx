@@ -53,7 +53,7 @@ export const AbstractItem = () => {
   const totalAmount = (aoqNo: string) => {
     const items = Array.isArray(data?.data) ? data.data : [];
     const filteredItems = items.filter(
-      (item) => item.afq === aoqNo && item.is_item_selected
+      (item) => item.aoq === aoqNo && item.is_item_selected
     );
     return filteredItems.reduce(
       (sum, item) => sum + Number(item.total_amount),
@@ -92,7 +92,7 @@ export const AbstractItem = () => {
                         {data.rfq_details.supplier_name}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {data.afq_no}
+                        {data.aoq_no}
                       </p>
                     </div>
 
@@ -102,7 +102,7 @@ export const AbstractItem = () => {
                           <OpenInNewWindowIcon
                             width={20}
                             height={20}
-                            onClick={() => navigate(`/bac/abstract-item-list/${data.afq_no}`)}
+                            onClick={() => navigate(`/bac/abstract-item-list/${data.aoq_no}`)}
                             className="hover:cursor-pointer hover:text-orange-300 transition-colors duration-200"
                           />
                         </TooltipTrigger>
@@ -114,7 +114,7 @@ export const AbstractItem = () => {
 
                 <CardContent className="mt-2">
                   <p className="text-base font-medium">
-                    Supplier Address:
+                    Supplier Address: bcvncnnbvnvbnvbnv
                     <span className="text-gray-600">
                       {data.rfq_details.supplier_address}
                     </span>
@@ -128,12 +128,12 @@ export const AbstractItem = () => {
                   <div className="mt-4 border-t pt-2">
                     <p className="text-base font-semibold">Quotation Summary</p>
                     <p className="text-base text-gray-700">
-                      Total Items: {totalItemsCount(data.afq_no)}
+                      Total Items: {totalItemsCount(data.aoq_no)}
                       
                     </p>
                     <p className="text-base text-gray-700"></p>
                     <p className="text-base text-green-600 font-medium">
-                      Total Price: {totalAmount(data.afq_no)}
+                      Total Price: {totalAmount(data.aoq_no)}
                     </p>
                   </div>
                 </CardContent>
@@ -146,7 +146,7 @@ export const AbstractItem = () => {
                     <div className="flex space-x-2">
                       <div className="bg-red-200 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                         <TrashIcon
-                          onClick={() => handleOpenDialog(data.afq_no)}
+                          onClick={() => handleOpenDialog(data.aoq_no)}
                           className="text-red-500"
                           width={20}
                           height={20}
