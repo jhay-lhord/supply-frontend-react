@@ -24,6 +24,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useState } from "react";
+import { saveTokenToLocalStorage } from "@/services/LoginUserServices";
 
 const FormSchema = z.object({
   otp_code: z.string().min(6, {
@@ -48,14 +49,11 @@ export function InputOTPForm() {
     const otp_code = data.otp_code;
     setIsloading(true);
     setOtpError("");
-    console.log(data.otp_code);
     api
       .post("/api/user/login_verify_otp/", { email, otp_code })
       .then((response) => {
-        localStorage.setItem(ACCESS_TOKEN, response.data.access);
-        localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
-        localStorage.setItem(ROLE, getRoleFromToken(response.data.access))
-        if (response.status === 200) {
+         if (response.status === 200) {
+          saveTokenToLocalStorage(response.data, email!)
           navigate("/");
           toast("Login successful!",{
             description: " Welcome back, CTU AC Supply Management System"

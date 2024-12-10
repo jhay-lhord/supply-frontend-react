@@ -6,12 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import {
-  trimmedUserRole,
-  userEmail,
-  userFullname,
-  userRole,
-} from "@/services/useProfile";
+import { getUserInformation } from "@/services/useProfile";
 import { ChevronsUpDownIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,12 +15,13 @@ import { useNavigate } from "react-router-dom";
 
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const {userEmail, userFullname, trimmedUserRole} = getUserInformation()
 
   const handleLogoutUser = () => {
-    logoutUser()
-    navigate("/login")
-  }
+    logoutUser();
+    navigate("/login");
+  };
 
   return (
     <div>
@@ -35,7 +31,7 @@ export const CustomSidebarFooter = () => {
             <SidebarMenuButton className="py-8 rounded-md bg-gradient-to-r from-orange-300 to-amber-200 hover:bg-orange-100">
               <Avatar className="h-10 w-10">
                 <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
+                <AvatarFallback>{trimmedUserRole}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
                 <p className="text-sm">{userFullname}</p>
@@ -49,7 +45,9 @@ export const CustomSidebarFooter = () => {
             <div className="flex items-center justify-center">
               <Avatar className=" w-8 h-8 bg-orange-200">
                 <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                <AvatarFallback className="bg-orange-200">{trimmedUserRole(userRole)}</AvatarFallback>
+                <AvatarFallback className="bg-orange-200">
+                  {trimmedUserRole}
+                </AvatarFallback>
               </Avatar>
             </div>
           )}

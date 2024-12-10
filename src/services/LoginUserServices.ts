@@ -8,7 +8,7 @@ const react_env = import.meta.env.VITE_REACT_ENV;
 const mode = react_env === "development" ? "offline" : "online";
 
 
-const saveTokenToLocalStorage = (
+export const saveTokenToLocalStorage = (
   data: AxiosResponse<any, any>,
   email: string
 ) => {
@@ -27,7 +27,6 @@ export const loginUser = async (data: userLoginType) => {
 
   try {
     const response = await api.post(url, data);
-    console.log(response);
     if (response.status === 200) {
       saveTokenToLocalStorage(response, data.email);
       isOTPSent = mode === "online"
@@ -49,34 +48,3 @@ export const loginUser = async (data: userLoginType) => {
 
   return { status, isOTPSent, errorMessage };
 };
-
-// export const useloginUser = () => {
-//   return useMutation({
-//     mutationFn: (data) => loginUser(data),
-//   });
-
-// api
-// .post("/api/user/login_token_offline/", data)
-// .then((response) => {
-//   if (response.status === 200) {
-//     // setIsOTPSent(true);
-//     localStorage.setItem(ACCESS_TOKEN, response.data.access);
-//     localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
-//     localStorage.setItem(ROLE, getRoleFromToken(response.data.access));
-//     navigate("/");
-//     localStorage.setItem("email", email);
-//   }
-// })
-// .catch((error) => {
-//   console.error(error);
-//   if (error.code === "ERR_NETWORK") {
-//     setError(`${error.message}, Please check your Internet Connection`);
-//   } else if (error.response?.status === 400) {
-//     setError("No active account found with the given credentials");
-//   } else {
-//     setError("An unexpected error occurred. Please try again.");
-//   }
-// })
-// .finally(() => {
-//   setIsloading(false);
-// });
