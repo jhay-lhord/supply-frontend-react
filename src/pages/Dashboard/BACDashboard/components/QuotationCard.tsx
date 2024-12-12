@@ -111,7 +111,7 @@ export const QuotationCard: React.FC<QuotationCardProps> = ({
 
   return (
     <div className="w-full ">
-      <p className="text-xl">{title}</p>
+      <p className="text-xl">{`${title} of [ ${pr_no} ]` }</p>
       <div className="grid grid-cols-3 gap-4 mt-8 relative">
         {filteredQuotations.length > 0 ? (
           filteredQuotations.map((quotation) => (

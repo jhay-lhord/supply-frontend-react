@@ -4,7 +4,7 @@ import { QuotationCard } from "./components/QuotationCard";
 export const QuotationList: React.FC = () => {
   return (
     <Layout>
-        <QuotationCard isDeleteAllowed={true} title={"All Quotes"} />
+        <QuotationCard isDeleteAllowed={true} title={"All Supplier "} />
     </Layout>
   );
 };

@@ -1,130 +1,215 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { formatDate } from "@/services/formatDate";
-import { CheckIcon, Cross2Icon, Pencil2Icon } from "@radix-ui/react-icons";
-import { PrinterIcon } from "lucide-react";
+import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
+import {
+  BuildingIcon,
+  CalendarIcon,
+  ClipboardIcon,
+  CreditCardIcon,
+  MapPinIcon,
+  PrinterIcon,
+} from "lucide-react";
 import { useParams } from "react-router-dom";
 import Loading from "../../shared/components/Loading";
-import { useAllItemSelectedQuote, useGetAbstractOfQuotation } from "@/services/AbstractOfQuotationServices";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  useGetAbstractOfQuotation,
+  useGetAllSupplierItem,
+} from "@/services/AbstractOfQuotationServices";
 import { generateAOQPDF } from "@/services/generateAOQPDF";
-import { AbstractFormEdit } from "./AbstractFormEdit";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Dialog } from "@radix-ui/react-dialog";
+import {
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useGetRequestForQuotation } from "@/services/requestForQoutationServices";
 
 export const AbstractItemContentList = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const [isInformationDialogOpen, setIsInformationDialogOpen] =
+    useState<boolean>(false);
+  const [rfqNo, setRfqNo] = useState<string | undefined>(undefined)
+
   const { aoq_no } = useParams();
 
-  const { data: abstract, isLoading: abstract_loading } = useGetAbstractOfQuotation(aoq_no!);
-  const { data:items, isLoading  } = useAllItemSelectedQuote()
+  const { data: abstract, isLoading: abstract_loading } =
+    useGetAbstractOfQuotation(aoq_no!);
+  const { data: items, isLoading } = useGetAllSupplierItem();
 
-  const abstractItems = items?.data?.filter((data) => data.afq === aoq_no);
-  const quotation = abstract && abstract.data;
-  console.log(abstractItems)
+  const supplierItemData = Array.isArray(items?.data) ? items.data : []
+
+  const abstractData = abstract && abstract.data;
+
   if (isLoading || abstract_loading) return <Loading />;
 
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true)
-  }
-
   const handlePDFPrint = async () => {
-    const url = await generateAOQPDF(abstractItems!)
-    return window.open(url!, '_blank')
-  }
+    const url = await generateAOQPDF(supplierItemData!);
+    return window.open(url!, "_blank");
+  };
+
+  const handleOpenSupplierInformation = (rfq_no: string) => {
+    setIsInformationDialogOpen(true);
+    setRfqNo(rfq_no)
+  };
 
   return (
-    <div className=" w-full pt-8">
-      <div className="">
-        <Card className="">
-          <CardHeader className="bg-orange-100 rounded-t">
-            <div className="flex justify-between items-end ">
-              <div>
-                <p className="text-xl">
-                  {quotation?.rfq_details.supplier_name}
-                </p>
-                <p className="text-sm">
-                  {formatDate(quotation?.created_at as Date)}
-                </p>
-                <p className="text-base">
-                  {quotation?.rfq_details.supplier_address}
-                </p>
-                <p className="text-base">{quotation?.rfq_details.tin}</p>
-                <div className="flex items-center justify-center gap-2">
-                <span> 
-                    non-VAT <Checkbox checked={!quotation?.rfq_details.is_VAT} disabled/>
-                  </span>
-                  <span>
-                    VAT <Checkbox checked={quotation?.rfq_details.is_VAT} disabled/>
-                  </span>
-                </div>
-              </div>
-              <div className="flex gap-2 ">
-                <Button>
-                  <Pencil2Icon onClick={handleOpenDialog} width={20} height={20} className="mx-2" /> Edit
-                </Button>
-                <Button variant={"outline"}>
-                  <PrinterIcon onClick={handlePDFPrint} width={20} height={20} className="mx-2" />
-                  Print
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl py-2">Abstract of Qoutations</p>
-            <div className="grid grid-cols-8 gap-2 items-center py-2  border-b-2 sticky bg-background top-0">
-              <p className="text-base">No.</p>
-              <p className="text-base col-span-2">ITEM DESCRIPTION</p>
-              <p className="text-base">QUANTITY</p>
-              <p className="text-base">PRICE</p>
-              <p className="text-base col-span-2">WINNING BIDDER</p>
-              <p className="text-base">WINNING PRICE</p>
-            </div>
-            {abstractItems && abstractItems?.length > 0 ? (
-              abstractItems?.map((item, index) => {
-                return (
-                  <div
-                    className="grid grid-cols-8 gap-2 items-center py-8 border-b-2"
-                    key={item.item_details.item_details.item_no}
-                  >
-                    <p className="text-gray-500">{index + 1}</p>
-                    <p className="text-gray-500 col-span-2">
-                      {item.item_details.item_details.item_description}
-                    </p>
-                    <p className="text-gray-500">
-                      {item.item_details.item_details.quantity}
-                    </p>
-                    <p className="text-gray-500">
-                      {item.item_details.item_details.unit_cost}
-                    </p>
-
-                    <p className="text-gray-500 col-span-2">
-                      {item.rfq_details.supplier_name}
-                    </p>
-
-                    <p
-                      className={`${
-                        item.item_details.is_low_price ? "text-green-400" : "text-red-400"
-                      } flex gap-2 items-center`}
-                    >
-                      {item.item_details.is_low_price ? <CheckIcon /> : <Cross2Icon />}
-                      {item.item_details.unit_price}
+    <div className="m-6 w-full">
+      <Card className="w-full bg-slate-100">
+        <CardHeader className="flex flex-col">
+          <CardTitle className="">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="">
+                  <p className="font-thin">{abstractData?.aoq_no}</p>
+                  <div className="flex items-center pt-2">
+                    <CalendarIcon className="w-3 h-3 mr-1" />
+                    <p className="text-sm font-thin">
+                      {abstractData?.created_at &&
+                        formatDate(abstractData?.created_at)}
                     </p>
                   </div>
-                );
-              })
-            ) : (
-              <p>No items Found</p>
-            )}
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
-      </div>
-      <AbstractFormEdit isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
+                </div>
+
+                <div className="flex gap-4">
+                  <Button onClick={handlePDFPrint} >
+                    <PrinterIcon width={20} height={20} className="mx-2" />
+                    Generate PDF
+                  </Button>
+                </div>
+              </div>
+              <Separator className="mt-3" />
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="border-2 mx-6 p-4 rounded-md">
+          <div className="flex gap-2 item-center">
+            <ClipboardIcon className="h-6 w-6" />
+            <p className="text-xl">Abstract of Qoutations</p>
+          </div>
+          <div className="grid grid-cols-8 gap-2 items-center py-2  border-b-2 sticky top-0">
+            <p className="text-base">No.</p>
+            <p className="text-base col-span-2">ITEM DESCRIPTION</p>
+            <p className="text-base">QUANTITY</p>
+            <p className="text-base">PRICE</p>
+            <p className="text-base col-span-2">WINNING BIDDER</p>
+            <p className="text-base">WINNING PRICE</p>
+          </div>
+          {supplierItemData && supplierItemData?.length > 0 ? (
+            supplierItemData?.map((item, index) => {
+              return (
+                <div
+                  className="grid grid-cols-8 gap-2 items-center py-6 border-b-2"
+                  key={item.item_quotation_details.item_details.item_no}
+                >
+                  <p className="text-gray-500">{index + 1}</p>
+                  <p className="text-gray-500 col-span-2">
+                    {item.item_quotation_details.item_details.item_description}
+                  </p>
+                  <p className="text-gray-500">
+                    {item.item_quotation_details.item_details.quantity}
+                  </p>
+                  <p className="text-gray-500">
+                    {item.item_quotation_details.item_details.unit_cost}
+                  </p>
+
+                  <p
+                    className="text-gray-500 col-span-2 underline hover:cursor-pointer"
+                    onClick={() => handleOpenSupplierInformation(item.rfq_details.rfq_no)}
+                  >
+                    {item.rfq_details.supplier_name}
+                  </p>
+
+                  <p
+                    className={`${
+                      item.item_quotation_details.is_low_price
+                        ? "text-green-400"
+                        : "text-red-400"
+                    } flex gap-2 items-center`}
+                  >
+                    {item.item_quotation_details.is_low_price ? (
+                      <CheckIcon />
+                    ) : (
+                      <Cross2Icon />
+                    )}
+                    {item.item_quotation_details.unit_price}
+                  </p>
+                </div>
+              );
+            })
+          ) : (
+            <p>No items Found</p>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between"></CardFooter>
+      </Card>
+
+      <SupplierInformation
+        rfqNo={rfqNo!}
+        isInformationDialogOpen={isInformationDialogOpen}
+        setIsInformationDialogOpen={setIsInformationDialogOpen}
+      />
     </div>
+  );
+};
+interface SupplierInformationProps {
+  isInformationDialogOpen: boolean;
+  setIsInformationDialogOpen: (open: boolean) => void;
+  rfqNo: string;
+}
+
+export const SupplierInformation: React.FC<SupplierInformationProps> = ({
+  rfqNo,
+  isInformationDialogOpen,
+  setIsInformationDialogOpen,
+}) => {
+  const { data } = useGetRequestForQuotation(rfqNo)
+  const rfqData = data?.data
+
+  return (
+    <Dialog
+      open={isInformationDialogOpen}
+      onOpenChange={setIsInformationDialogOpen}
+    >
+      <DialogHeader>
+        <DialogTitle></DialogTitle>
+      </DialogHeader>
+      <DialogContent>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center">
+            <BuildingIcon className="w-5 h-5 mr-1" />
+            <p className="text-lg font-thin">
+              {rfqData?.supplier_name}
+            </p>
+          </div>
+          <Separator/>
+          <div className="flex items-center">
+            <MapPinIcon className="w-5 h-5 mr-1" />
+            <p className="text-lg font-thin">
+              {rfqData?.supplier_address}
+            </p>
+          </div>
+          <Separator/>
+          <div className="flex items-center">
+            <CreditCardIcon className="w-4 h-4 mr-1" />
+            <p className="text-lg font-thin">{rfqData?.tin}</p>
+          </div>
+          <Separator/>
+          <Badge variant={"outline"} className="flex items-center">
+            <p className="text-lg font-thin">
+              {rfqData?.is_VAT ? "VAT" : "non-VAT"}
+            </p>
+          </Badge>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

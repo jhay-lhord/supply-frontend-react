@@ -1,10 +1,11 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { qoutationType } from "@/types/request/request_for_qoutation";
+import { BuildingIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
 
 interface SupplierCardProps {
   supplier: qoutationType;
@@ -19,23 +20,33 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
 }) => {
   return (
     <Card
-    key={supplier.rfq_no}
+      key={supplier.rfq_no}
       onClick={onToggle}
-      className={` border-2 rounded-lg ${
+      className={` border-2 rounded-lg p-0 ${
         isSelected ? "border-orange-300" : "border-gray-300"
       }`}
     >
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <p className="text-xl">{supplier.supplier_name}</p>
+        <div className="flex items-center gap-2">
+          <BuildingIcon className="h-4 w-4" />
+          <p className=" font-thin">{supplier.supplier_name}</p>
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-base">{supplier.supplier_address}</p>
-        <p className="text-base">{supplier.tin}</p>
-        <p className="text-base">{supplier.is_VAT ? "VAT" : "non-VAT"}</p>
+        <div className="flex items-center gap-2">
+          <MapPinIcon className="h-3 w-3" />
+          <p className="text-sm font-thin">{supplier.supplier_address}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <CreditCardIcon className="h-3 w-3" />
+          <p className="text-sm font-thin">{supplier.tin}</p>
+        </div>
+        <div>
+          <Badge variant={"outline"}>
+            <p className="text-xs font-thin">{supplier.is_VAT ? "VAT" : "non-VAT"}</p>
+          </Badge>
+        </div>
       </CardContent>
-      <CardFooter></CardFooter>
-    </Card>
+    </Card> 
   );
 };

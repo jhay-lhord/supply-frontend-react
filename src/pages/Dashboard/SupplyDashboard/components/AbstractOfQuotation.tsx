@@ -1,6 +1,6 @@
 import {
-  useAbstractOfQuotation,
-  useAllItemSelectedQuote,
+  useGetAllSupplier,
+  useGetAllSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
 import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
 import { useEffect, useMemo, useState } from "react";
@@ -19,50 +19,59 @@ import { PurchaseOrderForm } from "./PurchaseOrderForm";
 import Loading from "../../shared/components/Loading";
 
 export default function SupplyAOQ() {
-  const [aoqNo, setAoq] = useState<string>("");
+  const [supplierNo, setSupplierNo] = useState<string>("");
   const [prNo, setPrNo] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  const { data, isLoading } = useAbstractOfQuotation();
-  const { data: purchase_order } = useGetAllPurchaseOrder();
-  const { data: items } = useAllItemSelectedQuote();
+  const { data: purchase_order, isLoading } = useGetAllPurchaseOrder();
+  const { data: items } = useGetAllSupplierItem();
+  const { data: supplier } = useGetAllSupplier();
 
-  const itemsData = Array.isArray(items?.data) ? items.data : [];
-  const itemCount = (aoq_no:string) => (
-    itemsData.filter(item => item.aoq === aoq_no).length
-  )
+  const supplierItemData = Array.isArray(items?.data) ? items.data : [];
+  console.log(supplierItemData)
 
   const purchaseOrderData = Array.isArray(purchase_order?.data)
-    ? purchase_order.data
-    : [];
+  ? purchase_order.data
+  : [];
+console.log(purchaseOrderData)
+const supplier_no = purchaseOrderData
+  .filter((data) => data.supplier_details.supplier_no)
+  .map((data) => data.supplier_details.supplier_no);
 
-  const po_no = purchaseOrderData
-    .filter((data) => data.po_no)
-    .map((data) => data.po_no);
+const filteredSupplierData = useMemo(() => {
+  const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
+  return supplierData.filter((data) => !supplier_no.includes(data.supplier_no));
+}, [supplier?.data, supplier_no]);
 
-  const filteredAbstractData = useMemo(() => {
-    const abstractData = Array.isArray(data?.data) ? data.data : [];
-    return abstractData.filter((data) => !po_no.includes(data.aoq_no));
-  }, [data?.data, po_no]);
+console.log(filteredSupplierData)
+console.log(supplier_no)
+
+  const countItemsBySupplier = (supplierName: string) => 
+    supplierItemData.filter(data => data.rfq_details.supplier_name === supplierName).length;
+
+  const totalAmountPerSupplier = (supplier_no: string) => {
+    return supplierItemData.filter(data => data.supplier_details.supplier_no === supplier_no).reduce((accumulator, item) => (Number(accumulator) + Number(item.total_amount)), 0) 
+  }
+  
 
   const handleOpenForm = (
-    aoq_no: string,
+    supplier_no: string,
     pr_no: string,
     total_amount: number
   ) => {
     setIsDialogOpen(true);
-    setAoq(aoq_no);
+    setSupplierNo(supplier_no);
     setPrNo(pr_no);
     setTotalAmount(total_amount);
   };
 
   useEffect(() => {
-    if(!isDialogOpen){
-      setAoq("")
-      setTotalAmount(0)
+    if (!isDialogOpen) {
+      setSupplierNo("");
+      setTotalAmount(0);
     }
-  }, [isDialogOpen])
+  }, [isDialogOpen]);
 
   if (isLoading) return <Loading />;
 
@@ -70,7 +79,7 @@ export default function SupplyAOQ() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Order Number</TableHead>
+          <TableHead>AOQ No.</TableHead>
           <TableHead>Supplier</TableHead>
           <TableHead>Items</TableHead>
           <TableHead>Total Amount</TableHead>
@@ -79,23 +88,21 @@ export default function SupplyAOQ() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {filteredAbstractData.length > 0 ? (
-          filteredAbstractData.map((abstract) => (
-            <TableRow key={abstract.aoq_no}>
-              <TableCell>{abstract.pr_details.pr_no}</TableCell>
-              <TableCell>{abstract.rfq_details.supplier_name}</TableCell>
-              <TableCell>{itemCount(abstract.aoq_no)} Items </TableCell>
-              <TableCell>₱{abstract.total_amount}</TableCell>
-              <TableCell>
-                {formatDate(abstract.created_at)}
-              </TableCell>
+        {filteredSupplierData.length > 0 ? (
+          filteredSupplierData.map((item) => (
+            <TableRow key={item.supplier_no}>
+              <TableCell>{item.aoq_details.aoq_no}</TableCell>
+              <TableCell>{item.rfq_details.supplier_name}</TableCell>
+              <TableCell>{countItemsBySupplier(item.rfq_details.supplier_name)} Items </TableCell>
+              <TableCell>₱{totalAmountPerSupplier(item.supplier_no)}</TableCell>
+              <TableCell>{formatDate(item.created_at)}</TableCell>
               <TableCell>
                 <Button
                   onClick={() =>
                     handleOpenForm(
-                      abstract.aoq_no,
-                      abstract.pr_details.pr_no,
-                      Number(abstract.total_amount)
+                      item.supplier_no,
+                      item.aoq_details.pr_details.pr_no,
+                      Number(totalAmountPerSupplier(item.supplier_no))
                     )
                   }
                 >
@@ -122,7 +129,7 @@ export default function SupplyAOQ() {
         )}
       </TableBody>
       <PurchaseOrderForm
-        aoq_no={aoqNo!}
+        supplier_no={supplierNo!}
         pr_no={prNo}
         total_amount={totalAmount}
         isDialogOpen={isDialogOpen}

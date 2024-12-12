@@ -1,42 +1,61 @@
-export type itemSelectedType_ = {
-  aoq: string;
-  item_selected_no: string;
-  pr_details: {
-    pr_no:string;
-    res_center_code: string;
-    status: string;
-    requested_by: string;
-    purpose:string;
-    approved_by: string;
-    created_at: Date;
-  };
-  item_qoutation_details: {
-    brand_model: string;
-    is_low_price: boolean;
+export type supplierType_ = {
+  supplier_no: string
+  rfq_details: {
+    purchase_request: string
+    rfq_no: string
+    supplier_name: string
+    supplier_address: string
+    tin: string
+    is_VAT: boolean
+  }
+  aoq_details: {
+    aoq_no: string
+    pr_details: {
+      pr_no: string
+      requisitioner_details: {
+        name: string
+      }
+    }
+  }
+
+  created_at: Date
+}
+
+export type supplierItemType_ = {
+  supplier_item_no: string
+  total_amount: string
+  item_quotation_details: {
+    item_quotation_no: string
+    brand_model: string
+    is_low_price: boolean
+    unit_price: string
     item_details: {
       item_no: string
-      unit: string;
-      item_description: string;
-      purchase_request: string;
-      quantity: string;
-      unit_cost: string;
-
-    };
-    item_quotation_no:string;
-    purchase_request: string;
-    rfq: string;
-    unit_price: string;
+      stock_property_no: string
+      item_description: string
+      unit: string
+      quantity: string
+      unit_cost: string
+      total_cost: string
+    }
   }
-  rfq_details:{
-    supplier_name: string;
-    supplier_address: string;
-    tin: string;
-    is_VAT: boolean;
-    rfq_no: string;
-  };
-  is_item_selected: boolean;
-  total_amount: string;
-  created_at: Date
+  rfq_details: {
+    rfq_no: string
+    supplier_name: string
+    supplier_address: string
+    tin: string
+    is_VAT: boolean
+    purchase_request: string
+  }
+  supplier_details: {
+    aoq_details: {
+      aoq_no: string
+      pr_details: {
+        pr_no: string
+      }
+    }
+    supplier_no: string
+  }
 }
 
 export type abstractType_ = {

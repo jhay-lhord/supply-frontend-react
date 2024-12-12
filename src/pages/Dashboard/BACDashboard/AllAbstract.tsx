@@ -1,8 +1,7 @@
 import {
-  totalItemSelectedInAOQ,
   useAbstractOfQuotation,
-  useAllItemSelectedQuote,
   useDeleteAbstractOfQuotation,
+  useGetAllSupplier,
 } from "@/services/AbstractOfQuotationServices";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import {
@@ -27,12 +26,9 @@ import Loading from "../shared/components/Loading";
 import { useState } from "react";
 import { DeleteDialog } from "../shared/components/DeleteDialog";
 import {
-  Building2Icon,
   BuildingIcon,
   CalendarIcon,
-  CreditCardIcon,
-  MapPinIcon,
-  Trash2Icon,
+  TrashIcon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -40,23 +36,18 @@ export const AllAbstract = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [aoqNo, setAoqNo] = useState<string | null>(null);
 
-  const { data, isLoading: item_selected_loading } = useAllItemSelectedQuote();
-  const { data: aoq_data } = useAbstractOfQuotation();
-  const { mutate: deleteAOQMutation} = useDeleteAbstractOfQuotation();
+  const { data: aoq_data, isLoading } = useAbstractOfQuotation();
+  const { data: supplier } = useGetAllSupplier()
+  const { mutate: deleteAOQMutation } = useDeleteAbstractOfQuotation();
+
+  const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
+
+  const supplierName = supplierData.map(
+    (data) => data.rfq_details.supplier_name
+  );
 
   const navigate = useNavigate();
   const abstract = Array.isArray(aoq_data?.data) ? aoq_data.data : [];
-
-  const totalItemsCount = (aoqNo: string) => {
-    const items = Array.isArray(data?.data) ? data.data : [];
-    return totalItemSelectedInAOQ(items, aoqNo!);
-  };
-
-  const totalAmount = (aoqNo: string) => {
-    const items = Array.isArray(data?.data) ? data.data : [];
-    const matchingItem = items.find((item) => item.aoq === aoqNo);
-    return matchingItem?.total_amount || 0;
-  };
 
   const handleOpenDialog = (aoq_no: string) => {
     setIsDialogOpen(true);
@@ -73,7 +64,7 @@ export const AllAbstract = () => {
         <div className=" pb-8">
           <p className="text-xl"> All Abstract of Quotation</p>
           <div className="grid grid-cols-3 gap-4 mt-8 w-full">
-            {item_selected_loading ? (
+            {isLoading ? (
               <Loading />
             ) : abstract && abstract.length > 0 ? (
               abstract.map((data) => (
@@ -118,45 +109,25 @@ export const AllAbstract = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pb-2 space-y-4 ">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center space-x-2">
+                    {
+                      supplierName.map(name => (
+                        <div className="flex items-center space-x-2">
                         <BuildingIcon className="w-4 h-4" />
-                        <p>{data.rfq_details.supplier_name}</p>
+                        <p>{name}</p>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <MapPinIcon className="w-4 h-4" />
-                        <p>{data.rfq_details.supplier_address}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <CreditCardIcon className="w-4 h-4 " />
-                        <p>{data.rfq_details.tin}</p>
-                      </div>
-                    </div>
-                    <Separator/>
+                      ))
+                    }
+                
+                    <Separator />
                   </CardContent>
-                  <CardFooter className="">
-                    <div className="w-full">
-                      <p className="text-sm font-semibold flex items-center space-x-1">
-                        <Building2Icon className="w-4 h-4" />
-                        <span>Quotation Summary</span>
-                      </p>
-                      <div className="flex justify-between">
-                        <div className="gap-2 text-sm">
-                          <p className="text-gray-600">
-                            Total Items: {totalItemsCount(data.aoq_no)}
-                          </p>
-                          <p className="text-green-600 font-medium">
-                            Total: ₱{totalAmount(data.aoq_no)}
-                          </p>
-                        </div>
-                        <Button
-                          size="icon"
-                          className="text-gray-400 opacity-0 group-hover:opacity-100 bg-red-100 hover:bg-orange-100 group-hover:text-red-500"
-                          onClick={() => handleOpenDialog(data.aoq_no)}
-                        >
-                          <Trash2Icon className="w-4 h-4" />
-                        </Button>
-                      </div>
+                  <CardFooter className="flex items-center justify-center">
+                    <div className=" opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <TrashIcon
+                        onClick={() => handleOpenDialog(data.aoq_no)}
+                        className="text-red-500 bg-red-200 rounded-full p-2"
+                        width={30}
+                        height={30}
+                      />
                     </div>
                   </CardFooter>
                 </Card>

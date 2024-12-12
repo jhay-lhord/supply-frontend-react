@@ -2,11 +2,13 @@ import api from "@/api";
 import { useToast } from "@/hooks/use-toast";
 import {
   abstractType,
-  itemSelectedQuoteType,
+  supplierItemType,
+  supplierType,
 } from "@/types/request/abstract_of_quotation";
 import {
   abstractType_,
-  itemSelectedType_,
+  supplierItemType_,
+  supplierType_,
 } from "@/types/response/abstract-of-quotation";
 import { ApiResponse } from "@/types/response/api-response";
 import { handleError, handleSucess } from "@/utils/apiHelper";
@@ -60,26 +62,6 @@ export const useGetAbstractOfQuotation = (aoq_no: string) => {
 }
 
 
-export const getAllItemSelectedQuote = async (): Promise<
-  ApiResponse<itemSelectedType_[]>
-> => {
-  try {
-    const response = await api.get<itemSelectedType_[]>(
-      "api/item-selected-quote/"
-    );
-    return handleSucess(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-
-export const useAllItemSelectedQuote = () => {
-  return useQuery<ApiResponse<itemSelectedType_[]>>({
-    queryKey: ["item-selected-quotes"],
-    queryFn: getAllItemSelectedQuote,
-  });
-};
-
 export const FilteredItemSelectedInPR = (
   data: itemSelectedType_[],
   pr_no: string
@@ -116,30 +98,102 @@ export const useAddAbstractOfQuotation = () => {
   });
 };
 
-export const addItemSelectedQuote = async (
-  data: itemSelectedQuoteType
-): Promise<ApiResponse<itemSelectedQuoteType>> => {
+export const addSupplier = async (
+  data: supplierType
+): Promise<ApiResponse<supplierType>> => {
   try {
-    const response = await api.post("api/item-selected-quote/", data);
+    const response = await api.post<supplierType>("api/supplier/", data);
+    console.log(response)
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error)
+    return handleError(error);
+  }
+};
+
+export const useAddSupplier = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiResponse<supplierType>,
+    Error,
+    supplierType
+  >({
+    mutationFn: (data) => addSupplier(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+    },
+  });
+};
+
+export const addSupplierItem = async (
+  data: supplierItemType
+): Promise<ApiResponse<supplierItemType>> => {
+  try {
+    const response = await api.post<supplierItemType>("api/supplier-item/", data);
+    console.log(response)
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error)
+    return handleError(error);
+  }
+};
+
+export const useAddSupplierItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiResponse<supplierItemType>,
+    Error,
+    supplierItemType
+  >({
+    mutationFn: (data) => addSupplierItem(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["supplier-items"] });
+    },
+  });
+};
+
+export const getAllSupplierItem = async (): Promise<
+  ApiResponse<supplierItemType_[]>
+> => {
+  try {
+    const response = await api.get<supplierItemType_[]>(
+      "api/supplier-item/"
+    );
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
   }
 };
 
-export const useAddItemSelectedQuote = () => {
-  const queryClient = useQueryClient();
-  return useMutation<
-    ApiResponse<itemSelectedQuoteType>,
-    Error,
-    itemSelectedQuoteType
-  >({
-    mutationFn: (data) => addItemSelectedQuote(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["item-selected-quotes"] });
-    },
+export const useGetAllSupplierItem = () => {
+  return useQuery<ApiResponse<supplierItemType_[]>>({
+    queryKey: ["supplier-items"],
+    queryFn: getAllSupplierItem,
   });
 };
+
+export const getAllSupplier = async (): Promise<
+  ApiResponse<supplierType_[]>
+> => {
+  try {
+    const response = await api.get<supplierType_[]>(
+      "api/supplier/"
+    );
+    console.log(response)
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error)
+    return handleError(error);
+  }
+};
+
+export const useGetAllSupplier = () => {
+  return useQuery<ApiResponse<supplierType_[]>>({
+    queryKey: ["suppliers"],
+    queryFn: getAllSupplier,
+  });
+};
+
 
 export const deleteAbstractOfQuoutation = async (
   aoq_no: string

@@ -1,21 +1,21 @@
 import { z } from "zod";
 
-export type itemSelectedQuoteType = {
-  item_selected_no: string;
-  aoq: string;
-  purchase_request: string;
-  rfq: string;
-  item_qoutation: string;
-  is_item_selected: boolean;
-  total_amount: string;
-};
-
 export const abstractSchema = z.object({
   aoq_no: z.string(),
-  rfq: z.string(),
   purchase_request: z.string(),
-  item_quotation: z.string(),
-  total_amount:z.string(),
 });
 
+export type supplierType = {
+  supplier_no: string
+  aoq: string,
+  rfq: string
+} 
+
+export type supplierItemType = {
+  supplier_item_no: string
+  supplier: string
+  rfq: string
+  item_quotation: string
+  total_amount:string
+}
 export type abstractType = z.infer<typeof abstractSchema>;
