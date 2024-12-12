@@ -28,32 +28,59 @@ export default function SupplyAOQ() {
   const { data: items } = useGetAllSupplierItem();
   const { data: supplier } = useGetAllSupplier();
 
-  const supplierItemData = Array.isArray(items?.data) ? items.data : [];
-  console.log(supplierItemData)
+  const purchaseOrderData = useMemo(() => {
+    return Array.isArray(purchase_order?.data) ? purchase_order.data : [];
+  }, [purchase_order]);
 
-  const purchaseOrderData = Array.isArray(purchase_order?.data)
-  ? purchase_order.data
-  : [];
-console.log(purchaseOrderData)
-const supplier_no = purchaseOrderData
-  .filter((data) => data.supplier_details.supplier_no)
-  .map((data) => data.supplier_details.supplier_no);
+  const usedPos = useMemo(() => {
+    return purchaseOrderData
+      .filter((data) => data.pr_details.pr_no === prNo)
+      .map((data) => data.po_no);
+  }, [purchaseOrderData, prNo]);
 
-const filteredSupplierData = useMemo(() => {
-  const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
-  return supplierData.filter((data) => !supplier_no.includes(data.supplier_no));
-}, [supplier?.data, supplier_no]);
+  const supplierItemData = useMemo(() => {
+    return Array.isArray(items?.data) ? items.data : [];
+  }, [items]);
 
-console.log(filteredSupplierData)
-console.log(supplier_no)
+  const suppliers = useMemo(() => {
+    return Array.from(
+      new Set(
+        supplierItemData
+          .filter(
+            (data) =>
+              data.supplier_details.aoq_details.pr_details.pr_no === prNo
+          )
+          .map((data) => data.supplier_details.supplier_no)
+      )
+    );
+  }, [prNo, supplierItemData]);
 
-  const countItemsBySupplier = (supplierName: string) => 
-    supplierItemData.filter(data => data.rfq_details.supplier_name === supplierName).length;
+  const isManySupplier = suppliers.length > 1;
+
+  const supplier_no = purchaseOrderData
+    .filter((data) => data.supplier_details.supplier_no)
+    .map((data) => data.supplier_details.supplier_no);
+
+  const filteredSupplierData = useMemo(() => {
+    const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
+    return supplierData.filter(
+      (data) => !supplier_no.includes(data.supplier_no)
+    );
+  }, [supplier?.data, supplier_no]);
+
+  const countItemsBySupplier = (supplierName: string) =>
+    supplierItemData.filter(
+      (data) => data.rfq_details.supplier_name === supplierName
+    ).length;
 
   const totalAmountPerSupplier = (supplier_no: string) => {
-    return supplierItemData.filter(data => data.supplier_details.supplier_no === supplier_no).reduce((accumulator, item) => (Number(accumulator) + Number(item.total_amount)), 0) 
-  }
-  
+    return supplierItemData
+      .filter((data) => data.supplier_details.supplier_no === supplier_no)
+      .reduce(
+        (accumulator, item) => Number(accumulator) + Number(item.total_amount),
+        0
+      );
+  };
 
   const handleOpenForm = (
     supplier_no: string,
@@ -93,7 +120,9 @@ console.log(supplier_no)
             <TableRow key={item.supplier_no}>
               <TableCell>{item.aoq_details.aoq_no}</TableCell>
               <TableCell>{item.rfq_details.supplier_name}</TableCell>
-              <TableCell>{countItemsBySupplier(item.rfq_details.supplier_name)} Items </TableCell>
+              <TableCell>
+                {countItemsBySupplier(item.rfq_details.supplier_name)} Items{" "}
+              </TableCell>
               <TableCell>₱{totalAmountPerSupplier(item.supplier_no)}</TableCell>
               <TableCell>{formatDate(item.created_at)}</TableCell>
               <TableCell>
@@ -129,6 +158,8 @@ console.log(supplier_no)
         )}
       </TableBody>
       <PurchaseOrderForm
+        usedPos={usedPos}
+        isManySupplier={isManySupplier}
         supplier_no={supplierNo!}
         pr_no={prNo}
         total_amount={totalAmount}

@@ -16,17 +16,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package, Loader2, AlertCircle } from "lucide-react";
+import { Package, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { purchaseOrdertype_ } from "@/types/response/purchase-order";
-import { itemSelectedType_ } from "@/types/response/abstract-of-quotation";
 import {
   useAddInspectionReport,
   useAddItemsDelivered,
   useUpdatePurchaseOrderStatus,
 } from "@/services/puchaseOrderServices";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { deliveredSchema, deliveredType } from "@/types/request/purchase-order";
 import {
   Form,
   FormControl,
@@ -36,20 +33,20 @@ import {
 } from "@/components/ui/form";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { DeliveredFormType, SupplierItemType, deliveredFormSchema } from "@/types/request/purchase-order";
 
 interface OrderReceivedDialogProps {
   po_no: string;
-  aoq_no: string;
+  supplier_no: string;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
-  items_: itemSelectedType_[];
-  orderData: purchaseOrdertype_[];
+  items_: SupplierItemType[];
 }
 
-const areAllItemsFullyDelivered = (items: deliveredType) => {
+const areAllItemsFullyDelivered = (items: DeliveredFormType) => {
   return items.items.every((item) => {
     const orderedQuantity = parseInt(
-      item.item_qoutation_details.item_details.quantity || "0",
+      item.item_quotation_details.item_details.quantity || "0",
       10
     );
     const deliveredQuantity = item.quantity_delivered || 0;
@@ -60,12 +57,12 @@ const areAllItemsFullyDelivered = (items: deliveredType) => {
 
 export function OrderReceivedDialog({
   po_no,
-  aoq_no,
+  supplier_no,
   items_,
   isDialogOpen,
   setIsDialogOpen,
 }: OrderReceivedDialogProps) {
-  const [filteredItems, setFilteredItems] = useState<itemSelectedType_[]>();
+  const [filteredItems, setFilteredItems] = useState<SupplierItemType[]>([]);
 
   const { mutate: updateStatusMutation, isPending: updateStatusPending } =
     useUpdatePurchaseOrderStatus();
@@ -79,17 +76,18 @@ export function OrderReceivedDialog({
 
   useEffect(() => {
     if (isDialogOpen) {
-      const filteredItems = items_.filter((item) => item.aoq === aoq_no);
+      const filteredItems = items_.filter((item) => item.supplier_details.supplier_no === supplier_no);
       setFilteredItems(filteredItems);
     }
-  }, [items_, aoq_no, isDialogOpen]);
+  }, [items_, supplier_no, isDialogOpen]);
 
-  const form = useForm<deliveredType>({
-    resolver: zodResolver(deliveredSchema),
+  const form = useForm<DeliveredFormType>({
+    resolver: zodResolver(deliveredFormSchema),
     defaultValues: {
       items: [],
     },
   });
+
 
   const { fields, append } = useFieldArray({
     name: "items",
@@ -98,14 +96,14 @@ export function OrderReceivedDialog({
 
   useEffect(() => {
     form.reset({ items: [] });
-    filteredItems?.forEach((item) => append(item));
+    filteredItems.forEach((item) => append(item));
   }, [filteredItems, append, form]);
 
-  const onSubmit = (values: deliveredType) => {
+  const onSubmit = (values: DeliveredFormType) => {
     const allItemsDelivered = areAllItemsFullyDelivered(values);
     const inspectionData = {
       inspection_no: uuidv4(),
-      purchase_request: values.items[0].pr_details.pr_no,
+      purchase_request: values.items[0].supplier_details.aoq_details.pr_details.pr_no,
       purchase_order: po_no,
     };
     addInspectionMutation(inspectionData, {
@@ -115,7 +113,7 @@ export function OrderReceivedDialog({
         const itemDeliveredData = values.items.map((data) => {
           return {
             inspection: inspectionNo!,
-            items: data.item_selected_no!,
+            supplier_item: data.supplier_item_no,
             quantity_delivered: data.quantity_delivered!,
           };
         });
@@ -127,24 +125,26 @@ export function OrderReceivedDialog({
         );
         updateStatusMutation({
           po_no: po_no,
-          status: `${allItemsDelivered ? "Completed" : "Lacking"}`,
+          status: allItemsDelivered ? "Completed" : "Lacking",
         });
       },
+
     });
 
-    // if(!isLoading) return setIsDialogOpen(false) 
+    setIsDialogOpen(false)
   };
+
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-4xl ">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             Order Received
           </DialogTitle>
           <p>{po_no}</p>
         </DialogHeader>
-        {items_.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
@@ -178,21 +178,15 @@ export function OrderReceivedDialog({
                         {fields.map((field, index) => (
                           <TableRow key={field.id}>
                             <TableCell>
-                              {
-                                field.item_qoutation_details.item_details
-                                  .item_description
-                              }
+                              {field.item_quotation_details.item_details.item_description}
                             </TableCell>
                             <TableCell>
-                              {
-                                field.item_qoutation_details.item_details
-                                  .quantity
-                              }
+                              {field.item_quotation_details.item_details.quantity}
                             </TableCell>
                             <TableCell>
                               ₱
                               {parseFloat(
-                                field.item_qoutation_details.unit_price
+                                field.item_quotation_details.unit_price
                               ).toFixed(2)}
                             </TableCell>
                             <TableCell>
@@ -240,9 +234,7 @@ export function OrderReceivedDialog({
                     ) : (
                       <Package className="w-4 h-4 mr-2" />
                     )}
-                    {isLoading
-                      ? "Processing..."
-                      : "Confirm Receipt"}
+                    {isLoading ? "Processing..." : "Confirm Receipt"}
                   </Button>
                 </div>
               </form>

@@ -18,85 +18,77 @@ export type purchaseOrderItemType = {
 
 export type purchaseOrderType = z.infer<typeof purchaseOrderSchema>;
 
-const itemSchema = z.object({
-  aoq: z.string(),
-  item_selected_no: z.string(),
-  pr_details: z.object({
-    pr_no: z.string(),
-    res_center_code: z.string(),
-    status: z.string(),
-    requisitioner: z.string(),
-    purpose: z.string(),
-    campus_director: z.string(),
-  }),
-  item_qoutation_details: z.object({
-    brand_model: z.string(),
-    is_low_price: z.boolean(),
-    item_details: z.object({
-      item_no: z.string(),
-      unit: z.string(),
-      item_description: z.string(),
-      purchase_request: z.string(),
-      quantity: z.string(),
-      unit_cost: z.string(),
-    }),
-    item_quotation_no: z.string(),
-    purchase_request: z.string(),
-    rfq: z.string(),
-    unit_price: z.string(),
-  }),
+
+export const supplierSchema = z.object({
+  supplier_no: z.string(),
   rfq_details: z.object({
+    purchase_request: z.string(),
+    rfq_no: z.string(),
     supplier_name: z.string(),
     supplier_address: z.string(),
     tin: z.string(),
     is_VAT: z.boolean(),
-    rfq_no: z.string(),
   }),
-  is_item_selected: z.boolean(),
+  aoq_details: z.object({
+    aoq_no: z.string(),
+    pr_details: z.object({
+      pr_no: z.string(),
+      requisitioner_details: z.object({
+        name: z.string(),
+      }),
+    }),
+  }),
+  created_at: z.date(),
+})
+
+export const supplierItemSchema = z.object({
+  supplier_item_no: z.string(),
   total_amount: z.string(),
+  item_quotation_details: z.object({
+    item_quotation_no: z.string(),
+    brand_model: z.string(),
+    is_low_price: z.boolean(),
+    unit_price: z.string(),
+    item_details: z.object({
+      item_no: z.string(),
+      stock_property_no: z.string(),
+      item_description: z.string(),
+      unit: z.string(),
+      quantity: z.string(),
+      unit_cost: z.string(),
+      total_cost: z.string(),
+    }),
+  }),
+  rfq_details: z.object({
+    rfq_no: z.string(),
+    supplier_name: z.string(),
+    supplier_address: z.string(),
+    tin: z.string(),
+    is_VAT: z.boolean(),
+    purchase_request: z.string(),
+  }),
+  supplier_details: z.object({
+    aoq_details: z.object({
+      aoq_no: z.string(),
+      pr_details: z.object({
+        pr_no: z.string(),
+      }),
+    }),
+    supplier_no: z.string(),
+  }),
   quantity_delivered: z.number().min(0).optional(),
-})  
-
-export const deliveredSchema = z.object({
-  items: z.array(itemSchema),
 })
 
-export type deliveredType = z.infer<typeof deliveredSchema>
+export type SupplierType = z.infer<typeof supplierSchema>
+export type SupplierItemType = z.infer<typeof supplierItemSchema>
 
-export const inspectionSchema = z.object({
-  inspection_no: z.string(),
-  purchase_request: z.string(),
-  purchase_order: z.string()
+export const formSchema = z.object({
+  items: z.array(supplierItemSchema),
 })
 
-export type inspectionType = z.infer<typeof inspectionSchema>
+export const deliveredFormSchema = z.object({
+  items: z.array(supplierItemSchema),
+});
 
-export const itemsDeliveredSchema = z.object({
-  inspection: z.string(),
-  items: z.string(),
-  quantity_delivered: z.number().min(0).optional(),
-})
+export type DeliveredFormType = z.infer<typeof deliveredFormSchema>;
 
-export type itemsDeliveredType = z.infer<typeof itemsDeliveredSchema>
-
-export type _itemsDeliveredType = {
-  inspection_details: {
-    po_details: {
-      po_no: string
-      status: string
-      total_amount: string
-    }
-  }
-  item_details: {
-    item_qoutation_details: {
-      item_details: {
-        item_description: string
-        quantity: string
-        unit: string
-        unit_cost:string
-      }
-      unit_price: string
-    }
-  }
-  quantity_delivered: string
-}

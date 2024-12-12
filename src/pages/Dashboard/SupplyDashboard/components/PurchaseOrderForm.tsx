@@ -13,6 +13,7 @@ import {
   useGetAllSupplier,
   useGetAllSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
+import { generatePONo } from "@/services/generatePONo";
 import {
   useAddPurchaseOrder,
   useAddPurchaseOrderItem,
@@ -35,6 +36,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 interface PurchaseOrderFormProps {
+  usedPos: string[]
+  isManySupplier: boolean
   supplier_no: string;
   pr_no: string;
   total_amount: number;
@@ -43,6 +46,8 @@ interface PurchaseOrderFormProps {
 }
 
 export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
+  usedPos,
+  isManySupplier,
   supplier_no,
   pr_no,
   total_amount,
@@ -63,6 +68,8 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const poNo = generatePONo(isManySupplier, pr_no, usedPos)
+
   const { data: supplier } = useGetAllSupplier();
   const { data: supplier_item } = useGetAllSupplierItem();
   const { mutate: addPOMutation } = useAddPurchaseOrder();
@@ -80,9 +87,6 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   const supplierItemData = supplier_item_.filter(
     (item) => item.supplier_details.supplier_no === supplier_no
   );
-  console.log(supplierItemData);
-
-  console.log(supplierData);
 
   const aoq_no = supplierData.find(
     (supplier) => supplier.supplier_no === supplier_no
@@ -95,7 +99,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
 
   useEffect(() => {
     if (isDialogOpen) {
-      setValue("po_no", aoq_no!);
+      setValue("po_no", poNo!);
       setValue("total_amount", total_amount!);
       setValue("purchase_request", pr_no);
       setValue("request_for_quotation", rfq_no!);
@@ -105,6 +109,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   }, [
     setValue,
     aoq_no,
+    poNo,
     pr_no,
     isDialogOpen,
     rfq_no,

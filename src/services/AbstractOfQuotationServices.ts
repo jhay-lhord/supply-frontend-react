@@ -62,20 +62,6 @@ export const useGetAbstractOfQuotation = (aoq_no: string) => {
 }
 
 
-export const FilteredItemSelectedInPR = (
-  data: itemSelectedType_[],
-  pr_no: string
-) => {
-  return data.filter((item) => item.pr_details.pr_no === pr_no);
-};
-
-export const totalItemSelectedInAOQ = (
-  data: itemSelectedType_[],
-  aoq_no: string
-) => {
-  return data.filter((item) => item.is_item_selected && item.aoq === aoq_no)
-    .length;
-};
 
 export const addAbstractOfQuotation = async (
   data: abstractType
@@ -130,10 +116,8 @@ export const addSupplierItem = async (
 ): Promise<ApiResponse<supplierItemType>> => {
   try {
     const response = await api.post<supplierItemType>("api/supplier-item/", data);
-    console.log(response)
     return handleSucess(response);
   } catch (error) {
-    console.log(error)
     return handleError(error);
   }
 };
@@ -179,10 +163,8 @@ export const getAllSupplier = async (): Promise<
     const response = await api.get<supplierType_[]>(
       "api/supplier/"
     );
-    console.log(response)
     return handleSucess(response);
   } catch (error) {
-    console.log(error)
     return handleError(error);
   }
 };
