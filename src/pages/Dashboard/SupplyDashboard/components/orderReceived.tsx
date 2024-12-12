@@ -35,6 +35,34 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { DeliveredFormType, SupplierItemType, deliveredFormSchema } from "@/types/request/purchase-order";
 
+interface CategorizedItems {
+  completedItems: SupplierItemType[];
+  incompleteItems: SupplierItemType[];
+  stockItems: SupplierItemType[];
+}
+
+const categorizeItems = (items: DeliveredFormType['items']): CategorizedItems => {
+  const completedItems: SupplierItemType[] = [];
+  const incompleteItems: SupplierItemType[] = [];
+  const stockItems: SupplierItemType[] = [];
+
+  items.forEach((item) => {
+    const orderedQuantity = parseInt(item.item_quotation_details.item_details.quantity || "0", 10);
+    const deliveredQuantity = item.quantity_delivered || 0;
+
+    if (deliveredQuantity === orderedQuantity) {
+      completedItems.push(item);
+    } else if (deliveredQuantity < orderedQuantity) {
+      incompleteItems.push(item);
+    } else {
+      completedItems.push({...item, quantity_delivered: orderedQuantity});
+      stockItems.push({...item, quantity_delivered: deliveredQuantity - orderedQuantity});
+    }
+  });
+
+  return { completedItems, incompleteItems, stockItems };
+}
+
 interface OrderReceivedDialogProps {
   po_no: string;
   supplier_no: string;
@@ -100,6 +128,8 @@ export function OrderReceivedDialog({
   }, [filteredItems, append, form]);
 
   const onSubmit = (values: DeliveredFormType) => {
+    const {completedItems, incompleteItems, stockItems} = categorizeItems(values.items)
+
     const allItemsDelivered = areAllItemsFullyDelivered(values);
     const inspectionData = {
       inspection_no: uuidv4(),
