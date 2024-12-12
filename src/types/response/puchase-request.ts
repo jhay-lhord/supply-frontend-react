@@ -2,10 +2,11 @@ export type purchaseRequestType = {
   pr_no: string,
   user: string,
   item_no: string,
-  res_center_code: string,
+  office: string,
   purpose: string,
   status: string,
   requisitioner_details: {
+    requisition_id: string
     name: string
     designation: string
     department: string;

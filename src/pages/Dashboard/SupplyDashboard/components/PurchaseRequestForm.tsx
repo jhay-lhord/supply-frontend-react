@@ -158,9 +158,9 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                 />
               )}
               {renderField(
-                "Res Center Code",
-                "res_center_code",
-                <Input {...register("res_center_code")} />
+                "Office",
+                "office",
+                <Input {...register("office")} />
               )}
               {renderField(
                 "Purpose",

@@ -11,10 +11,13 @@ export type purchaseOrdertype_ = {
     supplier_address: string
     is_VAT: string
     tin: string
-  },
+  }
   aoq_details: {
     aoq_no: string
-  },
+  }
+  supplier_details: {
+    supplier_no: string
+  }
   total_amount: string
   created_at: Date;
   updated_at:Date;  

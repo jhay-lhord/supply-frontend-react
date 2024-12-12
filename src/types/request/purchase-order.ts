@@ -6,13 +6,14 @@ export const purchaseOrderSchema = z.object({
   purchase_request: z.string(),
   request_for_quotation: z.string(),
   abstract_of_quotation: z.string(),
+  supplier: z.string(),
 });
 
 export type purchaseOrderItemType = {
   po_item_no: string;
   purchase_request: string;
   purchase_order: string;
-  aoq_item: string;
+  supplier_item: string;
 };
 
 export type purchaseOrderType = z.infer<typeof purchaseOrderSchema>;

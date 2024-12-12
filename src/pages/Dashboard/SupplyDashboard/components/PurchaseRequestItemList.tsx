@@ -89,7 +89,7 @@ export default function PurchaseRequestItemList() {
       pr_no: pr_no,
       purpose: purchaseData?.purpose,
       status: purchaseData?.status,
-      res_center_code: purchaseData?.res_center_code,
+      office: purchaseData?.office,
       requisitioner: purchaseData?.requisitioner_details.name,
       campus_director: purchaseData?.campus_director_details.name,
     },
@@ -98,7 +98,7 @@ export default function PurchaseRequestItemList() {
   useEffect(() => {
     if (purchaseData) {
       setValue("purpose", purchaseData?.purpose || "");
-      setValue("res_center_code", purchaseData?.res_center_code || "");
+      setValue("office", purchaseData?.office || "");
       setValue("requisitioner", purchaseData?.requisitioner_details.name || "");
       setValue("campus_director", purchaseData?.campus_director_details.name || "");
       setValue("status", purchaseData?.status);

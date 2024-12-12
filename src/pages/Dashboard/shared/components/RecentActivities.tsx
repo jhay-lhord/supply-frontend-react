@@ -3,11 +3,12 @@ import { useMemo } from "react";
 import { TimeAgo } from "./GetTimeAgo";
 import { extractModelName } from "@/services/extractModelName";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { trimmedUserRole } from "@/services/useProfile";
+import { getUserInformation } from "@/services/useProfile";
 import Loading from "./Loading";
 
 export const RecentActivities = () => {
   const { data, isLoading } = useGetAllRecentActivities();
+  const { trimmedUserRole } = getUserInformation()
   const recentActivites = useMemo(() => {
     const _data = Array.isArray(data?.data) ? data.data : [];
     return _data;
@@ -25,7 +26,7 @@ export const RecentActivities = () => {
           <Avatar className="h-12 w-12">
             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
             <AvatarFallback className="bg-gradient-to-r from-orange-200 to-orange-300 text-base">
-              {trimmedUserRole(recent.user_role)}
+              {trimmedUserRole}
             </AvatarFallback>
           </Avatar>
           <div className="space-y-1 flex flex-col items-center ">

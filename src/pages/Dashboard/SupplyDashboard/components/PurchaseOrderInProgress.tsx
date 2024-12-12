@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { OrderReceivedDialog } from "./orderReceived";
-import { useAllItemSelectedQuote } from "@/services/AbstractOfQuotationServices";
+import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
 import { useState } from "react";
 import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
@@ -33,20 +33,20 @@ export default function PurchaseOrderInProgess() {
   const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({})
 
   const { data, isLoading } = useGetAllPurchaseOrder();
-  const { data: item_selected_quote } = useAllItemSelectedQuote();
+  const { data: supplier_item } = useGetAllSupplierItem();
 
-  const { data: items } = useAllItemSelectedQuote();
+  const { data: items } = useGetAllSupplierItem();
   const itemsData = Array.isArray(items?.data) ? items.data : [];
   const itemCount = (aoq_no:string) => (
-    itemsData.filter(item => item.aoq === aoq_no).length
+    itemsData.filter(item => item.supplier_details.aoq_details.aoq_no === aoq_no).length
   )
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
   const inProgressOrders = purchaseOrderData.filter(
     (order) => order.status === "In Progress"
   );
-  const itemSelectedData = Array.isArray(item_selected_quote?.data)
-    ? item_selected_quote.data
+  const supplierItemData = Array.isArray(supplier_item?.data)
+    ? supplier_item.data
     : [];
 
   const handleOpenOrderRecieveForm = (aoq_no:string) => {
@@ -155,7 +155,7 @@ export default function PurchaseOrderInProgess() {
       <OrderReceivedDialog
         po_no={poNo}
         aoq_no={aoqNo}
-        items_={itemSelectedData}
+        items_={supplierItemData}
         orderData={inProgressOrders}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}

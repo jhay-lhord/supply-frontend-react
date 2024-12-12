@@ -143,7 +143,6 @@ export const useAddItemsDelivered = () => {
 export const getItemsDelivered= async ():Promise<ApiResponse<_itemsDeliveredType[]>> => {
   try {
     const response = await api.get<_itemsDeliveredType[]>("api/items-delivered/")
-    console.log(response)
     return handleSucess(response)
   } catch (error) {
     return handleError(error)

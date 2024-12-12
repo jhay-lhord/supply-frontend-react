@@ -14,8 +14,17 @@ import { Label } from "@/components/ui/label";
 import { Description } from "@radix-ui/react-dialog";
 import Loading from "../../shared/components/Loading";
 import { Loader2 } from "lucide-react";
-import { usePurchaseRequestList, useUpdatePurchaseRequest } from "@/services/purchaseRequestServices";
-import { EditPRFormSchema, EditPRFormType } from "@/types/request/purchase-request";
+import {
+  usePurchaseRequestList,
+  useUpdatePurchaseRequest,
+} from "@/services/purchaseRequestServices";
+import {
+  EditPRFormSchema,
+  EditPRFormType,
+} from "@/types/request/purchase-request";
+import { getAllRequisitioner } from "@/services/requisitionerServices";
+import AsyncSelect from "react-select/async";
+import { Textarea } from "@/components/ui/textarea";
 
 interface EditPRFormProps {
   isEditDialogOpen: boolean;
@@ -23,19 +32,21 @@ interface EditPRFormProps {
   pr_no: string;
 }
 
+type option = {
+  value: string;
+  label: string;
+};
+
 const EditPRForm: React.FC<EditPRFormProps> = ({
   isEditDialogOpen,
   setIsEditDialogOpen,
   pr_no,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const {
-    isLoading: purchaseRequestLoading,
-    data: purchase_request,
-  } = usePurchaseRequestList(pr_no!);
+  const { isLoading: purchaseRequestLoading, data: purchase_request } =
+    usePurchaseRequestList(pr_no!);
 
   const purchaseData = purchase_request?.data;
-
 
   const {
     register,
@@ -46,8 +57,8 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
     resolver: zodResolver(EditPRFormSchema),
     defaultValues: {
       purpose: purchaseData?.purpose,
-      res_center_code: purchaseData?.res_center_code,
-      requested_by: purchaseData?.requested_by,
+      office: purchaseData?.office,
+      requisitioner: purchaseData?.requisitioner_details.name,
     },
   });
 
@@ -56,27 +67,67 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
   useEffect(() => {
     if (purchaseData) {
       setValue("purpose", purchaseData.purpose || "");
-      setValue("res_center_code", purchaseData.res_center_code || "");
-      setValue("requested_by", purchaseData.requested_by || "");
+      setValue("office", purchaseData.office || "");
+      setValue("requisitioner", purchaseData.requisitioner_details.name || "");
     }
   }, [purchaseData, setValue]);
+  console.log(purchaseData);
 
+  const loadRequisitionerOptions = async (
+    inputValue: string
+  ): Promise<option[]> => {
+    try {
+      const requisitioners = await getAllRequisitioner();
+      return (
+        requisitioners.data
+          ?.filter((requisitioner) =>
+            requisitioner.name.toLowerCase().includes(inputValue.toLowerCase())
+          )
+          .map((requisitioner) => ({
+            value: requisitioner.requisition_id,
+            label: requisitioner.name,
+          })) || []
+      );
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
 
+  const handleRequisitionerChange = (selectedOption: option | null) => {
+    setValue("requisitioner", selectedOption?.value ?? "");
+  };
 
   const onSubmit = (data: EditPRFormType) => {
-    setIsLoading(true)
+    setIsLoading(true);
     const result = EditPRFormSchema.safeParse(data);
 
     if (result.success) {
-      mutate({pr_no: pr_no, data: data}, {
-        onSuccess: () => {
-          setIsLoading(false)
-          setIsEditDialogOpen(false)
+      mutate(
+        { pr_no: pr_no, data: data },
+        {
+          onSuccess: () => {
+            setIsLoading(false);
+            setIsEditDialogOpen(false);
+          },
         }
-      });
+      );
     }
-
   };
+
+  const renderField = (
+    label: string,
+    name: keyof EditPRFormType,
+    component: React.ReactNode
+  ) => (
+    <div>
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">{errors[name]?.message}</span>
+      )}
+    </div>
+  );
 
   return (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -90,42 +141,46 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
               <Loading />
             ) : (
               <form
-            onSubmit={handleSubmit((data) => onSubmit(data))}
-            className="border-none rounded"
-          >
-            <div className="">
-              <InputField
-                label="Res Center Code"
-                name="res_center_code"
-                register={register}
-                error={errors.res_center_code}
-              />
-              <InputField
-                label="Purpose"
-                name="purpose"
-                register={register}
-                error={errors.purpose}
-              />
-              <InputField
-                label="Requested By"
-                name="requested_by"
-                register={register}
-                error={errors.requested_by}
-              />
-            </div>
-            <div className="mt-6 fixed bottom-6 right-6">
-                      <Button
-                        className="text-slate-950 bg-orange-200 hover:bg-orange-300 px-10"
-                        type="submit"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="animate-spin" />
-                        ) : (
-                          "Save Changes"
-                        )}
-                      </Button>
-                    </div>
-          </form>
+                onSubmit={handleSubmit((data) => onSubmit(data))}
+                className="border-none rounded"
+              >
+                <div className="">
+                  {renderField(
+                    "Office",
+                    "office",
+                    <Input {...register("office")} />
+                  )}
+                  {renderField(
+                    "Purpose",
+                    "purpose",
+                    <Textarea {...register("purpose")} />
+                  )}
+                  {renderField(
+                    "Requested By",
+                    "requisitioner",
+                    <AsyncSelect
+                      value={{value: purchaseData?.requisitioner_details.requisition_id ?? "", label:purchaseData?.requisitioner_details.name ?? ""}}
+                      defaultOptions
+                      loadOptions={loadRequisitionerOptions}
+                      onChange={handleRequisitionerChange}
+                      placeholder="Search for a Requisitioner..."
+                      className="mb-4 text-sm"
+                    />
+                  )}
+                </div>
+                <div className="mt-6 fixed bottom-6 right-6">
+                  <Button
+                    className="text-slate-950 bg-orange-200 hover:bg-orange-300 px-10"
+                    type="submit"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </div>
+              </form>
             )}
           </Description>
         </ScrollArea>
@@ -133,32 +188,5 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
     </Dialog>
   );
 };
-
-const ErrorMessage = ({ message }: { message?: string }) =>
-  message ? <p className="text-red-500 text-sm mt-1">{message}</p> : null;
-
-
-const InputField = ({
-  label,
-  name,
-  register,
-  error,
-}: {
-  label: string;
-  name: string;
-  register: any;
-  error?: { message?: string };
-}) => (
-  <div>
-    <Label className="text-base">{label}</Label>
-    <Input
-      className="mt-2"
-      {...register(name)}
-      placeholder={label}
-    />
-    <ErrorMessage message={error?.message} />
-  </div>
-);
-
 
 export default EditPRForm;

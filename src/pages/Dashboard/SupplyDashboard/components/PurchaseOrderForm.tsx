@@ -10,8 +10,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
-  useAbstractOfQuotation,
-  useAllItemSelectedQuote,
+  useGetAllSupplier,
+  useGetAllSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
 import {
   useAddPurchaseOrder,
@@ -35,7 +35,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 interface PurchaseOrderFormProps {
-  aoq_no: string;
+  supplier_no: string;
   pr_no: string;
   total_amount: number;
   isDialogOpen: boolean;
@@ -43,7 +43,7 @@ interface PurchaseOrderFormProps {
 }
 
 export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
-  aoq_no,
+  supplier_no,
   pr_no,
   total_amount,
   isDialogOpen,
@@ -57,39 +57,41 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
       purchase_request: pr_no,
       request_for_quotation: "",
       abstract_of_quotation: "",
+      supplier: "",
     },
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { data } = useAbstractOfQuotation();
-  const { data: item_quotation } = useAllItemSelectedQuote();
-  const { mutate } = useAddPurchaseOrder();
-  const { mutate: addPRItemMutation } = useAddPurchaseOrderItem();
+  const navigate = useNavigate();
+  const { data: supplier } = useGetAllSupplier();
+  const { data: supplier_item } = useGetAllSupplierItem();
+  const { mutate: addPOMutation } = useAddPurchaseOrder();
+  const { mutate: addPOItemMutation } = useAddPurchaseOrderItem();
 
-  const navigate = useNavigate()
-
-  const abstracts = Array.isArray(data?.data) ? data.data : [];
-  const filteredAbstract = abstracts.filter(
-    (abstract) => abstract.aoq_no === aoq_no
-  );
-
-  const abstractWithSamePR = abstracts.find(
-    (data) => data.pr_details.pr_no === pr_no
-  );
-
-  const rfq_no = abstractWithSamePR?.rfq_details.rfq_no;
-
-  const itemQuotation = Array.isArray(item_quotation?.data)
-    ? item_quotation.data
+  const supplier_ = Array.isArray(supplier?.data) ? supplier.data : [];
+  const supplier_item_ = Array.isArray(supplier_item?.data)
+    ? supplier_item.data
     : [];
 
-  const filteredItemQuotation = itemQuotation.filter(
-    (item) => item.aoq === aoq_no
+  const supplierData = supplier_.filter(
+    (data) => data.supplier_no === supplier_no
   );
 
-  const item_quotation_no = filteredItemQuotation.map(
-    (item) => item.item_selected_no
+  const supplierItemData = supplier_item_.filter(
+    (item) => item.supplier_details.supplier_no === supplier_no
   );
+  console.log(supplierItemData);
+
+  console.log(supplierData);
+
+  const aoq_no = supplierData.find(
+    (supplier) => supplier.supplier_no === supplier_no
+  )?.aoq_details.aoq_no;
+
+  const rfq_no = supplierData.find(
+    (supplier) => supplier.supplier_no === supplier_no
+  )?.rfq_details.rfq_no;
+
 
   useEffect(() => {
     if (isDialogOpen) {
@@ -98,29 +100,38 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
       setValue("purchase_request", pr_no);
       setValue("request_for_quotation", rfq_no!);
       setValue("abstract_of_quotation", aoq_no!);
+      setValue("supplier", supplier_no!);
     }
-  }, [setValue, aoq_no, pr_no, isDialogOpen, rfq_no, total_amount]);
+  }, [
+    setValue,
+    aoq_no,
+    pr_no,
+    isDialogOpen,
+    rfq_no,
+    total_amount,
+    supplier_no,
+  ]);
 
   const onSubmit = async (data: purchaseOrderType) => {
     setIsLoading(true);
     const result = purchaseOrderSchema.safeParse(data);
 
     if (result.success) {
-      await mutate(data, {
+      await addPOMutation(data, {
         onSuccess: async (poResponse) => {
           const po_no = poResponse.data?.po_no;
-          const purchaseOrderItem = item_quotation_no.map((item) => {
+          const purchaseOrderItem = supplierItemData.map((item) => {
             return {
               po_item_no: uuidv4(),
               purchase_request: pr_no,
               purchase_order: po_no!,
-              aoq_item: item,
+              supplier_item: item.supplier_item_no,
             };
           });
 
           await Promise.all(
             purchaseOrderItem.map((prItem) => {
-              addPRItemMutation(prItem);
+              addPOItemMutation(prItem);
             })
           );
           reset();
@@ -141,18 +152,26 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4 space-y-6">
-            {filteredAbstract.map((data, index) => (
+            {supplierData.map((data, index) => (
               <div key={index} className="bg-muted p-4 rounded-lg space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-semibold">
-                      {data.pr_details.pr_no}
+                      {data.aoq_details.pr_details.pr_no}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Requested by: {data.pr_details.requisitioner_details.name}
+                      Requested by:{" "}
+                      {data.aoq_details.pr_details.requisitioner_details.name}
                     </p>
                   </div>
-                  <Button variant="outline" onClick={()=> navigate(`/supply/purchase-request/${data.pr_details.pr_no}`)}>
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      navigate(
+                        `/supply/purchase-request/${data.aoq_details.pr_details.pr_no}`
+                      )
+                    }
+                  >
                     <FileText className="w-4 h-4 mr-2" />
                     View PR
                   </Button>
@@ -165,20 +184,22 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                       {data.rfq_details.supplier_name}
                     </p>
                   </div>
-                  <Separator orientation="vertical" className="h-8"/>
+                  <Separator orientation="vertical" className="h-8" />
                   <div className="flex items-center space-x-2">
                     <MapPinIcon className="w-4 h-4 text-muted-foreground" />
                     <p className="text-sm font-medium">
                       {data.rfq_details.supplier_address}
                     </p>
                   </div>
-                  <Separator orientation="vertical" className="h-8"/>
+                  <Separator orientation="vertical" className="h-8" />
 
                   <div className="flex items-center space-x-2">
                     <CreditCard className="w-4 h-4 font-medium" />
-                    <p className="text-sm font-medium">TIN: {data.rfq_details.tin}</p>
+                    <p className="text-sm font-medium">
+                      TIN: {data.rfq_details.tin}
+                    </p>
                   </div>
-                  <Separator orientation="vertical" className="h-8"/>
+                  <Separator orientation="vertical" className="h-8" />
 
                   <Badge
                     variant={data.rfq_details.is_VAT ? "default" : "secondary"}
@@ -192,35 +213,35 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-4">Order Items</h3>
             <div className="bg-muted p-4 rounded-lg">
-              <div className="grid grid-cols-12 gap-4 text-sm font-medium text-muted-foreground mb-2">
-                <div className="col-span-1">#</div>
-                <div className="col-span-1">Unit</div>
-                <div className="col-span-6">Description</div>
-                <div className="col-span-2">Quantity</div>
-                <div className="col-span-2">Unit Cost</div>
+              <div className="grid grid-cols-5 gap-4 text-sm font-medium text-muted-foreground mb-2">
+                <div className="">#</div>
+                <div className="">Unit</div>
+                <div className="">Description</div>
+                <div className="">Quantity</div>
+                <div className="">Unit Cost</div>
               </div>
               <ScrollArea className="h-[150px] pr-4">
-                {filteredItemQuotation.map((item, index) => (
+                {supplierItemData.map((item, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-12 gap-4 text-sm py-2 border-t border-border"
+                    className="grid grid-cols-5 gap-4 text-sm py-2 border-t border-border"
                   >
-                    <div className="col-span-1">{index + 1}</div>
-                    <div className="col-span-1">
-                      {item.item_qoutation_details.item_details.unit}
+                    <div className="">{index + 1}</div>
+                    <div className="">
+                      {item.item_quotation_details.item_details.unit}
                     </div>
-                    <div className="col-span-6">
+                    <div className="">
                       {
-                        item.item_qoutation_details.item_details
+                        item.item_quotation_details.item_details
                           .item_description
                       }
                     </div>
-                    <div className="col-span-2">
-                      {item.item_qoutation_details.item_details.quantity}
+                    <div className="">
+                      {item.item_quotation_details.item_details.quantity}
                     </div>
-                    <div className="col-span-2">
+                    <div className="">
                       ₱
-                      {Number(item.item_qoutation_details.unit_price).toFixed(
+                      {Number(item.item_quotation_details.unit_price).toFixed(
                         2
                       )}
                     </div>

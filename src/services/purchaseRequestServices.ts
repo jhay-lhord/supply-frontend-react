@@ -4,8 +4,6 @@ import { ApiResponse } from "@/types/response/api-response";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation } from "@tanstack/react-query";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { ItemType } from "@/types/request/item";
 import {
   EditPRFormType,
   PurchaseRequestData,
@@ -256,6 +254,62 @@ export const usePurchaseRequestActions = () => {
     isPendingReject,
     isPendingCancel,
     isPendingForward
+  };
+};
+
+type MOPStatus = "Direct Contracting" | "Small Value Procurement" | "Shopping" | "Public Bidding"
+
+export const updatePurchaseRequestMOP = async ({
+  pr_no,
+  status,
+}: {
+  pr_no: string;
+  status: MOPStatus;
+}) => {
+  try {
+    const response = await api.patch(
+      `api/purchase-request/${pr_no}/mop-update/`,
+      { status }
+    );
+    console.log(response);
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error);
+    return handleError(error);
+  }
+};
+
+export const useUpdatePurchaseRequestMOP = () => {
+  const queryClient = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
+
+  const mutation = useMutation<
+    ApiResponse<unknown>,
+    Error,
+    { pr_no: string; status: MOPStatus }
+  >({
+    mutationFn: ({ pr_no, status }) =>
+      updatePurchaseRequestMOP({ pr_no, status }),
+    onMutate: () => {
+      setIsPending(true);
+    },
+    onSuccess: (_, variables) => {
+      const { pr_no } = variables;
+
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", pr_no] });
+      queryClient.invalidateQueries({ queryKey: ["purchase-requests"] });
+    },
+    onError: () => {
+      setIsPending(false);
+    },
+    onSettled: () => {
+      setIsPending(false);
+    },
+  });
+
+  return {
+    ...mutation,
+    isPending,
   };
 };
 
