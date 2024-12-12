@@ -32,6 +32,7 @@ import { AllAbstract } from "./pages/Dashboard/BACDashboard/AllAbstract";
 import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/components/AbstractOfQuotation";
 import Stocks from "./pages/Dashboard/SupplyDashboard/Stocks";
 import PurchaseOrderItemList from "./pages/Dashboard/SupplyDashboard/components/PurchaseOrderItemList";
+import BACPurchaseRequestIncoming from "./pages/Dashboard/BACDashboard/BACPurchaseRequestIncoming";
 
 const App = () => {
   return (
@@ -78,7 +79,11 @@ const App = () => {
 
           {/* Pages in BAC Dashboard */}
           <Route
-            path="/bac/purchase-request"
+            path="/bac/purchase-request/incoming"
+            element={<BACPurchaseRequestIncoming />}
+          />
+          <Route
+            path="/bac/purchase-request/received"
             element={<BACPurchaseRequestInProgress />}
           />
           <Route
