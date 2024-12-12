@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useGetItemQuotation,
   useRequestForQoutation,
@@ -37,25 +36,47 @@ import {
 import {
   abstractType,
   abstractSchema,
+  supplierType,
+  supplierItemType,
 } from "@/types/request/abstract_of_quotation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
+  addSupplier,
   useAbstractOfQuotation,
   useAddAbstractOfQuotation,
-  useAddItemSelectedQuote,
-  useAllItemSelectedQuote,
+  useAddSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { Empty } from "../../shared/components/Empty";
 import { generateAOQNo } from "@/services/generateAOQNo";
 import Loading from "../../shared/components/Loading";
+import { itemQuotationResponseType } from "@/types/response/request-for-qoutation";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface AbstractFormProps {
   prNoFromProps: string;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+}
+
+interface SelectedItems {
+  rfq_no: string;
+  item_quote_no: string;
+  item_no: string;
+  total_amount: number;
+}
+
+interface Quotation {
+  rfq_no: string;
+  items: SelectedItems[];
 }
 
 export const AbstractForm: React.FC<AbstractFormProps> = ({
@@ -67,8 +88,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const [rfqNo, setRfqNo] = useState<string | null>(null);
   const [aoqNo, setAoqNo] = useState<string>("");
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
-  const [itemSelected, setItemSelected] = useState<string[]>([]);
-  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [quotations, setQuotations] = useState<Quotation[]>([]);
 
   const { pr_no } = useParams();
 
@@ -83,56 +103,31 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     return _items.filter((data) => data.rfq === rfqNo);
   }, [items_?.data, rfqNo]);
 
-  const { data: item_quote } = useAllItemSelectedQuote();
+  // const { data: item_quote } = useAllItemSelectedQuote();
   const { data: abstract } = useAbstractOfQuotation();
 
-  const item_selected_quote_no = useMemo(() => {
-    const item_quote_data = Array.isArray(item_quote?.data)
-      ? item_quote.data
-      : [];
-
-    const item_quote_no = item_quote_data
-      ?.filter(
-        (data) =>
-          data.is_item_selected && data.pr_details.pr_no === purchaseNumber
-      )
-      .map((data) => data.item_qoutation_details.item_details.item_no);
-    return Array.from(new Set(item_quote_no));
-  }, [item_quote, purchaseNumber]);
-
-  const filteredItemQuotation = useMemo(() => {
-    return itemQuotation.filter(
-      (quotations) =>
-        !item_selected_quote_no.includes(quotations.item_details.item_no)
-    );
-  }, [itemQuotation, item_selected_quote_no]);
-
-  const quotations = useMemo(() => {
+  const quotations_ = useMemo(() => {
     const data_ = Array.isArray(rfqs?.data) ? rfqs.data : [];
     return data_.filter((data) => data.purchase_request === purchaseNumber);
   }, [rfqs?.data, purchaseNumber]);
 
   const { mutate: addAOQMutation } = useAddAbstractOfQuotation();
-  const { mutate: addItemSelectedMutation } =
-    useAddItemSelectedQuote();
+  const { mutate: addSupplierItemMutation } = useAddSupplierItem();
 
-  const { handleSubmit, setValue } = useForm({
+  const {
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(abstractSchema),
     defaultValues: {
       aoq_no: aoqNo,
-      rfq: rfqNo,
       purchase_request: pr_no,
-      item_quotation: "",
-      total_amount: totalAmount.toString()
     },
   });
 
-  useEffect(() => {
-    if (!isDialogOpen) {
-      setItemSelected([]);
-      setTotalAmount(0);
-    }
-  }, [isDialogOpen]);
+  console.log(errors);
+
 
   useEffect(() => {
     const abstract_data = Array.isArray(abstract?.data) ? abstract.data : [];
@@ -141,29 +136,79 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
   useEffect(() => {
     if (isDialogOpen && itemQuotation.length > 0) {
-      itemQuotation.map((item) => {
-        setValue("aoq_no", aoqNo);
-        setValue("rfq", rfqNo!);
-        setValue("purchase_request", purchaseNumber);
-        setValue("item_quotation", item.item_quotation_no);
-        setValue("total_amount", totalAmount.toString())
-      });
+      setValue("aoq_no", aoqNo);
+      setValue("purchase_request", purchaseNumber);
     }
-  }, [isDialogOpen, setValue, rfqNo, itemQuotation, purchaseNumber, aoqNo, totalAmount]);
+  }, [isDialogOpen, setValue, itemQuotation, purchaseNumber, aoqNo]);
+
+  const handleItemSelection = (item: itemQuotationResponseType) => {
+    if (!selectedSupplier) return;
+    setQuotations((prevQuotations) => {
+      const supplierQuotation = prevQuotations.find(
+        (q) => q.rfq_no === selectedSupplier
+      );
+      const selectedItem: SelectedItems = {
+        rfq_no: item.rfq,
+        item_quote_no: item.item_quotation_no,
+        item_no: item.item_details.item_no,
+        total_amount:
+          Number(item.item_details.quantity) * Number(item.unit_price),
+      };
+
+      if (supplierQuotation) {
+        const itemIndex = supplierQuotation.items.findIndex(
+          (i) => i.item_quote_no === item.item_quotation_no
+        );
+        if (itemIndex > -1) {
+          const updatedItems = [...supplierQuotation.items];
+          updatedItems.splice(itemIndex, 1);
+          return prevQuotations.map((q) =>
+            q.rfq_no === selectedSupplier ? { ...q, items: updatedItems } : q
+          );
+        } else {
+          return prevQuotations.map((q) =>
+            q.rfq_no === selectedSupplier
+              ? { ...q, items: [...q.items, selectedItem] }
+              : q
+          );
+        }
+      } else {
+        return [
+          ...prevQuotations,
+          { rfq_no: selectedSupplier, items: [selectedItem] },
+        ];
+      }
+    });
+  };
+
+  const isItemSelected = (item_no: string) => {
+    return quotations.some(
+      (q) =>
+        q.rfq_no !== selectedSupplier &&
+        q.items.some((item) => item.item_no === item_no)
+    );
+  };
+
+  const isItemSelectedForCurrentSupplier = (item_quote_no: string) => {
+    return (
+      quotations
+        .find((q) => q.rfq_no === selectedSupplier)
+        ?.items.some((item) => item.item_quote_no === item_quote_no) || false
+    );
+  };
 
   const handleToggle = (supplier: qoutationType) => {
     setSelectedSupplier(
-      supplier.supplier_name === selectedSupplier
-        ? null
-        : supplier.supplier_name
+      supplier.rfq_no === selectedSupplier ? null : supplier.rfq_no
     );
     setRfqNo((prevRfqNo) =>
       supplier.rfq_no === prevRfqNo ? null : supplier.rfq_no
     );
   };
 
-
-  const onSubmit = async (data: abstractType) => {
+  const onSubmit = async (
+    data: abstractType | supplierType | supplierItemType
+  ) => {
     setIsLoading(true);
     try {
       const result = abstractSchema.safeParse(data);
@@ -171,56 +216,63 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         return;
       }
 
-      await addAOQMutation(data, {
-        onSuccess: async (afqResponse) => {
-          const aoqNo = afqResponse?.data?.aoq_no;
-          const itemSelectedDataArray = itemSelected.map((item) => {
-            return {
-              item_selected_no: uuidv4(),
-              aoq: aoqNo!,
-              purchase_request: purchaseNumber!,
-              rfq: rfqNo!,
-              item_qoutation: item,
-              is_item_selected: true,
-              total_amount: totalAmount.toString(),
-            };
-          });
+      await addAOQMutation(data as abstractType, {
+        onSuccess: async (AOQResponse) => {
+          const aoqNo = AOQResponse?.data?.aoq_no;
+
+          const suppliersWithItems = quotations.map((quotation) => ({
+            supplier_no: uuidv4(),
+            aoq: aoqNo!,
+            rfq: quotation.rfq_no,
+            items: quotation.items,
+          }));
+
+          let allItems: Array<supplierItemType> = [];
+
+          for (const supplier of suppliersWithItems) {
+            try {
+              const supplierResponse = await addSupplier({
+                supplier_no: supplier.supplier_no,
+                aoq: supplier.aoq,
+                rfq: supplier.rfq,
+              });
+
+              const supplier_no = supplierResponse?.data?.supplier_no;
+              if (!supplier_no) {
+                console.error(
+                  "Failed to retrieve supplier number from the response."
+                );
+                continue;
+              }
+
+              const supplierItems = supplier.items.map((item) => ({
+                supplier_item_no: uuidv4(),
+                supplier: supplier_no,
+                rfq: item.rfq_no,
+                item_quotation: item.item_quote_no,
+                total_amount: item.total_amount.toString(),
+              }));
+
+              allItems = [...allItems, ...supplierItems];
+            } catch (error) {
+              console.error("Error processing supplier:", error);
+            }
+          }
 
           await Promise.all(
-            itemSelectedDataArray.map((itemData) => {
-              addItemSelectedMutation(itemData);
+            allItems.map(async (item) => {
+              await addSupplierItemMutation(item);
             })
           );
 
-          setIsLoading(false);
           setIsDialogOpen(false);
+          setIsLoading(false);
         },
       });
     } catch (error) {
       console.error("Error saving items:", error);
+      setIsLoading(false);
     }
-  };
-
-  const handleCheckBoxChange = (
-    item_quotation_no: string,
-    isChecked: boolean,
-    unitPrice: number,
-    quantity: number,
-  ) => {
-    setItemSelected((prevItemSelected) => {
-      if (isChecked) {
-        return [...prevItemSelected, item_quotation_no];
-      } else {
-        return prevItemSelected.filter((item) => item !== item_quotation_no);
-      }
-    });
-    setTotalAmount((prevTotal) => {
-      if (isChecked) {
-        return prevTotal + (unitPrice * quantity);
-      } else {
-        return prevTotal - (unitPrice * quantity);
-      }
-    });
   };
 
   return (
@@ -234,211 +286,162 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
           </DialogHeader>
           <ScrollArea className="h-[30rem] mb-9">
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Tabs defaultValue="supplier">
-                <div className="w-full flex flex-col items-center sticky top-0 z-10 pb-4 bg-white">
-                  <TabsList className="grid grid-cols-2 w-1/2 items-center">
-                    <TabsTrigger className="" value="supplier">
-                      <span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">
-                        1
-                      </span>
-                      <p className="text-base">Select Supplier</p>
-                    </TabsTrigger>
-                    <TabsTrigger value="items">
-                      <span className="bg-orange-300  w-8 h-8 p-2 rounded-full mx-2">
-                        2
-                      </span>
-                      <p className="text-base">Choose Items</p>
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
-                <TabsContent value="supplier" className=" ">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-xl">
-                        <p>Supplier</p>
-                      </CardTitle>
-                      <CardDescription>
-                        <p>Please fill up the supplier information</p>
-                        <p>Selected Supplier: {selectedSupplier}</p>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-3 gap-2 relative">
-                      {quotations.length > 0 ? (
-                        quotations?.map((supplier) => (
-                          <SupplierCard
-                            supplier={supplier}
-                            isSelected={
-                              supplier.supplier_name === selectedSupplier
-                            }
-                            onToggle={() => handleToggle(supplier)}
-                          />
-                        ))
-                      ) : (
-                        <Empty message="No Supplier Found" />
-                      )}
-                    </CardContent>
-                    <div className="fixed bottom-6 right-10">
-                      <TabsList className="bg-orange-200">
-                        <TabsTrigger
-                          className="bg-orange-200 px-6 py-1 text-gray-950"
-                          value="items"
-                        >
-                          Next
-                        </TabsTrigger>
-                      </TabsList>
-                    </div>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="items">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        <div className="flex justify-between">
-                          <p>Items</p>
-
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <QuestionMarkCircledIcon
-                                  width={25}
-                                  height={25}
-                                  className="text-gray-600"
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent side="top">
-                                <p>
-                                  Tick the checkbox to include this item in your
-                                  abstract of quotation.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </CardTitle>
-                      <CardDescription>
-                        Please Fill up the Items Quotation
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="grid grid-cols-9 gap-2 items-center py-4  border-b-2 sticky bg-background top-0">
-                        <p>UNIT</p>
-                        <p className="col-span-2">ITEM DESCRIPTION</p>
-                        <p>QUANTITY</p>
-                        <p>UNIT COST</p>
-                        <p className="col-span-2">BRAND / MODEL</p>
-                        <p>UNIT PRICE </p>
-                        <p>SELECT ITEM</p>
-                      </div>
-                      {item_loading ? (
-                        <Loading />
-                      ) : filteredItemQuotation &&
-                        filteredItemQuotation?.length > 0 ? (
-                        filteredItemQuotation.map(
-                          (item, index) =>
-                              <div
-                                key={item.item_quotation_no}
-                                className="grid grid-cols-9 gap-2 mb-8 items-center py-4 border-b-2"
-                              >
-                                <p className="text-gray-500">
-                                  {
-                                    filteredItemQuotation[index].item_details
-                                      .unit
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle className="text-xl w-full">
+                    <p className="">Select Supplier</p>
+                    <Carousel
+                      opts={{
+                        align: "start",
+                        loop: true
+                      }}
+                      className=" mx-10"
+                    >
+                      <CarouselContent className="">
+                        {quotations_.length > 0 ? (
+                          quotations_?.map((supplier, index) => (
+                            <CarouselItem
+                              key={index}
+                              className="md:basis-1/2 lg:basis-1/3"
+                            >
+                              <div className="p-1">
+                                <SupplierCard
+                                  supplier={supplier}
+                                  isSelected={
+                                    supplier.rfq_no === selectedSupplier
                                   }
-                                </p>
-                                <p className="text-gray-500 col-span-2">
-                                  {
-                                    filteredItemQuotation[index].item_details
-                                      .item_description
-                                  }
-                                </p>
-                                <p className="text-gray-500">
-                                  {
-                                    filteredItemQuotation[index].item_details
-                                      .quantity
-                                  }
-                                </p>
-                                <p className="text-gray-500">
-                                  {
-                                    filteredItemQuotation[index].item_details
-                                      .unit_cost
-                                  }
-                                </p>
-                                <div className="flex flex-col col-span-2">
-                                  <p className="text-gray-500">
-                                    {filteredItemQuotation[index].brand_model}
-                                  </p>
-                                </div>
-                                <div className="flex flex-col">
-                                  <div
-                                    className={`${
-                                      item.is_low_price
-                                        ? "text-green-400 bg-green-100"
-                                        : "text-red-400 bg-red-100"
-                                    } rounded-md flex gap-2 items-center`}
-                                  >
-                                    <div className="pl-2">
-                                      {item.is_low_price ? (
-                                        <CheckCircledIcon />
-                                      ) : (
-                                        <CrossCircledIcon />
-                                      )}
-                                    </div>
-                                    <p>
-                                      {filteredItemQuotation[index].unit_price}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Checkbox
-                                  checked={itemSelected.includes(
-                                    item.item_quotation_no
-                                  )}
-                                  onCheckedChange={(isChecked) => {
-                                    handleCheckBoxChange(
-                                      item.item_quotation_no,
-                                      isChecked as boolean,
-                                      Number(item.unit_price),
-                                      Number(item.item_details.quantity)
-                                    );
-                                  }}
+                                  onToggle={() => handleToggle(supplier)}
                                 />
                               </div>
-                        )
-                      ) : (
-                        <div className="grid place-items-center w-full h-96">
-                          <p className="flex">
-                            No suppliers found. Please select a supplier to
-                            proceed.
+                            </CarouselItem>
+                          ))
+                        ) : (
+                          <Empty message="No Supplier Found" />
+                        )}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </Carousel>
+ 
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="">
+                  <div className="flex justify-between">
+                    <p className="text-xl">Items</p>
+
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <QuestionMarkCircledIcon
+                            width={25}
+                            height={25}
+                            className="text-gray-600"
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>
+                            Tick the checkbox to include this item in your
+                            abstract of quotation.
                           </p>
-                        </div>
-                      )}
-                      <div className="fixed bottom-6 right-10">
-                        <Button
-                          className={`text-slate-950 bg-orange-200 px-8 py-1 hover:bg-orange-300 ${
-                            isLoading && "px-16"
-                          }`}
-                          type="submit"
-                        >
-                          {isLoading ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            <p className="text-base">Submit Quotation</p>
-                          )}
-                        </Button>
-                      </div>
-                    </CardContent>
-                    <div className="fixed bottom-6 left-10">
-                      <TabsList className="border-2 border-orange-200">
-                        <TabsTrigger
-                          className="px-8 py-1 text-gray-950"
-                          value="supplier"
-                        >
-                          Back
-                        </TabsTrigger>
-                      </TabsList>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+
+                  <div>
+                    <div className="grid grid-cols-9 gap-2 items-center py-4  border-b-2 sticky bg-background top-0">
+                      <p>UNIT</p>
+                      <p className="col-span-2">ITEM DESCRIPTION</p>
+                      <p>QUANTITY</p>
+                      <p>UNIT COST</p>
+                      <p className="col-span-2">BRAND / MODEL</p>
+                      <p>UNIT PRICE </p>
+                      <p>SELECT ITEM</p>
                     </div>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+                    {item_loading ? (
+                      <Loading />
+                    ) : itemQuotation && itemQuotation?.length > 0 ? (
+                      itemQuotation.map((item, index) => (
+                        <div
+                          key={item.item_quotation_no}
+                          className="grid grid-cols-9 gap-2 items-center py-6 border-b-2"
+                        >
+                          <p className="text-gray-500">
+                            {itemQuotation[index].item_details.unit}
+                          </p>
+                          <p className="text-gray-500 col-span-2">
+                            {itemQuotation[index].item_details.item_description}
+                          </p>
+                          <p className="text-gray-500">
+                            {itemQuotation[index].item_details.quantity}
+                          </p>
+                          <p className="text-gray-500">
+                            {itemQuotation[index].item_details.unit_cost}
+                          </p>
+                          <div className="flex flex-col col-span-2">
+                            <p className="text-gray-500">
+                              {itemQuotation[index].brand_model}
+                            </p>
+                          </div>
+                          <div className="flex flex-col">
+                            <div
+                              className={`${
+                                item.is_low_price
+                                  ? "text-green-400 bg-green-100"
+                                  : "text-red-400 bg-red-100"
+                              } rounded-md flex gap-2 items-center`}
+                            >
+                              <div className="pl-2">
+                                {item.is_low_price ? (
+                                  <CheckCircledIcon />
+                                ) : (
+                                  <CrossCircledIcon />
+                                )}
+                              </div>
+                              <p>{itemQuotation[index].unit_price}</p>
+                            </div>
+                          </div>
+
+                          <Checkbox
+                            className="place-self-center"
+                            checked={isItemSelectedForCurrentSupplier(
+                              item.item_quotation_no.toString()
+                            )}
+                            onCheckedChange={() => handleItemSelection(item)}
+                            disabled={
+                              !selectedSupplier ||
+                              isItemSelected(item.item_details.item_no)
+                            }
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="grid place-items-center w-full h-96">
+                        <p className="flex">
+                          No suppliers found. Please select a supplier to
+                          proceed.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <div className="fixed bottom-6 right-10">
+                    <Button
+                      className={`text-slate-950 bg-orange-200 px-8 py-1 hover:bg-orange-300 ${
+                        isLoading && "px-16"
+                      }`}
+                      type="submit"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        <p className="text-base">Submit Quotation</p>
+                      )}
+                    </Button>
+                  </div>
+                </CardFooter>
+              </Card>
             </form>
           </ScrollArea>
         </DialogContent>
