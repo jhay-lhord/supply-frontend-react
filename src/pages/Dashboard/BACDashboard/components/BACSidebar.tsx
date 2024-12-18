@@ -109,7 +109,7 @@ const BACSidebar = () => {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    className="px-3 py-5 "
+                    className="px-4 py-6"
                     isActive={location.pathname === item.url}
                   >
                     <Link to={item.url}>
@@ -126,7 +126,7 @@ const BACSidebar = () => {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    className="px-3 py-5  hover:bg-orange-100"
+                    className="px-4 py-6  hover:bg-orange-100"
                     isActive={location.pathname === item.url}
                   >
                     <Link to={item.url}>
@@ -144,7 +144,7 @@ const BACSidebar = () => {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
                       asChild
-                      className="px-3 py-5  hover:bg-orange-100"
+                      className="px-4 py-6  hover:bg-orange-100"
                       isActive={location.pathname === quotation.url}
                     >
                       <div className="flex justify-between">
@@ -162,7 +162,7 @@ const BACSidebar = () => {
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             asChild
-                            className="px-3 py-5  hover:bg-orange-100"
+                            className="px-4 py-6  hover:bg-orange-100"
                             isActive={location.pathname === data.url}
                           >
                             <Link to={data.url}>
@@ -180,7 +180,7 @@ const BACSidebar = () => {
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
                     asChild
-                    className="px-3 py-5  hover:bg-orange-100"
+                    className="px-4 py-6  hover:bg-orange-100"
                     isActive={location.pathname === abstract.url}
                   >
                     <div className="flex justify-between">
@@ -198,7 +198,7 @@ const BACSidebar = () => {
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
                           asChild
-                          className="px-3 py-5  hover:bg-orange-100"
+                          className="px-4 py-6  hover:bg-orange-100"
                           isActive={location.pathname === data.url}
                         >
                           <Link to={data.url}>
