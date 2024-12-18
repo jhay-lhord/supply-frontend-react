@@ -10,10 +10,17 @@ export type quotationResponseType = {
 };
 
 export type itemQuotationResponseType = {
+  item_quotation_no:string;
   purchase_request: string;
   rfq: string;
-  item: string;
-  unit_price: number;
+  item_details: {
+    item_no: string,
+    item_description: string;
+    unit: string;
+    quantity: string;
+    unit_cost: string;
+  };
+  unit_price: number;   
   brand_model: string;
   is_low_price: boolean;
 };

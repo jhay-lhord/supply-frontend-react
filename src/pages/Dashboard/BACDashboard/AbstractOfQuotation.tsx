@@ -1,19 +1,12 @@
-import DashboardLayout from "../shared/Layouts/DashboardLayout"
-import BACSidebar from "../BACDashboard/components/BACSidebar"
-import AbstractOfQuotationDataTable from "./components/AbstractOfQuotationDataTable"
+import AbstractOfQuotationDataTable from "./components/AbstractOfQuotationDataTable";
+import Layout from "./components/Layout/BACDashboardLayout";
 
 const AbstractOfQuotation: React.FC = () => {
   return (
-    <DashboardLayout>
-        <BACSidebar />
+    <Layout>
+        <AbstractOfQuotationDataTable />
+    </Layout>
+  );
+};
 
-        <div className="pt-16 w-full">
-            <AbstractOfQuotationDataTable/>
-        </div>
-            
-    </DashboardLayout>
-
-  )
-}
-
-export default AbstractOfQuotation
+export default AbstractOfQuotation;

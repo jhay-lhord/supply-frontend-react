@@ -1,16 +1,11 @@
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
 import PurchaseRequestDataTable from "./components/PurchaseRequestDataTable";
-import SupplySidebar from "./components/SupplySidebar";
-
+import Layout from "./components/Layout/SupplyDashboardLayout";
 
 const PurchaseRequest: React.FC = () => {
   return (
-    <DashboardLayout>
-      <SupplySidebar />
-      <div className="pt-16 w-full">
+    <Layout>
         <PurchaseRequestDataTable />
-      </div>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

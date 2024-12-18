@@ -2,10 +2,19 @@ export type purchaseRequestType = {
   pr_no: string,
   user: string,
   item_no: string,
-  res_center_code: string,
+  office: string,
   purpose: string,
   status: string,
-  requested_by?: string,
-  approved_by?: string,
+  requisitioner_details: {
+    requisition_id: string
+    name: string
+    designation: string
+    department: string;
+  },
+  campus_director_details: {
+    name: string
+    designation: string
+    department: string;
+  },
   created_at: Date,
 }

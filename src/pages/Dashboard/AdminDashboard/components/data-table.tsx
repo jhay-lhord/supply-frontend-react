@@ -66,10 +66,10 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4 m-6 p-6 bg-slate-100 rounded">
       <DataTableToolbar table={table}/>
       <div className="rounded-md border">
-        <Table >
+        <Table className="table-auto">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -96,7 +96,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell className="truncate" key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

@@ -1,27 +1,20 @@
-import { UserNav } from "@/pages/Dashboard/shared/components/UserNav";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { greetings } from "@/services/greeting";
+import SupplySidebar from "../SupplySidebar";
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-const SupplyDashboardLayout: React.FC<DashboardLayoutProps> = ({
-  children,
-}) => {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Top Navigation */}
-      <header className="fixed top-0 right-0 left-0 z-10 shadow bg-white">
-        <div className="flex h-16 items-center px-4">
-          <h2>LOGO</h2>
-          <div className="ml-auto flex items-center space-x-4">
-            <UserNav />
+    <SidebarProvider>
+      <SupplySidebar />
+      <main className="flex flex-col min-h-screen w-full">
+        <div className="flex justify-between items-center bg-slate-50 sticky top-0 z-10">
+          <div className="flex gap-6 py-6">
+            <SidebarTrigger />
+            <h1 className="text-xl font-normal">{greetings()}</h1>
           </div>
         </div>
-      </header>
-
-      <div className="flex">{children}</div>
-    </div>
+        <div className="flex   p-4">{children}</div>
+      </main>
+    </SidebarProvider>
   );
-};
-
-export default SupplyDashboardLayout;
+}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -6,60 +6,98 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import ErrorCard from "@/components/ErrorCard";
 import { InputOTPForm } from "@/pages/Forms/InputOTPForm";
-import api from "../../api";
+import { useNavigate } from "react-router-dom";
+import { FieldErrors, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { userLoginSchema, userLoginType } from "@/types/request/user";
+import { loginUser } from "@/services/LoginUserServices";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsloading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOTPSent, setIsOTPSent] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    setIsloading(true);
-    setError("");
+  const { toast } = useToast();
 
-    if (!email || !password) {
-      setError("Both email and password are required.");
-      setIsloading(false);
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(userLoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    api
-      .post("/api/user/login_token/", {
-        email,
-        password,
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          setIsOTPSent(true);
-          localStorage.setItem("email", email);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        if (error.code === "ERR_NETWORK") {
-          setError(`${error.message}, Please check your Internet Connection`);
-        } else if (error.response?.status === 400) {
-          setError("No active account found with the given credentials");
-        } else {
-          setError("An unexpected error occurred. Please try again.");
-        }
-      })
-      .finally(() => {
-        setIsloading(false);
+  const navigate = useNavigate();
+
+  const onSubmit = async (data: userLoginType) => {
+    setIsLoading(true);
+    setError(null);
+
+    const { status, isOTPSent, errorMessage } = await loginUser(data);
+
+    setIsOTPSent(isOTPSent);
+
+    if (isOTPSent)
+      return toast({
+        title: "Success",
+        description: "OTP sent to your email, please verify",
       });
+
+    if (status === 200 && !isOTPSent) {
+      navigate("/");
+    } else {
+      setError(errorMessage);
+    }
+    setError(errorMessage);
+    setIsLoading(false);
   };
 
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
+  interface RenderFieldProps {
+    label: string;
+    field_name: "email" | "password";
+    errors: FieldErrors<userLoginType>;
+  }
 
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
+  const renderField = ({ label, field_name, errors }: RenderFieldProps) => (
+    <div className="w-full relative">
+      <Label>{label}</Label>
+      <div className="relative">
+        <Input
+          type={
+            field_name === "password" && !showPassword ? "password" : "text"
+          }
+          {...register(field_name)}
+          className="w-full pr-10"
+        />
+        {field_name === "password" && (
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            onClick={togglePasswordVisibility}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? (
+              <EyeOff className="w-5 h-5 text-gray-500" />
+            ) : (
+              <Eye className="w-5 h-5 text-gray-500" />
+            )}
+          </button>
+        )}
+      </div>
+      {errors && errors[field_name as keyof typeof errors] && (
+        <span className="text-xs text-red-500">
+          {errors[field_name as keyof typeof errors]?.message}
+        </span>
+      )}
+    </div>
+  );
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -67,27 +105,23 @@ const Login = () => {
 
   return (
     <div className="relative flex h-screen justify-center items-center">
-      {/* Background Image with Blur */}
       <div
         className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
         style={{
-          backgroundImage: "url('/image2.jpg')", // Replace this with the path to your image
-          filter: "blur(8px )", // Adjust blur value if necessary
+          backgroundImage: "url('/image2.jpg')",
+          filter: "blur(8px )",
         }}
       ></div>
 
-      {/* Content Section */}
       <div className="relative flex border border-[#FDE3CF] rounded-lg w-[800px] shadow-lg bg-white z-10">
-        {/* Image Section */}
         <div className="flex justify-center items-center w-1/2 border-r border-[#FDE3CF] p-5 shadow-lg bg-blue-50">
           <img
-            src="CTU_new_logotransparent.svg"
+            src="/CTU_new_logotransparent.svg"
             alt="Illustration"
             className="w-full h-auto object-contain"
           />
         </div>
 
-        {/* Form Section */}
         <div className="flex justify-center items-center w-1/2 p-7">
           {!isOTPSent ? (
             <div className="w-full flex flex-col justify-between space-y-4">
@@ -98,67 +132,22 @@ const Login = () => {
 
                 {error && <ErrorCard description={error} />}
 
-                {/* Email Input */}
-                <div className="mb-4">
-                  <Label
-                    htmlFor="email"
-                    className="my-2 text-lg font-normal text-gray-900"
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  {renderField({ label: "Email", field_name: "email", errors })}
+                  {renderField({
+                    label: "Password",
+                    field_name: "password",
+                    errors,
+                  })}
+                  <Button
+                    type="submit"
+                    className="w-full mt-4"
+                    disabled={isLoading}
                   >
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    className="w-full"
-                    placeholder="email@example.com"
-                    onChange={handleEmailChange}
-                    value={email}
-                    aria-required="true"
-                  />
-                </div>
-
-                {/* Password Input with Toggle */}
-                <div className="mb-4 relative">
-                  <Label
-                    htmlFor="password"
-                    className="my-2 text-lg font-normal text-gray-900"
-                  >
-                    Password
-                  </Label>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    className="w-full pr-10"
-                    placeholder="Your password"
-                    onChange={handlePasswordChange}
-                    value={password}
-                    aria-required="true"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center"
-                    onClick={togglePasswordVisibility}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                    aria-pressed={showPassword}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5 mt-7" />
-                    ) : (
-                      <Eye className="w-5 h-5 mt-7" />
-                    )}
-                  </button>
-                </div>
+                    {isLoading ? <Loader2 className="animate-spin" /> : "Login"}
+                  </Button>
+                </form>
               </div>
-
-              {/* Submit Button */}
-              <Button
-                className="w-full mt-4"
-                onClick={handleSubmit}
-                disabled={isLoading || !email || !password}
-              >
-                {isLoading ? <Loader2 className="animate-spin" /> : "Login"}
-              </Button>
 
               <p className="mt-4 text-center">
                 Don't have an account?{" "}

@@ -4,38 +4,74 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import { CalendarDateRangePicker } from "../shared/components/CalendarDateRangePicker";
-import { RecentActivity } from "../shared/components/RecentActivity";
-import { DataTable } from "../shared/components/DataTable";
-import BACSidebar from "./components/BACSidebar";
+import { RecentActivities } from "../shared/components/RecentActivities";
+import Layout from "./components/Layout/BACDashboardLayout";
+
+import { Loader2 } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { usePurchaseRequestInProgressCount } from "@/services/purchaseRequestServices";
+import { useRequestForQuotationCount } from "@/services/requestForQoutationServices";
+import { useAbstractOfQuotationCount } from "@/services/AbstractOfQuotationServices";
+
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { useGetBACDailyReport } from "@/services/DailyReport";
+
+const chartConfig = {
+  total_approved: {
+    label: "Approved PR ",
+    color: "hsl(var(--chart-1))",
+  },
+  total_quotation: {
+    label: "Quotation ",
+    color: "hsl(var(--chart-2))",
+  },
+  total_abstract: {
+    label: "Abstract ",
+    color: "hsl(var(--chart-3))",
+  },
+} satisfies ChartConfig;
 
 const BACDashboard: React.FC = () => {
-  return (
-    <DashboardLayout>
-      <BACSidebar />
+  const { inProgressCount, isLoading } = usePurchaseRequestInProgressCount();
 
-      {/* Main Content */}
-      <ScrollArea className="w-full mt-14">
+  const { requestForQuotationCount, isLoading: quotation_loading } =
+    useRequestForQuotationCount();
+
+  const { abstractCount, isLoading: abstract_loading } =
+    useAbstractOfQuotationCount();
+
+  const { data } = useGetBACDailyReport();
+
+  const chartData = data?.data;
+
+
+  return (
+    <Layout>
+      <ScrollArea className="w-full">
         <main className=" flex-grow">
           <div className="md:hidden"></div>
           <div className="hidden flex-col md:flex">
-            <div className=" space-y-4 p-8 pt-6">
+            <div className=" space-y-4">
               <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">
-                  BAC Dashboard
+                  Dashboard
                 </h2>
 
-                <div className="flex items-center space-x-2">
-                </div>
+                <div className="flex items-center space-x-2"></div>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-md font-medium">
-                      Active Bids
+                    <CardTitle className="">
+                      <p className="text-base font-medium">Approved Purchase Request</p> 
                     </CardTitle>
                     <svg
                       width="20"
@@ -54,13 +90,19 @@ const BACDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
+                    <div className=" text-2xl font-bold">
+                      {isLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        inProgressCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card className="bg-slate-100 border-none">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-md font-medium">
-                      Bids for Evaluation
+                      Request for Quotation
                     </CardTitle>
                     <svg
                       width="20"
@@ -79,13 +121,19 @@ const BACDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
+                    <div className="text-2xl font-bold">
+                      {quotation_loading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        requestForQuotationCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card className="border-none bg-slate-100">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-md font-medium">
-                      Bids Awards
+                      Abstract of Quotation
                     </CardTitle>
                     <svg
                       width="20"
@@ -104,19 +152,62 @@ const BACDashboard: React.FC = () => {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
+                    <div className="text-2xl font-bold">
+                      {abstract_loading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        abstractCount
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <div className="grid grid-cols-3 gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4  bg-slate-100">
-                  <CardHeader className=" border-none">
-                    <CardTitle>Active Bids</CardTitle>
+                  <CardHeader>
+                    <CardTitle>Weekly Reports</CardTitle>
+                    <CardDescription>My Weekly Reports for the last 7 days</CardDescription>
                   </CardHeader>
-                  <CardContent className="pl-2">
-                    {/* <Overview /> */}
-                    <DataTable />
+                  <CardContent>
+                    <ChartContainer config={chartConfig}>
+                      <BarChart accessibilityLayer data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="day"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          tickFormatter={(value) => value.slice(0, 3)}
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent indicator="dot" />}
+                        />
+                        <Bar
+                          dataKey="total_approved"
+                          fill="var(--color-total_approved)"
+                          radius={10}
+                          width={20}
+                        />
+
+                        <Bar
+                          dataKey="total_quotation"
+                          fill={"var(--color-total_quotation)"}
+                          radius={10}
+                          width={20}
+                        />
+
+                        <Bar
+                          dataKey="total_abstract"
+                          fill="var(--color-total_abstract)"
+                          radius={10}
+                          width={20}
+                        />
+                      </BarChart>
+                    </ChartContainer>
                   </CardContent>
+                  <CardFooter className="flex-col items-start gap-2 text-sm">
+                  </CardFooter>
                 </Card>
 
                 <Card className="col-span-3 bg-slate-100">
@@ -125,7 +216,7 @@ const BACDashboard: React.FC = () => {
                   </CardHeader>
                   <ScrollArea className="h-96">
                     <CardContent className="">
-                      <RecentActivity />
+                      <RecentActivities />
                     </CardContent>
                   </ScrollArea>
                 </Card>
@@ -134,7 +225,7 @@ const BACDashboard: React.FC = () => {
           </div>
         </main>
       </ScrollArea>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TrashIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
+import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "./DeleteDialog";
 import {
@@ -8,26 +8,30 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { deletePurchaseRequest } from "@/services/purchaseRequestServices";
+import { deletePurchaseRequest, usePurchaseRequestActions } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { Loader2, MoveRightIcon } from "lucide-react";
+import { abstractType_ } from "@/types/response/abstract-of-quotation";
 
 interface DataTableRowActionsProps {
   pr_no: string;
-  _data: purchaseRequestType;
+  _data: purchaseRequestType | abstractType_;
 }
 
 export const DataTableRowActions = ({
   _data,
   pr_no,
 }: DataTableRowActionsProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const purchaseData = _data as purchaseRequestType
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { handleForward, isPendingForward} = usePurchaseRequestActions()
 
   const deletePurchasePurchaseMutation = useMutation({
     mutationFn: deletePurchaseRequest,
@@ -44,13 +48,9 @@ export const DataTableRowActions = ({
     navigate(`/supply/purchase-request/${pr_no}`);
   };
 
-  const handleOpenDialog = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setIsDialogOpen(true);
-  };
 
   const handleDeletePurchaseRequest = async () => {
-    const selectedPrNo = _data.pr_no;
+    const selectedPrNo = purchaseData.pr_no;
     try {
       deletePurchasePurchaseMutation.mutate(selectedPrNo);
     } catch (error) {
@@ -66,39 +66,46 @@ export const DataTableRowActions = ({
             <TooltipTrigger asChild>
               <Button
                 onClick={handleViewClick}
-                variant="ghost"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+                className=" px-2 bg-orange-200 data-[state=open]:bg-muted hover:rounded-full"
               >
-                <ArrowTopRightIcon className="h-4 w-4 text-orange-400" />
+                <p className="mx-1 text-sm font-thin">Open</p>
+                <ArrowTopRightIcon className="h-4 w-4" />
                 <span className="sr-only">Open</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">Open</TooltipContent>
           </Tooltip>
 
-          <Separator className="h-8" orientation="vertical" decorative />
+          {purchaseData.status === "Approved" && (
+            <>
+              <Separator className="h-10" orientation="vertical" decorative />
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={handleOpenDialog}
-                variant="ghost"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
-              >
-                <TrashIcon className="h-4 w-4" />
-                <span className="sr-only">Delete</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">Delete</TooltipContent>
-          </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => handleForward(pr_no)}
+                    variant="outline"
+                    className="flex data-[state=open]:bg-muted hover:rounded-full bg- hover:bg-green-300 hover:border-none text-gray-950"
+                  >
+                    <p className="mx-1 text-sm font-thin">{isPendingForward ? <Loader2 className="animate-spin"/>: "Forward"}</p>
+                    <MoveRightIcon className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  Forward to Procurement
+                </TooltipContent>
+              </Tooltip>
+            </>
+          )}
         </div>
       </TooltipProvider>
 
       <DeleteDialog
         onDeleteClick={handleDeletePurchaseRequest}
         message="Purchase Request"
-        isDialogOpen={isDialogOpen}
-        setIsDialogOpen={setIsDialogOpen}
+        isDialogOpen={isDeleteDialogOpen}
+        setIsDialogOpen={setIsDeleteDialogOpen}
       />
     </>
   );

@@ -5,7 +5,21 @@ import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+
 // Step 2 define the request
+
+export const GetUsers = async (): Promise<
+  ApiResponse<UsersType[]>
+> => {
+  try {
+    const response = await api.get<UsersType[]>(
+      "/api/users/"
+    )
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
 
 export const getUsers = async (): Promise<ApiResponse<UsersType[]>> => {
   try {
@@ -55,3 +69,18 @@ export const useActivateUser = (action: string) => {
     
   })
 }
+
+
+export const useUser = () => {
+  return useQuery<ApiResponse<UsersType[]>, Error>({
+    queryKey: ["users"],
+    queryFn: GetUsers,
+    refetchInterval: 5000,
+  });
+};
+
+export const useUserCount = () => {
+  const { data, isLoading } = useUser();
+  const UserCount = data?.data?.length;
+  return { UserCount, isLoading };
+};

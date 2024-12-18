@@ -1,15 +1,16 @@
-import DashboardLayout from "@/pages/Dashboard/shared/Layouts/DashboardLayout";
-import AdminSidebar from "./components/AdminSidebar";
+
+
 import UsersDataTable from "./components/UsersDataTable";
+import Layout from "./components/Layout/AdminDashboardLayout";
 
 const Users: React.FC = () => {
   return (
-    <DashboardLayout>
-      <AdminSidebar />
-      <div className="pt-16 w-full">
+    <Layout>
+      
+      <div className=" w-full">
         <UsersDataTable />
       </div>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

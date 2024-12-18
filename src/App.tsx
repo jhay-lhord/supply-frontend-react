@@ -1,8 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "@/pages/Forms/Login";
 import ProtectedRoutes from "./components/Auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -24,6 +20,19 @@ import { Logout, RegisterAndLogout } from "./components/Auth/auth";
 import BACPurchaseRequestList from "./pages/Dashboard/BACDashboard/BACPurchaseRequestList";
 import ItemNotFound from "./pages/Dashboard/SupplyDashboard/components/ItemNotFound";
 import { QuotationList } from "./pages/Dashboard/BACDashboard/QuotationList";
+import { BACQuotation } from "./pages/Dashboard/BACDashboard/BACQuotation";
+import { AbstractList } from "./pages/Dashboard/BACDashboard/AbstractList";
+import { AbstractItemList } from "./pages/Dashboard/BACDashboard/AbstractItemList";
+import { BACItemList } from "./pages/Dashboard/BACDashboard/BACItemList";
+import Requisitioner from "./pages/Dashboard/AdminDashboard/Requisitioner";
+import CampusDirector from "./pages/Dashboard/AdminDashboard/CampusDirector";
+import BACmember from "./pages/Dashboard/AdminDashboard/BACmember";
+import { AllQuotations } from "./pages/Dashboard/BACDashboard/AllQuotations";
+import { AllAbstract } from "./pages/Dashboard/BACDashboard/AllAbstract";
+import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/components/AbstractOfQuotation";
+import Stocks from "./pages/Dashboard/SupplyDashboard/Stocks";
+import PurchaseOrderItemList from "./pages/Dashboard/SupplyDashboard/components/PurchaseOrderItemList";
+import BACPurchaseRequestIncoming from "./pages/Dashboard/BACDashboard/BACPurchaseRequestIncoming";
 
 const App = () => {
   return (
@@ -54,14 +63,27 @@ const App = () => {
             element={<PurchaseRequestList />}
           />
           <Route path="/supply/purchase-order" element={<PurchaseOrder />} />
-          <Route path="/supply/in-progress" element={<PurchaseRequestInProgress />} />
+          <Route
+            path="/supply/in-progress"
+            element={<PurchaseRequestInProgress />}
+          />
+          <Route
+            path="/supply/abstract-of-quotation/"
+            element={<SupplyAOQ />}
+          />
           <Route path="/supply/reports" element={<Reports />} />
           <Route path="/supply/inventory" element={<Inventory />} />
-          <Route path="/supply/not-found" element={<ItemNotFound/>} />
+
+          <Route path="/supply/stocks" element={<Stocks />} />
+          <Route path="/supply/not-found" element={<ItemNotFound />} />
 
           {/* Pages in BAC Dashboard */}
           <Route
-            path="/bac/purchase-request"
+            path="/bac/purchase-request/incoming"
+            element={<BACPurchaseRequestIncoming />}
+          />
+          <Route
+            path="/bac/purchase-request/received"
             element={<BACPurchaseRequestInProgress />}
           />
           <Route
@@ -69,16 +91,38 @@ const App = () => {
             element={<BACPurchaseRequestList />}
           />
           <Route
+            path="/bac/purchase-order/:po_no"
+            element={<PurchaseOrderItemList />}
+          />
+          <Route
             path="/bac/request-for-quotation"
             element={<RequestForQuotation />}
           />
-           <Route
+          <Route
+            path="/bac/request-for-quotations"
+            element={<AllQuotations title="All Request of Quotation" />}
+          />
+          <Route
             path="/bac/request-for-quotation/:pr_no"
             element={<QuotationList />}
           />
           <Route
+            path="/bac/abstract-of-quotation/:pr_no"
+            element={<AbstractList />}
+          />
+          <Route path="/bac/quotation/:rfq_no" element={<BACQuotation />} />
+          <Route
+            path="/bac/abstract-item-list/:aoq_no"
+            element={<BACItemList />}
+          />
+          <Route
             path="/bac/abstract-of-quotation"
             element={<AbstractOfQuotation />}
+          />
+          <Route path="/bac/abstract-of-quotations" element={<AllAbstract />} />
+          <Route
+            path="/bac/item-selected-quotation/:pr_no"
+            element={<AbstractItemList />}
           />
           <Route path="/bac/bac-reports" element={<BACReports />} />
           <Route path="/bac/bac-transaction" element={<BACTransaction />} />
@@ -86,6 +130,9 @@ const App = () => {
           {/* Pages in Admin */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/requisitioner" element={<Requisitioner />} />
+          <Route path="/admin/campus-director" element={<CampusDirector />} />
+          <Route path="/admin/BACmembers" element={<BACmember />} />
         </Routes>
       </Router>
     </>

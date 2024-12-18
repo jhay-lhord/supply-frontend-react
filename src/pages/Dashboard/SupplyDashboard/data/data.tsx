@@ -1,31 +1,39 @@
 import {
-  CircleIcon,
   QuestionMarkCircledIcon,
-  StopwatchIcon,
 } from "@radix-ui/react-icons"
+import {CheckCircleIcon, CircleArrowUpIcon, CircleXIcon } from "lucide-react"
 
 
 export const statuses = [
   {
-    value: "pending",
+    value: "Not Approved",
     label: "Pending",
     icon: QuestionMarkCircledIcon,
   },
   {
     value: "Forwarded to Procurement",
-    label: "Forwarded to Procurement",
-    icon: CircleIcon,
+    label: "Forwarded",
+    icon: CircleArrowUpIcon,
   },
   {
-    value: "Ready for Canvassing",
-    label: "Ready for Canvassing",
-    icon: CircleIcon,
+    value: "Received by the Procurement",
+    label: "Canvassing",
+    icon: CircleArrowUpIcon,
   },
   {
-    value: "Ready for Purchase Order",
-    label: "Ready for Purchase Order",
-    icon: StopwatchIcon,
+    value: "Approved",
+    label: "Approved",
+    icon: CheckCircleIcon,
   },
-
+  {
+    value: "Rejected",
+    label: "Rejected",
+    icon: CircleXIcon,
+  },
+  {
+    value: "Cancelled",
+    label: "Cancelled",
+    icon: CircleXIcon,
+  },
 ]
 

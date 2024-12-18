@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import api from "@/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "@/types/response/api-response";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation } from "@tanstack/react-query";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { toast } from "sonner";
-import { ItemType } from "@/types/request/item";
+import {
+  EditPRFormType,
+  PurchaseRequestData,
+} from "@/types/request/purchase-request";
+import { useState } from "react";
 
 export const GetPurchaseRequest = async (): Promise<
   ApiResponse<purchaseRequestType[]>
@@ -14,7 +17,7 @@ export const GetPurchaseRequest = async (): Promise<
   try {
     const response = await api.get<purchaseRequestType[]>(
       "/api/purchase-request/"
-    )
+    );
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
@@ -34,14 +37,7 @@ export const GetPurchaseRequestList = async (
   }
 };
 
-export const AddPurchaseRequest = async (data: {
-  pr_no: string;
-  res_center_code: string;
-  purpose: string;
-  pr_status: string;
-  requested_by: string;
-  approved_by: string;
-}) => {
+export const AddPurchaseRequest = async (data: PurchaseRequestData) => {
   try {
     const response = await api.post("api/purchase-request/", data);
     console.log(response);
@@ -51,11 +47,22 @@ export const AddPurchaseRequest = async (data: {
   }
 };
 
-export const UpdatePurchaseRequest = async (data: purchaseRequestType) => {
+export const updatePurchaseRequest = async ({
+  pr_no,
+  data,
+}: {
+  pr_no: string;
+  data: EditPRFormType;
+}) => {
   try {
-    const response = await api.put(`api/purchase-request/${data.pr_no}`, data);
+    const response = await api.patch(
+      `api/purchase-request/${pr_no}/edit/`,
+      data
+    );
+    console.log(response);
     return handleSucess(response);
   } catch (error) {
+    console.log(error);
     return handleError(error);
   }
 };
@@ -63,16 +70,14 @@ export const UpdatePurchaseRequest = async (data: purchaseRequestType) => {
 export const useUpdatePurchaseRequest = () => {
   const queryClient = useQueryClient();
   return useMutation<
-    ApiResponse<purchaseRequestType>,
+    ApiResponse<unknown>,
     Error,
-    purchaseRequestType
+    { pr_no: string; data: EditPRFormType }
   >({
-    mutationFn: UpdatePurchaseRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["purchase_request"] });
-      toast.success("Edit Successfully", {
-        description: "Item Purchase Request Successfully",
-      });
+    mutationFn: ({ pr_no, data }) => updatePurchaseRequest({ pr_no, data }),
+    onSuccess: (_, variables) => {
+      const { pr_no } = variables;
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", pr_no] });
     },
   });
 };
@@ -100,14 +105,32 @@ export const usePurchaseRequestInProgressCount = () => {
     .filter((data) => {
       return data.status === "Forwarded to Procurement";
     });
-  const inProgressCount = purchase_request_in_progress?.length;
+  const inProgressCount = purchase_request_in_progress?.length ?? 0;
   return { inProgressCount, isLoading };
 };
 
 export const usePurchaseRequestInProgress = () => {
   const { data, isLoading } = usePurchaseRequest();
 
-  const purchaseRequestInProgress = data?.data
+  const inProgress = Array.isArray(data?.data) ? data.data : [];
+
+  const purchaseRequestInProgress = inProgress
+    ?.map((data) => {
+      return data;
+    })
+    .filter((data) => {
+      return data.status === "Received by the Procurement";
+    });
+
+  return { purchaseRequestInProgress, isLoading };
+};
+
+export const usePurchaseRequestIncoming = () => {
+  const { data, isLoading } = usePurchaseRequest();
+
+  const inComing = Array.isArray(data?.data) ? data.data : [];
+
+  const purchaseRequestIncoming = inComing
     ?.map((data) => {
       return data;
     })
@@ -115,15 +138,17 @@ export const usePurchaseRequestInProgress = () => {
       return data.status === "Forwarded to Procurement";
     });
 
-  return { purchaseRequestInProgress, isLoading };
+  return { purchaseRequestIncoming, isLoading };
 };
+
 export const usePurchaseRequestList = (pr_no: string) => {
   return useQuery<ApiResponse<purchaseRequestType>, Error>({
-    queryKey: ["purchase_request", pr_no],
+    queryKey: ["purchase-request", pr_no],
     queryFn: () => GetPurchaseRequestList(pr_no!),
     enabled: !!pr_no,
   });
 };
+
 export const GetPurchaseRequestItem = async (): Promise<
   ApiResponse<purchaseRequestType[]>
 > => {
@@ -137,7 +162,7 @@ export const GetPurchaseRequestItem = async (): Promise<
   }
 };
 
-export const deletePurchaseRequest = async (pr_no: string): Promise<T> => {
+export const deletePurchaseRequest = async (pr_no: string) => {
   try {
     const response = await api.delete(`/api/purchase-request/${pr_no}`);
     console.log(response);
@@ -147,558 +172,161 @@ export const deletePurchaseRequest = async (pr_no: string): Promise<T> => {
   }
 };
 
-export const generateEditablePDF = async () => {
-  console.log("clicked");
-  // Create a new PDF document
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([612, 792]); // 8.5 inches x 11 inches in points
-
-  // Embed the standard Times Roman font
-  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-  const timesRomanItalicFont = await pdfDoc.embedFont(
-    StandardFonts.TimesRomanItalic
-  );
-  const timesBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
-
-  // Add title and other elements to the PDF
-  page.drawText("PURCHASE REQUEST", {
-    x: 201,
-    y: 725,
-    size: 14,
-    font: timesBoldFont,
-  });
-  page.drawText("Appendix 60", {
-    x: 490,
-    y: 760,
-    size: 14,
-    font: timesRomanItalicFont,
-  });
-  page.drawText("Entity Name:", {
-    x: 23,
-    y: 697,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("CTU - ARGAO CAMPUS", {
-    x: 96,
-    y: 697,
-    size: 11,
-    font: timesRomanFont,
-  });
-
-  // Horizontal and vertical lines are drawn here...
-  //Horizontal Line
-
-  page.drawLine({
-    start: { x: 22, y: 680 },
-    end: { x: 564, y: 680 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 635 },
-    end: { x: 564, y: 635 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 590 },
-    end: { x: 564, y: 590 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 43 },
-    end: { x: 564, y: 43 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 102 },
-    end: { x: 564, y: 102 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 150 },
-    end: { x: 564, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-
-  // Add Fund Cluster label and editable field
-  page.drawText("Fund Cluster:", {
-    x: 369,
-    y: 697,
-    size: 11,
-    font: timesBoldFont,
-  });
-
-  page.drawText("", { x: 130, y: 669, size: 11, font: timesRomanFont });
-  page.drawLine({
-    start: { x: 445, y: 695 }, // Starting point of the line
-    end: { x: 520, y: 695 }, // Ending point of the line (same y value)
-    thickness: 1, // Line thickness
-    color: rgb(0, 0, 0), // Black color
-  });
-  page.drawText("Office/Section:", {
-    x: 30,
-    y: 663,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("PR No.:", { x: 125, y: 663, size: 11, font: timesBoldFont });
-  page.drawText("Responsibility Center Code :", {
-    x: 125,
-    y: 645,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Date :", { x: 418, y: 663, size: 11, font: timesBoldFont });
-  page.drawText("Stock/", { x: 30, y: 620, size: 11, font: timesBoldFont });
-  page.drawText("Property", { x: 25, y: 609, size: 11, font: timesBoldFont });
-  page.drawText("No.", { x: 35, y: 595, size: 11, font: timesBoldFont });
-  page.drawText("Unit", { x: 80, y: 610, size: 11, font: timesBoldFont });
-  page.drawText("Item Description", {
-    x: 206,
-    y: 610,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Quantity", {
-    x: 370,
-    y: 610,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Unit Cost", {
-    x: 425,
-    y: 610,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Total Cost", {
-    x: 495,
-    y: 610,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Purpose:", { x: 53, y: 138, size: 12, font: timesBoldFont });
-  page.drawText("Requested by:", {
-    x: 125,
-    y: 92,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Signature:", {
-    x: 26,
-    y: 80,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Printed Name:", {
-    x: 26,
-    y: 65,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Designation:", {
-    x: 26,
-    y: 50,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Approved by:", {
-    x: 367,
-    y: 92,
-    size: 12,
-    font: timesBoldFont,
-  });
-  //Vertical Lines
-  page.drawLine({
-    start: { x: 22.68, y: 680 },
-    end: { x: 22.68, y: 43 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 564, y: 680 },
-    end: { x: 564, y: 43 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 416, y: 680 },
-    end: { x: 416, y: 150 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 119, y: 680 },
-    end: { x: 119, y: 150 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 70, y: 635 },
-    end: { x: 65, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 480, y: 635 },
-    end: { x: 480, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 365, y: 635 },
-    end: { x: 365, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 365, y: 102 },
-    end: { x: 365, y: 43 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const pdfBlobUrl = URL.createObjectURL(blob);
-
-  // Set the PDF URL to preview it
-  return pdfBlobUrl;
-};
-
-export const generatePDF = async (
-  items: ItemType[],
-  purchase_request: purchaseRequestType
-) => {
-  console.log(items);
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    console.error("No data available to generate the PDF");
+export const updatePurchaseRequestStatus = async ({
+  pr_no,
+  status,
+}: {
+  pr_no: string;
+  status: PurchaseRequestStatus;
+}) => {
+  try {
+    const response = await api.patch(
+      `api/purchase-request/${pr_no}/update-status/`,
+      { status }
+    );
+    console.log(response);
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error);
+    return handleError(error);
   }
-
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([612, 792]); // 8.5 inches x 11 inches in points
-
-  // Embed the standard Times Roman font
-  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-  const timesRomanItalicFont = await pdfDoc.embedFont(
-    StandardFonts.TimesRomanItalic
-  );
-  const timesBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
-
-  // Add title and other elements to the PDF
-  page.drawText("PURCHASE REQUEST", {
-    x: 201,
-    y: 725,
-    size: 14,
-    font: timesBoldFont,
-  });
-  page.drawText("Appendix 60", {
-    x: 510,
-    y: 760,
-    size: 10,
-    font: timesRomanItalicFont,
-  });
-  page.drawText("Entity Name:", {
-    x: 23,
-    y: 697,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("CTU - ARGAO CAMPUS", {
-    x: 96,
-    y: 697,
-    size: 11,
-    font: timesRomanFont,
-  });
-
-  // Horizontal and vertical lines are drawn here...
-  //Horizontal Line
-
-  page.drawLine({
-    start: { x: 22, y: 680 },
-    end: { x: 564, y: 680 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 635 },
-    end: { x: 564, y: 635 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 590 },
-    end: { x: 564, y: 590 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 43 },
-    end: { x: 564, y: 43 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 102 },
-    end: { x: 564, y: 102 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 22.68, y: 150 },
-    end: { x: 564, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-
-  // Add Fund Cluster label and editable field
-  page.drawText("Fund Cluster:", {
-    x: 369,
-    y: 697,
-    size: 11,
-    font: timesBoldFont,
-  });
-
-  page.drawText("", { x: 130, y: 669, size: 11, font: timesRomanFont });
-  page.drawLine({
-    start: { x: 445, y: 695 }, // Starting point of the line
-    end: { x: 520, y: 695 }, // Ending point of the line (same y value)
-    thickness: 1, // Line thickness
-    color: rgb(0, 0, 0), // Black color
-  });
-  page.drawText("Office/Section:", {
-    x: 30,
-    y: 663,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("PR No.:", { x: 125, y: 663, size: 11, font: timesBoldFont });
-  page.drawText("Responsibility Center Code :", {
-    x: 125,
-    y: 645,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Date :", { x: 418, y: 663, size: 11, font: timesBoldFont });
-  page.drawText("Stock/", { x: 30, y: 620, size: 11, font: timesBoldFont });
-  page.drawText("Property", { x: 25, y: 609, size: 11, font: timesBoldFont });
-  page.drawText("No.", { x: 35, y: 595, size: 11, font: timesBoldFont });
-  page.drawText("Unit", { x: 80, y: 610, size: 11, font: timesBoldFont });
-  page.drawText("Item Description", {
-    x: 206,
-    y: 610,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Quantity", { x: 370, y: 610, size: 11, font: timesBoldFont });
-  page.drawText("Unit Cost", { x: 425, y: 610, size: 11, font: timesBoldFont });
-  page.drawText("Total Cost", {
-    x: 495,
-    y: 610,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("Purpose:", { x: 53, y: 138, size: 12, font: timesBoldFont });
-  page.drawText("Requested by:", {
-    x: 125,
-    y: 92,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Signature:", { x: 26, y: 80, size: 12, font: timesBoldFont });
-  page.drawText("Printed Name:", {
-    x: 26,
-    y: 65,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Designation:", {
-    x: 26,
-    y: 50,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText("Approved by:", {
-    x: 367,
-    y: 92,
-    size: 12,
-    font: timesBoldFont,
-  });
-  //Vertical Lines
-  page.drawLine({
-    start: { x: 22.68, y: 680 },
-    end: { x: 22.68, y: 43 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 564, y: 680 },
-    end: { x: 564, y: 43 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 416, y: 680 },
-    end: { x: 416, y: 150 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 119, y: 680 },
-    end: { x: 119, y: 150 },
-    thickness: 2,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 70, y: 635 },
-    end: { x: 65, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 480, y: 635 },
-    end: { x: 480, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 365, y: 635 },
-    end: { x: 365, y: 150 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawLine({
-    start: { x: 365, y: 102 },
-    end: { x: 365, y: 43 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  // Add all the items from purchase request
-  items.forEach((entry, index) => {
-    const {
-      stock_property_no,
-      unit,
-      item_description,
-      quantity,
-      unit_cost,
-      total_cost,
-    } = entry;
-
-    const yPosition = 570 - index * 20; // Adjust y-coordinate for each entry
-
-    page.drawText(stock_property_no, {
-      x: 35,
-      y: yPosition,
-      size: 11,
-      font: timesRomanFont,
-    });
-    page.drawText(unit, {
-      x: 80,
-      y: yPosition,
-      size: 11,
-      font: timesRomanFont,
-    });
-    page.drawText(item_description, {
-      x: 130,
-      y: yPosition,
-      size: 11,
-      font: timesRomanFont,
-    });
-    page.drawText(quantity.toString(), {
-      x: 385,
-      y: yPosition,
-      size: 11,
-      font: timesRomanFont,
-    });
-    page.drawText(unit_cost.toString(), {
-      x: 438,
-      y: yPosition,
-      size: 11,
-      font: timesRomanFont,
-    });
-    page.drawText(total_cost.toString(), {
-      x: 495,
-      y: yPosition,
-      size: 11,
-      font: timesRomanFont,
-    });
-  });
-
-  //Add the Purchase Request Information
-  const formattedDate = new Date(
-    purchase_request.created_at
-  ).toLocaleDateString("en-US", {
-    year: "2-digit",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  page.drawText(purchase_request.pr_no, {
-    x: 170,
-    y: 663,
-    size: 11,
-    font: timesBoldFont,
-    color: rgb(0, 0.8, 0),
-  });
-  page.drawText("_______________________", {
-    x: 170,
-    y: 663,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText(purchase_request.res_center_code, {
-    x: 265,
-    y: 645,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText("_________________", {
-    x: 265,
-    y: 645,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText(formattedDate, {
-    x: 450,
-    y: 663,
-    size: 11,
-    font: timesBoldFont,
-    color: rgb(0.8, 0, 0),
-  });
-  page.drawText("___________________", {
-    x: 450,
-    y: 663,
-    size: 11,
-    font: timesBoldFont,
-  });
-  page.drawText(purchase_request.purpose, {
-    x: 100,
-    y: 125,
-    size: 10,
-    font: timesBoldFont,
-  });
-  page.drawText(purchase_request.requested_by!, {
-    x: 200,
-    y: 70,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText(purchase_request.approved_by!, {
-    x: 443,
-    y: 70,
-    size: 12,
-    font: timesBoldFont,
-  });
-
-  // Serialize the PDF to bytes
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-
-  return url; // Return the URL for preview/download
 };
+
+export const useUpdatePurchaseRequestStatus = () => {
+  const queryClient = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
+
+  const mutation = useMutation<
+    ApiResponse<unknown>,
+    Error,
+    { pr_no: string; status: PurchaseRequestStatus }
+  >({
+    mutationFn: ({ pr_no, status }) =>
+      updatePurchaseRequestStatus({ pr_no, status }),
+    onMutate: () => {
+      setIsPending(true);
+    },
+    onSuccess: (_, variables) => {
+      const { pr_no } = variables;
+
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", pr_no] });
+      queryClient.invalidateQueries({ queryKey: ["purchase-requests"] });
+    },
+    onError: () => {
+      setIsPending(false);
+    },
+    onSettled: () => {
+      setIsPending(false);
+    },
+  });
+
+  return {
+    ...mutation,
+    isPending,
+  };
+};
+
+type PurchaseRequestStatus = "Approved" | "Rejected" | "Cancelled" | "Forwarded to Procurement" | "Received by the Procurement";
+
+export const usePurchaseRequestActions = () => {
+  const mutation = useUpdatePurchaseRequestStatus();
+  const [isPendingApprove, setIsPendingApprove] = useState(false);
+  const [isPendingReject, setIsPendingReject] = useState(false);
+  const [isPendingCancel, setIsPendingCancel] = useState(false);
+  const [isPendingForward, setIsPendingForward] = useState(false);
+
+  const handleAction = async (status: PurchaseRequestStatus, pr_no: string) => {
+    let setPendingState = (_state: boolean) => {}; // Default no-op function
+
+    switch (status) {
+      case "Approved":
+        setPendingState = setIsPendingApprove;
+        break;
+      case "Rejected":
+        setPendingState = setIsPendingReject;
+        break;
+      case "Cancelled":
+        setPendingState = setIsPendingCancel;
+        break;
+      case "Forwarded to Procurement":
+        setPendingState = setIsPendingForward;
+        break;
+    }
+
+    setPendingState(true);
+
+    try {
+      await mutation.mutateAsync({ pr_no, status });
+    } finally {
+      setPendingState(false);
+    }
+  };
+
+  return {
+    handleApprove: (pr_no: string) => handleAction("Approved", pr_no),
+    handleReject: (pr_no: string) => handleAction("Rejected", pr_no),
+    handleCancel: (pr_no: string) => handleAction("Cancelled", pr_no),
+    handleForward: (pr_no: string) => handleAction("Forwarded to Procurement", pr_no),
+    isPendingApprove,
+    isPendingReject,
+    isPendingCancel,
+    isPendingForward
+  };
+};
+
+type MOPStatus = "Direct Contracting" | "Small Value Procurement" | "Shopping" | "Public Bidding"
+
+export const updatePurchaseRequestMOP = async ({
+  pr_no,
+  status,
+}: {
+  pr_no: string;
+  status: MOPStatus;
+}) => {
+  try {
+    const response = await api.patch(
+      `api/purchase-request/${pr_no}/mop-update/`,
+      { status }
+    );
+    console.log(response);
+    return handleSucess(response);
+  } catch (error) {
+    console.log(error);
+    return handleError(error);
+  }
+};
+
+export const useUpdatePurchaseRequestMOP = () => {
+  const queryClient = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
+
+  const mutation = useMutation<
+    ApiResponse<unknown>,
+    Error,
+    { pr_no: string; status: MOPStatus }
+  >({
+    mutationFn: ({ pr_no, status }) =>
+      updatePurchaseRequestMOP({ pr_no, status }),
+    onMutate: () => {
+      setIsPending(true);
+    },
+    onSuccess: (_, variables) => {
+      const { pr_no } = variables;
+
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", pr_no] });
+      queryClient.invalidateQueries({ queryKey: ["purchase-requests"] });
+    },
+    onError: () => {
+      setIsPending(false);
+    },
+    onSettled: () => {
+      setIsPending(false);
+    },
+  });
+
+  return {
+    ...mutation,
+    isPending,
+  };
+};
+
