@@ -186,10 +186,6 @@ export const generatePRPDF = async (
       yPosition -= lineHeight;
     }
     const totalamount = quantity * unit_cost;
-    const formattedTotal = new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(totalamount || 0);
     runningTotal += totalamount || 0;
     const stockPropertytext = stock_property_no.toString() || "";
     const stockPropertywidth = timesRomanFont.widthOfTextAtSize(
@@ -303,7 +299,6 @@ export const generatePRPDF = async (
       timesRomanFont,
       timesRomanItalicFont,
       Helveticafont,
-      Helveticabold,
       data
     );
   }
@@ -320,7 +315,6 @@ const textandlines = async (
   timesRomanFont: PDFFont,
   timesRomanItalicFont: PDFFont,
   Helveticafont: PDFFont,
-  Helveticabold: PDFFont,
   data: purchaseRequestType
 ) => {
   page.drawText("PURCHASE REQUEST", {

@@ -43,7 +43,7 @@ export const abstract_columns: ColumnDef<abstractType_>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium hover:underline">
-            {/* {row.getValue("afq_no")} */}4 Items
+            {row.getValue("afq_no")}
           </span>
         </div>
       );
@@ -80,7 +80,6 @@ export const abstract_columns: ColumnDef<abstractType_>[] = [
     ),
     cell: ({ row }) => (
       <DataTableRowActions
-        aoq_no={row.original.aoq_no}
         pr_no={row.original.pr_details.pr_no}
         _data={row.original}
       />

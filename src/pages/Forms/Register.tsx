@@ -17,9 +17,10 @@ import {
   type RegisterInputData,
 } from "@/types/request/input";
 import { useRegisterUser } from "@/services/registerUserServices";
-import { ApiResponse } from "@/types/response/api-response";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
+import { ApiResponse } from "@/types/response/api-response";
+import { UserResponse } from "@/types/request/user";
 
 const Register = () => {
   const [isloading, setIsloading] = useState<boolean>(false);
@@ -66,20 +67,22 @@ const Register = () => {
     // }
     if (result.success) {
       mutate(data, {
-        onSuccess: (response ) => {
+        onSuccess: (response: ApiResponse<UserResponse>) => {
           setIsloading(false);
           console.log(response);
-          if (response.statusCode === 200) {
+          if (response.status === "success") {
             navigate("/");
             toast({
               title: "Success",
               description:
                 "Your account is pending activation by an administrator. You'll be notified once it's activated.",
             });
+          } else if (response.status === "error") {
+            setErrorMessage(
+              response.error?.message || "An unexpected error occurred"
+            );
           } else {
-            if (response instanceof AxiosError) {
-              setErrorMessage(response.data || "An unexpected error occurred 1");
-            }
+            setErrorMessage("An unexpected error occurred");
           }
         },
         onError: (error) => {

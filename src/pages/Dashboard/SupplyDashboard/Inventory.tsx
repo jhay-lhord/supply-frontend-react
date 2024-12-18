@@ -1,11 +1,6 @@
 import {
   Package,
-  ShoppingCart,
-  DollarSign,
-  Truck,
-  BarChart2,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Layout from "./components/Layout/SupplyDashboardLayout";
 import { useGetAllPurchaseOrder, useGetItemsDelivered } from "@/services/puchaseOrderServices";
 import { DataTable } from "./components/data-table";

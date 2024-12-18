@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { purchaseRequestType } from "@/types/response/puchase-request";
-import { DataTableColumnHeader } from "../components/data-table-column-header";
-import { DataTableRowActions } from "../components/data-table-row-actions";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 
@@ -45,8 +45,8 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
             className={`${
               status === "Approved"
                 ? "bg-green-200 hover:bg-green-300 text-green-500"
-                : status === "Cancelled" ?
-                  "bg-red-100 hover:bg-red-200 text-red-400"
+                : status === "Cancelled"
+                ? "bg-red-100 hover:bg-red-200 text-red-400"
                 : "bg-orange-100 text-orange-400"
             }`}
           >

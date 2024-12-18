@@ -1,8 +1,6 @@
 import {
   ShoppingCart,
-  Layers,
   Clipboard,
-  ClipboardList,
   ClipboardPenLine,
   LayoutGrid,
 } from "lucide-react";

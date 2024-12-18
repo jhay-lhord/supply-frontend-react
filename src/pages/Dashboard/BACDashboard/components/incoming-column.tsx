@@ -1,12 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { ColumnDef } from "@tanstack/react-table";
 import { purchaseRequestType } from "@/types/response/puchase-request";
-import { DataTableColumnHeader } from "../components/data-table-column-header";
+import { DataTableColumnHeader } from "./data-table-column-header";
 import { useNavigate } from "react-router-dom";
 import { IncomingDataTableRowActions } from "./incoming-row-actions";
 import { formatDate } from "@/services/formatDate";
-
-
 
 export const incoming_columns: ColumnDef<purchaseRequestType>[] = [
   {
@@ -15,11 +13,14 @@ export const incoming_columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="PO No." />
     ),
     cell: ({ row }) => {
-      const navigate = useNavigate()
-      const pr_no = row.getValue("pr_no")
+      const navigate = useNavigate();
+      const pr_no = row.getValue("pr_no");
       return (
         <div className="flex space-x-2 items-center">
-          <span className="max-w-[500px] truncate font-medium hover:underline" onClick={()=> navigate(`/bac/purchase-request/${pr_no}`)}>
+          <span
+            className="max-w-[500px] truncate font-medium hover:underline"
+            onClick={() => navigate(`/bac/purchase-request/${pr_no}`)}
+          >
             {row.getValue("pr_no")}
           </span>
         </div>
@@ -62,7 +63,6 @@ export const incoming_columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="Date Forwarded" />
     ),
     cell: ({ row }) => {
-  
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
@@ -77,9 +77,8 @@ export const incoming_columns: ColumnDef<purchaseRequestType>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Actions" />
     ),
-    cell: ({row}) => (
+    cell: ({ row }) => (
       <IncomingDataTableRowActions pr_no={row.getValue("pr_no")} />
     ),
   },
 ];
-

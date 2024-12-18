@@ -37,13 +37,17 @@ const Login = () => {
 
   const onSubmit = async (data: userLoginType) => {
     setIsLoading(true);
-    setError(null)
+    setError(null);
 
     const { status, isOTPSent, errorMessage } = await loginUser(data);
 
     setIsOTPSent(isOTPSent);
 
-    if(isOTPSent) return toast({title: "Success", description: "OTP sent to your email, please verify"})
+    if (isOTPSent)
+      return toast({
+        title: "Success",
+        description: "OTP sent to your email, please verify",
+      });
 
     if (status === 200 && !isOTPSent) {
       navigate("/");
@@ -51,7 +55,7 @@ const Login = () => {
       setError(errorMessage);
     }
     setError(errorMessage);
-    setIsLoading(false)
+    setIsLoading(false);
   };
 
   interface RenderFieldProps {
@@ -69,7 +73,7 @@ const Login = () => {
             field_name === "password" && !showPassword ? "password" : "text"
           }
           {...register(field_name)}
-          className="w-full pr-10" 
+          className="w-full pr-10"
         />
         {field_name === "password" && (
           <button
@@ -135,11 +139,14 @@ const Login = () => {
                     field_name: "password",
                     errors,
                   })}
-                  <Button type="submit" className="w-full mt-4" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full mt-4"
+                    disabled={isLoading}
+                  >
                     {isLoading ? <Loader2 className="animate-spin" /> : "Login"}
                   </Button>
                 </form>
-
               </div>
 
               <p className="mt-4 text-center">

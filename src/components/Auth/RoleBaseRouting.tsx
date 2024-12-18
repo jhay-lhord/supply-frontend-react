@@ -5,8 +5,8 @@ import { getRoleFromToken } from "@/utils/jwtHelper";
 import { ACCESS_TOKEN } from "@/constants";
 
 const RoleBaseRouting = () => {
-  const access_token = localStorage.getItem(ACCESS_TOKEN)
-  const role = getRoleFromToken(access_token!)
+  const access_token = localStorage.getItem(ACCESS_TOKEN);
+  const role = getRoleFromToken(access_token!);
 
   switch (role) {
     case "Supply Officer":
@@ -16,7 +16,7 @@ const RoleBaseRouting = () => {
     case "BAC Officer":
       return <BACDashboard />;
     default:
-      return <div>Access Denied</div>
+      return <div>Access Denied</div>;
   }
 };
 

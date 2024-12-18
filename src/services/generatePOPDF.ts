@@ -29,7 +29,7 @@ export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, items
   let yPosition = 632;
 
   let runningTotal = 0;
-  const wrapText = (text: string, maxWidth: number, font: PDFFont, fontSize: number) => {
+  const wrapText = (text: string, maxWidth: number, fontSize: number) => {
     const words = text.split(" ");
     const lines = [];
     let currentLine = "";
@@ -63,7 +63,6 @@ export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, items
     const wrappedDescription = wrapText(
       item_description,
       maxWidth,
-      timesRomanFont,
       9
     );
     const descriptionHeight = wrappedDescription.length * lineHeight;
@@ -106,10 +105,6 @@ export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, items
 
     // Draw content
     const totalamount = Number(unit_price) * Number(quantity);
-    const formattedTotal = new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(totalamount || 0);
     runningTotal += totalamount || 0;
 
     // Stock/Property No.

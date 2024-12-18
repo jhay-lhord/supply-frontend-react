@@ -1,8 +1,8 @@
-import { AxiosError } from "axios";
+  import { AxiosError } from "axios";
 
-export interface ApiResponse<T>{
-  status: 'success' | 'error';
-  data?: T;
-  error?: AxiosError;
-  statusCode?: number;
-}
+  export interface ApiResponse<T>{
+    status: 'success' | 'error';
+    data?: T;
+    error?: AxiosError;
+    statusCode?: number;
+  }

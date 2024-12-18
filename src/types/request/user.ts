@@ -6,3 +6,13 @@ export const userLoginSchema = z.object({
 })
 
 export type userLoginType = z.infer<typeof userLoginSchema>
+
+export interface UserResponse {
+  employee_id: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  email: string;
+  password: string;
+  password2: string;
+}

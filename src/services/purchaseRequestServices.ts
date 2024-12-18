@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import api from "@/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "@/types/response/api-response";
@@ -235,7 +236,7 @@ export const usePurchaseRequestActions = () => {
   const [isPendingForward, setIsPendingForward] = useState(false);
 
   const handleAction = async (status: PurchaseRequestStatus, pr_no: string) => {
-    let setPendingState = (state: boolean) => {}; // Default no-op function
+    let setPendingState = (_state: boolean) => {}; // Default no-op function
 
     switch (status) {
       case "Approved":

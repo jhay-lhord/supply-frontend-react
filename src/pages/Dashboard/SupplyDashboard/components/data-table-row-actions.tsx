@@ -15,10 +15,11 @@ import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Loader2, MoveRightIcon } from "lucide-react";
+import { abstractType_ } from "@/types/response/abstract-of-quotation";
 
 interface DataTableRowActionsProps {
   pr_no: string;
-  _data: purchaseRequestType;
+  _data: purchaseRequestType | abstractType_;
 }
 
 export const DataTableRowActions = ({
@@ -26,6 +27,7 @@ export const DataTableRowActions = ({
   pr_no,
 }: DataTableRowActionsProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const purchaseData = _data as purchaseRequestType
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ export const DataTableRowActions = ({
 
 
   const handleDeletePurchaseRequest = async () => {
-    const selectedPrNo = _data.pr_no;
+    const selectedPrNo = purchaseData.pr_no;
     try {
       deletePurchasePurchaseMutation.mutate(selectedPrNo);
     } catch (error) {
@@ -74,7 +76,7 @@ export const DataTableRowActions = ({
             <TooltipContent side="top">Open</TooltipContent>
           </Tooltip>
 
-          {_data.status === "Approved" && (
+          {purchaseData.status === "Approved" && (
             <>
               <Separator className="h-10" orientation="vertical" decorative />
 

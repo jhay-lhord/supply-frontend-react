@@ -1,5 +1,4 @@
 import Loading from "../../shared/components/Loading";
-import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { usePurchaseRequestIncoming } from "@/services/purchaseRequestServices";
 import { incoming_columns } from "./incoming-column";

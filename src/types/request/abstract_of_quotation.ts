@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const abstractSchema = z.object({
   aoq_no: z.string(),
-  purchase_request: z.string(),
+  purchase_request: z.string().optional(),
 });
 
 export type supplierType = {

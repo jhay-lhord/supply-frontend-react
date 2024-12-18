@@ -5,9 +5,7 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import api from "../../api";
-import { ACCESS_TOKEN, REFRESH_TOKEN, ROLE } from "@/constants";
 import { toast } from "sonner";
-import { getRoleFromToken } from "@/utils/jwtHelper";
 
 import {
   Form,
@@ -52,13 +50,13 @@ export function InputOTPForm() {
     api
       .post("/api/user/login_verify_otp/", { email, otp_code })
       .then((response) => {
-        console.log(response)
-         if (response.status === 200) {
-          saveTokenToLocalStorage(response, email!)
+        console.log(response);
+        if (response.status === 200) {
+          saveTokenToLocalStorage(response, email!);
           navigate("/");
-          toast("Login successful!",{
-            description: " Welcome back, CTU AC Supply Management System"
-          })
+          toast("Login successful!", {
+            description: " Welcome back, CTU AC Supply Management System",
+          });
         } else {
           navigate("/login");
         }

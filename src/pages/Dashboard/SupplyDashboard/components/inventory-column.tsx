@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "../components/data-table-column-header";
+import { DataTableColumnHeader } from "./data-table-column-header";
 import { _itemsDeliveredType } from "@/types/request/purchase-order";
 
 export const inventoryColumns: ColumnDef<_itemsDeliveredType>[] = [
@@ -13,9 +13,7 @@ export const inventoryColumns: ColumnDef<_itemsDeliveredType>[] = [
         <div className="flex space-x-2">
           <span className="max-w-[300px] truncate font-medium">
             <div className="flex items-center">
-              <p className="font-thin text-sm">
-                {row.getValue("po_no")}
-              </p>
+              <p className="font-thin text-sm">{row.getValue("po_no")}</p>
             </div>
           </span>
         </div>
@@ -29,11 +27,7 @@ export const inventoryColumns: ColumnDef<_itemsDeliveredType>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="w-[200px]">
-          {
-            row.getValue("item_description")
-          }
-        </div>
+        <div className="w-[200px]">{row.getValue("item_description")}</div>
       );
     },
     enableSorting: false,
@@ -48,11 +42,7 @@ export const inventoryColumns: ColumnDef<_itemsDeliveredType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] font-medium">
-            <p className="font-thin text-sm">
-              {
-                row.getValue("unit")
-              }
-            </p>
+            <p className="font-thin text-sm">{row.getValue("unit")}</p>
           </span>
         </div>
       );
@@ -67,11 +57,7 @@ export const inventoryColumns: ColumnDef<_itemsDeliveredType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            <p className="font-thin text-sm">
-              {
-                row.getValue("quantity")
-              }
-            </p>
+            <p className="font-thin text-sm">{row.getValue("quantity")}</p>
           </span>
         </div>
       );

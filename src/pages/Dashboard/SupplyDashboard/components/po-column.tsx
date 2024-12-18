@@ -44,7 +44,7 @@ export const po_columns: ColumnDef<purchaseOrdertype_>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium hover:underline">
-            {/* {row.getValue("afq_no")} */}4 Items
+            {row.getValue("afq_no")}
           </span>
         </div>
       );
