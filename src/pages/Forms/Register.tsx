@@ -17,16 +17,21 @@ import {
   type RegisterInputData,
 } from "@/types/request/input";
 import { useRegisterUser } from "@/services/registerUserServices";
+import { ApiResponse } from "@/types/response/api-response";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
 
 const Register = () => {
   const [isloading, setIsloading] = useState<boolean>(false);
-  const [emailError, setEmailError] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false); // State for password visibility
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false); // State for confirm password visibility
 
   const navigate = useNavigate();
-  const { mutate } = useRegisterUser();
+  const { toast } = useToast();
+  const { mutate, isError } = useRegisterUser();
+  console.log(isError);
 
   const {
     register,
@@ -39,15 +44,58 @@ const Register = () => {
 
   const onSubmit = async (data: RegisterInputData) => {
     setIsloading(true);
-    setEmailError("");
 
     const result = registerFormSchema.safeParse(data);
 
+    // if (result.success) {
+    //   mutate(data, {
+    //     onSuccess: (response as AxiosResponse) => {
+    //       console.log(response);
+    //       if (response.statusCode === 200) {
+    //         setIsloading(false);
+    //         navigate("/");
+    //       }
+    //       else {
+    //         setErrorMessage(response.data.)
+    //       }
+    //     },
+    //     onError: (error) => {
+    //       setErrorMessage(error.message);
+    //     },
+    //   });
+    // }
     if (result.success) {
       mutate(data, {
-        onSuccess: () => {
+        onSuccess: (response ) => {
           setIsloading(false);
-          navigate("/");
+          console.log(response);
+          if (response.statusCode === 200) {
+            navigate("/");
+            toast({
+              title: "Success",
+              description:
+                "Your account is pending activation by an administrator. You'll be notified once it's activated.",
+            });
+          } else {
+            if (response instanceof AxiosError) {
+              setErrorMessage(response.data || "An unexpected error occurred 1");
+            }
+          }
+        },
+        onError: (error) => {
+          setIsloading(false);
+          console.log(error);
+          if (error instanceof AxiosError) {
+            setErrorMessage(
+              error.response?.data?.email ||
+                error.response?.data?.message ||
+                error.message
+            );
+          } else if (error instanceof Error) {
+            setErrorMessage(error.message);
+          } else {
+            setErrorMessage("An unexpected error occurred 2");
+          }
         },
       });
     }
@@ -89,7 +137,7 @@ const Register = () => {
             className="w-full flex flex-col justify-between space-y-4"
             onSubmit={handleSubmit(onSubmit)}
           >
-            {emailError && <p className="text-red-500">{emailError}</p>}
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
             <p className="font-normal text-3xl mt-0 mb-6 text-gray-900 text-center">
               Create an Account
@@ -98,7 +146,9 @@ const Register = () => {
             <div>
               <Input placeholder="Employee ID" {...register("employee_id")} />
               {errors.employee_id && (
-                <p className="text-red-500">{errors.employee_id.message}</p>
+                <p className="text-red-500 text-xs">
+                  {errors.employee_id.message}
+                </p>
               )}
             </div>
 
@@ -106,13 +156,17 @@ const Register = () => {
               <div className="w-full">
                 <Input placeholder="First Name" {...register("first_name")} />
                 {errors.first_name && (
-                  <p className="text-red-500">{errors.first_name.message}</p>
+                  <p className="text-red-500 text-xs">
+                    {errors.first_name.message}
+                  </p>
                 )}
               </div>
               <div className="w-full">
                 <Input placeholder="Last Name" {...register("last_name")} />
                 {errors.last_name && (
-                  <p className="text-red-500">{errors.last_name.message}</p>
+                  <p className="text-red-500 text-xs">
+                    {errors.last_name.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -121,7 +175,7 @@ const Register = () => {
               <div className="w-full">
                 <Input placeholder="email@gmail.com" {...register("email")} />
                 {errors.email && (
-                  <p className="text-red-500">{errors.email.message}</p>
+                  <p className="text-red-500 text-xs">{errors.email.message}</p>
                 )}
               </div>
 
@@ -138,7 +192,7 @@ const Register = () => {
                   </SelectContent>
                 </Select>
                 {errors.role && (
-                  <p className="text-red-500">{errors.role.message}</p>
+                  <p className="text-red-500 text-xs">{errors.role.message}</p>
                 )}
               </div>
             </div>
@@ -151,7 +205,9 @@ const Register = () => {
                   {...register("password")}
                 />
                 {errors.password && (
-                  <p className="text-red-500">{errors.password.message}</p>
+                  <p className="text-red-500 text-xs">
+                    {errors.password.message}
+                  </p>
                 )}
                 <button
                   type="button"
@@ -173,7 +229,9 @@ const Register = () => {
                   {...register("password2")}
                 />
                 {errors.password2 && (
-                  <p className="text-red-500">{errors.password2.message}</p>
+                  <p className="text-red-500 text-xs">
+                    {errors.password2.message}
+                  </p>
                 )}
                 <button
                   type="button"

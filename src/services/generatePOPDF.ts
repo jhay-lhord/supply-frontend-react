@@ -4,6 +4,8 @@ import { purchaseOrdertype_ } from "@/types/response/purchase-order";
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "pdf-lib";
 import { formatPrDate } from "./formatDate";
+
+
 export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, itemsDelivered: _itemsDeliveredType[]) => {
 
   const pdfDoc = await PDFDocument.create();
@@ -51,11 +53,11 @@ export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, items
   pages.push(page);
   itemsDelivered.forEach((item, index) => {
     // const { no, unit, description, quantity, unitcost } = entry;
-    const item_description = item.item_details.item_qoutation_details.item_details.item_description
-    const unit_price = item.item_details.item_qoutation_details.unit_price
-    const quantity = item.item_details.item_qoutation_details.item_details.quantity
-    const unit = item.item_details.item_qoutation_details.item_details.unit 
-    const unit_cost = item.item_details.item_qoutation_details.item_details.unit_cost
+    const item_description = item.item_details.item_quotation_details.item_details.item_description
+    const unit_price = item.item_details.item_quotation_details.unit_price
+    const quantity = item.item_details.item_quotation_details.item_details.quantity
+    const unit = item.item_details.item_quotation_details.item_details.unit 
+    const unit_cost = item.item_details.item_quotation_details.item_details.unit_cost
 
     // Calculate height needed for wrapped description
     const wrappedDescription = wrapText(

@@ -8,7 +8,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  Package,
   XCircle,
 } from "lucide-react";
 import {
@@ -21,7 +20,6 @@ import {
 import PurchaseOrderCompleted from "./components/PurchaseOrderCompleted";
 import PurchaseOrderCancelled from "./components/PurchaseOrderCancelled";
 import { useMemo } from "react";
-import PurchaseOrderLacked from "./components/PurchaseOrderLacked";
 import { Badge } from "@/components/ui/badge";
 
 const PurchaseOrder: React.FC = () => {
@@ -42,8 +40,8 @@ const PurchaseOrder: React.FC = () => {
           case "Completed":
             acc.completed += 1;
             break;
-          case "Canceled":
-            acc.canceled += 1;
+          case "Cancelled":
+            acc.cancelled += 1;
             break;
           case "Lacking":
             acc.lackingItems += 1;
@@ -55,7 +53,7 @@ const PurchaseOrder: React.FC = () => {
         toOrder: 0,
         toReceive: 0,
         completed: 0,
-        canceled: 0,
+        cancelled: 0,
         lackingItems: 0,
       }
     );
@@ -63,7 +61,7 @@ const PurchaseOrder: React.FC = () => {
 
   return (
     <Layout>
-      <Card className="w-full">
+      <Card className="w-full m-6">
         <CardHeader>
           <CardTitle>Purchase Orders</CardTitle>
           <CardDescription>
@@ -72,7 +70,7 @@ const PurchaseOrder: React.FC = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="to-order" className="w-full rounded-full">
-            <TabsList className="grid grid-cols-5 rounded-md w-full p-2 ">
+            <TabsList className="grid grid-cols-4 rounded-md w-full p-2 ">
               {[
                 {
                   label: "To Order",
@@ -90,15 +88,15 @@ const PurchaseOrder: React.FC = () => {
                   count: counts?.completed,
                 },
                 {
-                  label: "Canceled",
-                  value: "canceled",
-                  count: counts?.canceled,
+                  label: "Cancelled",
+                  value: "cancelled",
+                  count: counts?.cancelled,
                 },
-                {
-                  label: "Lacking Items",
-                  value: "lacking-items",
-                  count: counts?.lackingItems,
-                },
+                // {
+                //   label: "Lacking Items",
+                //   value: "lacking-items",
+                //   count: counts?.lackingItems,
+                // },
               ].map((tab) => (
                 <TabsTrigger
                   key={tab.value}
@@ -144,7 +142,7 @@ const PurchaseOrder: React.FC = () => {
               </Alert>
               <PurchaseOrderCompleted />
             </TabsContent>
-            <TabsContent value="canceled">
+            <TabsContent value="cancelled">
               <Alert variant="destructive" className="my-5">
                 <XCircle className="h-4 w-4" />
                 <AlertTitle>Cancelled</AlertTitle>
@@ -154,7 +152,7 @@ const PurchaseOrder: React.FC = () => {
               </Alert>
               <PurchaseOrderCancelled />
             </TabsContent>
-            <TabsContent value="lacking-items">
+            {/* <TabsContent value="lacking-items">
               <Alert className="my-5 border-purple-500 text-purple-500">
                 <Package className="h-4 w-4" />
                 <AlertTitle className="text-purple-600">
@@ -166,7 +164,7 @@ const PurchaseOrder: React.FC = () => {
                 </AlertDescription>
               </Alert>
               <PurchaseOrderLacked />
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </CardContent>
       </Card>

@@ -63,7 +63,9 @@ export default function PurchaseRequestItemList() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
 
   const { pr_no } = useParams();
-  const { setStatus } = useStatusStore();
+  const { setStatus, status } = useStatusStore();
+
+
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const {
     isLoading,
@@ -100,7 +102,10 @@ export default function PurchaseRequestItemList() {
       setValue("purpose", purchaseData?.purpose || "");
       setValue("office", purchaseData?.office || "");
       setValue("requisitioner", purchaseData?.requisitioner_details.name || "");
-      setValue("campus_director", purchaseData?.campus_director_details.name || "");
+      setValue(
+        "campus_director",
+        purchaseData?.campus_director_details.name || ""
+      );
       setValue("status", purchaseData?.status);
     }
   }, [purchaseData, setValue]);
@@ -112,6 +117,12 @@ export default function PurchaseRequestItemList() {
       setStatus("idle");
     };
   }, [setStatus, purchaseData]);
+
+  const actionDisabled =
+  status === "Rejected" ||
+  status === "Cancelled" ||
+  status === "Forwarded to Procurement" ||
+  status === "Received by the Procurement";
 
   let sortedItems;
   if (!isLoading) {
@@ -139,11 +150,12 @@ export default function PurchaseRequestItemList() {
         <CardHeader className="flex flex-col">
           <CardTitle className="">
             <div>
-              <div className="flex items-center justify-between"> 
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <p className="font-thin">{purchaseData?.pr_no}</p>
                   <Button
                     type="button"
+                    disabled={actionDisabled}
                     className=" bg-orange-200 hover:bg-orange-300 text-slate-950"
                     onClick={handleOpenEditForm}
                   >
@@ -163,7 +175,7 @@ export default function PurchaseRequestItemList() {
                   {purchaseData?.status}
                 </Badge>
               </div>
-              <Separator className="mt-3"/>
+              <Separator className="mt-3" />
               <div className="flex items-center gap-4 mt-2">
                 <div className="flex items-center">
                   <UserIcon className="w-4 h-4 mr-1" />
@@ -171,7 +183,7 @@ export default function PurchaseRequestItemList() {
                     {purchaseData?.requisitioner_details.name}
                   </p>
                 </div>
-                <Separator orientation="vertical" className="h-6"/>
+                <Separator orientation="vertical" className="h-6" />
                 <div className="flex items-center">
                   <CalendarIcon className="w-4 h-4 mr-1" />
                   <p className="text-lg font-thin">
@@ -209,7 +221,8 @@ export default function PurchaseRequestItemList() {
             <div className="flex gap-1">
               <>
                 {purchaseData?.status !== "Cancelled" &&
-                  purchaseData?.status !== "Forwarded to Procurement" && (
+                  purchaseData?.status !== "Forwarded to Procurement" &&
+                  purchaseData?.status !== "Received by the Procurement" && (
                     <>
                       {purchaseData?.status !== "Approved" &&
                         purchaseData?.status !== "Rejected" && (
@@ -290,8 +303,10 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedItemNo, setSelectedItemNo] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+
   const { pr_no } = useParams();
   const queryClient = useQueryClient();
+  const { status } = useStatusStore();
 
   const deleteItemMutation = useMutation({
     mutationFn: deleteItem,
@@ -302,6 +317,12 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
       });
     },
   });
+
+  const actionDisabled =
+    status === "Rejected" ||
+    status === "Cancelled" ||
+    status === "Forwarded to Procurement" ||
+    status === "Received by the Procurement";
 
   const handleItemDelete = () => {
     deleteItemMutation.mutate(selectedItemNo!);
@@ -335,38 +356,52 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
               <div className="flex gap-4 ">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        setSelectedItemNo(item.item_no);
-                        setIsEditDialogOpen(true);
-                      }}
-                      variant="ghost"
-                      className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
-                    >
-                      <Pencil1Icon className="h-4 w-4 text-orange-400" />
-                      <span className="sr-only">Edit</span>
-                    </Button>
+                    <div>
+                      <Button
+                        disabled={actionDisabled}
+                        onClick={() => {
+                          setSelectedItemNo(item.item_no);
+                          setIsEditDialogOpen(true);
+                        }}
+                        variant="ghost"
+                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full"
+                      >
+                        <Pencil1Icon className="h-4 w-4 text-orange-400" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                    </div>
                   </TooltipTrigger>
-                  <TooltipContent side="top">Edit</TooltipContent>
+                  <TooltipContent side="top">
+                    {actionDisabled
+                      ? `You cannot edit items because it has already been ${status}`
+                      : "Click to edit Items"}
+                  </TooltipContent>
                 </Tooltip>
 
                 <Separator className="h-8" orientation="vertical" decorative />
 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        setIsDialogOpen(true);
-                        setSelectedItemNo(item.item_no);
-                      }}
-                      variant="ghost"
-                      className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
+                    <div>
+                      <Button
+                        disabled={actionDisabled}
+                        onClick={() => {
+                          setIsDialogOpen(true);
+                          setSelectedItemNo(item.item_no);
+                        }}
+                        variant="ghost"
+                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:rounded-full text-orange-400 hover:bg-red-400 hover:text-gray-100"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
                   </TooltipTrigger>
-                  <TooltipContent side="top">Delete</TooltipContent>
+                  <TooltipContent side="top">
+                    {actionDisabled
+                      ? `You cannot delete items because it has already been ${status}`
+                      : "Click to delete Items"}
+                  </TooltipContent>
                 </Tooltip>
               </div>
             </TooltipProvider>

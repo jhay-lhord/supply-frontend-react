@@ -118,10 +118,26 @@ export const usePurchaseRequestInProgress = () => {
       return data;
     })
     .filter((data) => {
-      return data.status === "Forwarded to Procurement";
+      return data.status === "Received by the Procurement";
     });
 
   return { purchaseRequestInProgress, isLoading };
+};
+
+export const usePurchaseRequestIncoming = () => {
+  const { data, isLoading } = usePurchaseRequest();
+
+  const inComing = Array.isArray(data?.data) ? data.data : [];
+
+  const purchaseRequestIncoming = inComing
+    ?.map((data) => {
+      return data;
+    })
+    .filter((data) => {
+      return data.status === "Forwarded to Procurement";
+    });
+
+  return { purchaseRequestIncoming, isLoading };
 };
 
 export const usePurchaseRequestList = (pr_no: string) => {
@@ -209,7 +225,7 @@ export const useUpdatePurchaseRequestStatus = () => {
   };
 };
 
-type PurchaseRequestStatus = "Approved" | "Rejected" | "Cancelled" | "Forwarded to Procurement";
+type PurchaseRequestStatus = "Approved" | "Rejected" | "Cancelled" | "Forwarded to Procurement" | "Received by the Procurement";
 
 export const usePurchaseRequestActions = () => {
   const mutation = useUpdatePurchaseRequestStatus();

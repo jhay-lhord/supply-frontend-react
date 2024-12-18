@@ -44,6 +44,8 @@ export const supplierSchema = z.object({
 export const supplierItemSchema = z.object({
   supplier_item_no: z.string(),
   total_amount: z.string(),
+  remaining_quantity: z.number(),
+  old_delivered_quantity: z.number().default(0),
   item_quotation_details: z.object({
     item_quotation_no: z.string(),
     brand_model: z.string(),
@@ -91,4 +93,54 @@ export const deliveredFormSchema = z.object({
 });
 
 export type DeliveredFormType = z.infer<typeof deliveredFormSchema>;
+
+export const inspectionSchema = z.object({
+  inspection_no: z.string(),
+  purchase_request: z.string(),
+  purchase_order: z.string()
+})
+
+export type inspectionType = z.infer<typeof inspectionSchema>
+
+export const itemsDeliveredSchema = z.object({
+  inspection: z.string(),
+  supplier_item: z.string(),
+  quantity_delivered: z.number().min(0).optional(),
+  is_complete: z.boolean()
+})
+
+export type itemsDeliveredType = z.infer<typeof itemsDeliveredSchema>
+
+export type _itemsDeliveredType = {
+  id:number
+  inspection_details: {
+    po_details: {
+      po_no: string
+      status: string
+      total_amount: string
+    }
+  }
+  item_details: {
+    item_quotation_details: {
+      item_details: {
+        item_description: string
+        quantity: string
+        unit: string
+        unit_cost:string
+      }
+      unit_price: string
+    }
+    supplier_item_no:string
+  }
+  quantity_delivered: number
+  supplier_item: string
+  created_at: Date
+  date_received: Date
+  is_complete: boolean
+  is_partial: boolean
+}
+
+export type StockItemType = Omit<itemsDeliveredType, 'id'>;
+
+
 

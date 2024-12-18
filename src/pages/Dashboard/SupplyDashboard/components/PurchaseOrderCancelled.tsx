@@ -11,15 +11,26 @@ import {
 import { formatDate } from "@/utils/formateDate";
 import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
+import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
 
 export default function PurchaseOrderCancelled() {
 
   const { data, isLoading } = useGetAllPurchaseOrder();
+  const { data: supplier_item} = useGetAllSupplierItem()
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
   const canceledOrders = purchaseOrderData.filter(
     (order) => order.status === "Cancelled"
   );
+
+  const supplierItemData = Array.isArray(supplier_item?.data)
+  ? supplier_item.data
+  : [];
+
+  const itemsInSupplierCount = (supplier_no: string) =>
+    supplierItemData.filter(
+      (data) => data.supplier_details.supplier_no === supplier_no
+    ).length;
 
   if (isLoading) return <Loading />;
 
@@ -43,7 +54,7 @@ export default function PurchaseOrderCancelled() {
                 <TableRow key={order.po_no}>
                   <TableCell className="font-medium">{order.po_no}</TableCell>
                   <TableCell>{order.aoq_details.aoq_no}</TableCell>
-                  <TableCell>{4}</TableCell>
+                  <TableCell>{itemsInSupplierCount(order.supplier_details.supplier_no)}</TableCell>
                   <TableCell>
                     php {Number(order.total_amount).toFixed(2)}
                   </TableCell>

@@ -6,6 +6,7 @@ import { DataTableRowActions } from "../components/data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { useRequestForQoutationCount } from "@/services/requestForQoutationServices";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "@/services/formatDate";
 
 
 
@@ -69,23 +70,16 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
     },
   },
   {
-    accessorKey: "created_at",
+    accessorKey: "updated_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created At" />
+      <DataTableColumnHeader column={column} title="Date Received" />
     ),
     cell: ({ row }) => {
-      const createdAt = row.getValue("created_at") as string | number;
-      const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short", 
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {formattedDate}
+            {formatDate(row.getValue("updated_at"))}
           </span>
         </div>
       );

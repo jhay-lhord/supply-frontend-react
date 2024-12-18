@@ -127,8 +127,10 @@ export const useAddInspectionReport = () => {
 export const addItemsDelivered= async (data: itemsDeliveredType):Promise<ApiResponse<itemsDeliveredType>> => {
   try {
     const response = await api.post<itemsDeliveredType>("api/items-delivered/", data)
+    console.log(response)
     return handleSucess(response)
   } catch (error) {
+    console.log(error)
     return handleError(error)
   }
 }
@@ -136,7 +138,29 @@ export const addItemsDelivered= async (data: itemsDeliveredType):Promise<ApiResp
 export const useAddItemsDelivered = () => {
   return useMutation<ApiResponse<itemsDeliveredType>, Error, itemsDeliveredType>({
     mutationFn: addItemsDelivered,
-    mutationKey: ["inspection-reports"]
+    mutationKey: ["items-delivered"]
+  })
+}
+
+export const updateItemsDelivered= async ({id, data}:{id: number, data: itemsDeliveredType}):Promise<ApiResponse<itemsDeliveredType>> => {
+  try {
+    const response = await api.patch<itemsDeliveredType>(`api/items-delivered/${id}/update`, data)
+    console.log(response)
+    return handleSucess(response)
+  } catch (error) {
+    console.log(error)
+    return handleError(error)
+  }
+}
+
+export const useUpdateItemsDelivered = () => {
+  const queryClient = useQueryClient()
+  return useMutation<ApiResponse<unknown>, Error, {id: number, data: itemsDeliveredType}>({
+    mutationFn: updateItemsDelivered,
+    mutationKey: ["inspection-reports"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey:["items-delivered"]})
+    }
   })
 }
 
@@ -153,5 +177,40 @@ export const useGetItemsDelivered = () => {
   return useQuery<ApiResponse<_itemsDeliveredType[]>, Error>({
     queryFn: getItemsDelivered,
     queryKey: ["items-delivered"]
+  })
+}
+
+export const addStockItems= async (data: itemsDeliveredType):Promise<ApiResponse<itemsDeliveredType>> => {
+  try {
+    const response = await api.post<itemsDeliveredType>("api/stock-items/", data)
+    console.log(response)
+    return handleSucess(response)
+  } catch (error) {
+    console.log(error)
+    return handleError(error)
+  }
+}
+
+export const useAddStockItems = () => {
+  return useMutation<ApiResponse<itemsDeliveredType>, Error, itemsDeliveredType>({
+    mutationFn: addStockItems,
+    mutationKey: ["stock-items"]
+  })
+}
+
+
+export const getStockItems= async ():Promise<ApiResponse<_itemsDeliveredType[]>> => {
+  try {
+    const response = await api.get<_itemsDeliveredType[]>("api/stock-items/")
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useGetStockItems = () => {
+  return useQuery<ApiResponse<_itemsDeliveredType[]>, Error>({
+    queryFn: getStockItems,
+    queryKey: ["stock-items"]
   })
 }

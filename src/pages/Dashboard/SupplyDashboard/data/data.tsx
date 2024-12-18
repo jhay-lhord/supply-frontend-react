@@ -6,13 +6,18 @@ import {CheckCircleIcon, CircleArrowUpIcon, CircleXIcon } from "lucide-react"
 
 export const statuses = [
   {
-    value: "pending",
+    value: "Not Approved",
     label: "Pending",
     icon: QuestionMarkCircledIcon,
   },
   {
     value: "Forwarded to Procurement",
     label: "Forwarded",
+    icon: CircleArrowUpIcon,
+  },
+  {
+    value: "Received by the Procurement",
+    label: "Canvassing",
     icon: CircleArrowUpIcon,
   },
   {

@@ -52,8 +52,9 @@ export function InputOTPForm() {
     api
       .post("/api/user/login_verify_otp/", { email, otp_code })
       .then((response) => {
+        console.log(response)
          if (response.status === 200) {
-          saveTokenToLocalStorage(response.data, email!)
+          saveTokenToLocalStorage(response, email!)
           navigate("/");
           toast("Login successful!",{
             description: " Welcome back, CTU AC Supply Management System"

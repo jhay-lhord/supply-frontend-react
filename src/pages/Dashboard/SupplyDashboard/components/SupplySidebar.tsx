@@ -45,21 +45,21 @@ const procurement = [
 ];
 
 const inventory = [
-  {
-    title: "Stocks",
-    url: "/supply/stocks",
-    icon: Layers,
-  },
+  // {
+  //   title: "Stocks",
+  //   url: "/supply/stocks",
+  //   icon: Layers,
+  // },
   {
     title: "Inventory",
     url: "/supply/inventory",
     icon: Clipboard,
   },
-  {
-    title: "Reports",
-    url: "/supply/reports",
-    icon: ClipboardList,
-  },
+  // {
+  //   title: "Reports",
+  //   url: "/supply/reports",
+  //   icon: ClipboardList,
+  // },
 ];
 
 const SupplySidebar = () => {

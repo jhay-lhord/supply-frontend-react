@@ -35,8 +35,13 @@ const dashboard = [
 
 const purchaseRequest = [
   {
-    title: "Approved PR",
-    url: "/bac/purchase-request",
+    title: "Incoming Purchase Request",
+    url: "/bac/purchase-request/incoming",
+    icon: FileTextIcon,
+  },
+  {
+    title: "Received Purchase Request",
+    url: "/bac/purchase-request/received",
     icon: FileTextIcon,
   },
 ];

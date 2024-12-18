@@ -43,27 +43,25 @@ export const CDDataTableRowActions = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  const [isEditDialogOpen, setIsEditDialogOpen ] =  useState<boolean>(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
   const [cdId, setcdId] = useState<string>("");
   const location = useLocation();
   const usersPath = "/admin/users";
-  const {mutate:cdMutation} = useDeleteCampusDirector()
+  const { mutate: cdMutation } = useDeleteCampusDirector();
 
   const handleOpenDropdown = () => {
     setIsDropdownOpen(true);
   };
   const handleDelete = () => {
-    cdMutation(id!)
+    cdMutation(id!);
   };
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
-   
   };
 
   const handleEditOpenDialog = () => {
     setIsEditDialogOpen(true);
     setcdId(id!);
-   
   };
 
   const buttonLabel = (_data as UsersType).is_active
@@ -131,46 +129,34 @@ export const CDDataTableRowActions = ({
         </TooltipProvider>
       ) : (
         <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-          <div className="flex gap-1 bg-orange-200 rounded p-1 items-center justify-center">
+          <div className="flex gap-1   p-1 items-center justify-center w-full">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  
-                  onClick={handleEditOpenDialog}
-                  className="flex  h-8 w-8 p-0  hover:bg-orange-200 bg-orange-200 "
-                >
-                  <div className ="flex items-center justify-cente gap-5 mr-20">
-                    Edit
-                  <Pencil1Icon className="h-5 w-5" />
-                 
-                  </div>
-                </Button>
+                <div className="flex items-center gap-5">
+                  <Button onClick={handleEditOpenDialog}>
+                    <Pencil1Icon className="h-5 w-5" />
+                    <p className="mx-2">Edit</p>
+                  </Button>
+                </div>
               </TooltipTrigger>
-              
-            </Tooltip>
 
-            <Separator className="h-8" orientation="vertical" decorative />
+              <Separator className="h-8" orientation="vertical" decorative />
 
-            <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  
+                <div
+                  className="flex items-center gap-5"
                   onClick={handleOpenDialog}
-                  className= "flex  h-8 w-8 p-0 hover:bg-orange-200"
                 >
-                  <div className="flex items-center justify-center gap-5 ml-20">
-                  <TrashIcon className="h-5 w-5" />
-                  
-                  Delete
-                  </div>
-                </Button>
+                  <Button variant={"destructive"}>
+                    <TrashIcon className="h-5 w-5" />
+                    <p className="mx-2">Delete</p>
+                  </Button>
+                </div>
               </TooltipTrigger>
-           
             </Tooltip>
           </div>
         </TooltipProvider>
       )}
-
 
       <DeleteDialog
         isDialogOpen={isDialogOpen}
@@ -179,14 +165,11 @@ export const CDDataTableRowActions = ({
         onDeleteClick={handleDelete}
       />
 
-      <EditCDForm 
-       isEditDialogOpen={isEditDialogOpen}
-       setIsEditDialogOpen={setIsEditDialogOpen}
-       cd_id={cdId}
-
+      <EditCDForm
+        isEditDialogOpen={isEditDialogOpen}
+        setIsEditDialogOpen={setIsEditDialogOpen}
+        cd_id={cdId}
       />
-
     </>
-
   );
 };

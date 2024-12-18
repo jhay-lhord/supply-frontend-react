@@ -1,9 +1,10 @@
-import { itemQuotationResponseType } from "@/types/response/request-for-qoutation";
+import { itemQuotationResponseType, quotationResponseType } from "@/types/response/request-for-qoutation";
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "pdf-lib";
 
-export const generateRFQPDF = async (item: itemQuotationResponseType[]) => {
+export const generateRFQPDF = async (item: itemQuotationResponseType[], rfq: quotationResponseType) => {
 
   const pdfDoc = await PDFDocument.create();
+  console.log(rfq)
 
   const timesBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -84,7 +85,8 @@ export const generateRFQPDF = async (item: itemQuotationResponseType[]) => {
       page,
       timesBoldFont,
       timesRomanFont,
-      timesRomanItalicFont
+      timesRomanItalicFont,
+      rfq
     );
   }
   const pdfBytes = await pdfDoc.save();
@@ -100,7 +102,8 @@ const textandlines = async (
   page: PDFPage,
   timesBoldFont: PDFFont,
   timesRomanFont: PDFFont,
-  timesRomanItalicFont: PDFFont
+  timesRomanItalicFont: PDFFont,
+  rfq: quotationResponseType
 ) => {
   page.drawText("REQUEST FOR QUOTATION", {
     x: 215,
@@ -133,6 +136,12 @@ const textandlines = async (
     thickness: 1.5,
     color: rgb(0, 0, 0),
   });
+  page.drawText(rfq.supplier_name, {
+    x: 32.5,
+    y: 725.02,
+    size: 11,
+    font: timesRomanFont,
+  });
   page.drawText("Company Name", {
     x: 32.5,
     y: 709.02,
@@ -146,8 +155,11 @@ const textandlines = async (
     thickness: 1.5,
     color: rgb(0, 0, 0),
   });
+  page.drawText(rfq.supplier_address, { x: 32.5, y: 695, size: 11, font: timesRomanFont });
+
   page.drawText("Address", { x: 32.5, y: 678, size: 11, font: timesRomanFont });
   page.drawText("TIN:", { x: 32.5, y: 664, size: 11, font: timesRomanFont });
+  page.drawText(rfq.tin, { x: 65, y: 665, size: 11, font: timesRomanFont });
   page.drawLine({
     start: { x: 67, y: 663.29 },
     end: { x: 211.81, y: 663.29 },

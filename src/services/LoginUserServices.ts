@@ -27,6 +27,7 @@ export const loginUser = async (data: userLoginType) => {
 
   try {
     const response = await api.post(url, data);
+    console.log(response)
     if (response.status === 200) {
       saveTokenToLocalStorage(response, data.email);
       isOTPSent = mode === "online"

@@ -23,10 +23,10 @@ export default function ModernInventory() {
   const flattenedItemDeliveredData = itemDeliveredData.map(item => ({
     ...item,
     po_no: item.inspection_details.po_details.po_no,
-    item_description: item.item_details.item_qoutation_details.item_details.item_description,
-    unit: item.item_details.item_qoutation_details.item_details.unit,
-    quantity: item.item_details.item_qoutation_details.item_details.quantity,
-    unit_cost: item.item_details.item_qoutation_details.item_details.unit_cost,
+    item_description: item.item_details.item_quotation_details.item_details.item_description,
+    unit: item.item_details.item_quotation_details.item_details.unit,
+    quantity: item.item_details.item_quotation_details.item_details.quantity,
+    unit_cost: item.item_details.item_quotation_details.item_details.unit_cost,
   }));
   
   console.log(itemDeliveredData)
@@ -40,7 +40,7 @@ export default function ModernInventory() {
           Inventory Management
         </h1>
 
-        <div className="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* <div className="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -85,7 +85,7 @@ export default function ModernInventory() {
               <div className="text-2xl font-bold">0</div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
         <div className="rounded-md border">
           <DataTable data={flattenedItemDeliveredData} columns={inventoryColumns}/>

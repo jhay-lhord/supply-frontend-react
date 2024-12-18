@@ -33,9 +33,9 @@ export default function PurchaseOrderItemList() {
   const { setStatus } = useStatusStore();
   const { data: purchase_request } = usePurchaseRequestList(pr_no!);
 
-  const { data, isLoading } = useGetPurchaseOrder(po_no!);
+  const { data: purchase_order, isLoading } = useGetPurchaseOrder(po_no!);
   const { data: item_delivered } = useGetItemsDelivered()
-  const purchaseOrderData = data?.data;
+  const purchaseOrderData = purchase_order?.data;
   console.log(purchaseOrderData);
 
   const purchaseData = purchase_request?.data;
@@ -142,9 +142,9 @@ export default function PurchaseOrderItemList() {
                   </Badge>
                 </div>
               </div>
-              <div className="flex justify-end pt-8 pb-2">
+              <div className="flex justify-start pt-8 pb-2">
                 <div className="flex gap-1">
-                  <Button className="bg-orange-200 text-slate-950" onClick={handleGeneratePDF}>
+                  <Button className="bg-green-400 hover:bg-green-300 text-slate-950" onClick={handleGeneratePDF}>
                     <p className="mx-1 text-sm font-thin">Generate PDF</p>
                     <FileTextIcon className="w-4 h-4 mr-2" />
                   </Button>
@@ -173,43 +173,43 @@ const ItemList = () => {
   return (
     <div className="border-none">
       <p className="font-bold">Items</p>
-      <div className="grid grid-cols-7 gap-2 items-center border-b-2 py-4">
+      <div className="grid grid-cols-6 gap-2 items-center border-b-2 py-4">
         <p className="text-base uppercase">Stock Property No.</p>
         <p className="text-base uppercase">Unit</p>
         <p className="text-base uppercase">Description</p>
         <p className="text-base uppercase">Quantity</p>
         <p className="text-base uppercase">Unit Cost</p>
         <p className="text-base uppercase">Amount</p>
-        <p className="text-base uppercase">Delivered Quantity</p>
+        {/* <p className="text-base uppercase">Delivered Quantity</p> */}
       </div>
       {itemDeliveredData?.length ? (
         itemDeliveredData.map((item, index) => (
           <div
             key={item.inspection_details.po_details.po_no}
-            className="grid grid-cols-7 gap-2 items-center py-6 border-b-2"
+            className="grid grid-cols-6 gap-2 items-center py-6 border-b-2"
           >
             <p className="text-sm">{index + 1}</p>
             <p className="text-sm">
-              {item.item_details.item_qoutation_details.item_details.unit}
+              {item.item_details.item_quotation_details.item_details.unit}
             </p>
             <p className="text-sm">
               {
-                item.item_details.item_qoutation_details.item_details
+                item.item_details.item_quotation_details.item_details
                   .item_description
               }
             </p>
             <p className="text-sm">
-              {item.item_details.item_qoutation_details.item_details.quantity}
+              {item.item_details.item_quotation_details.item_details.quantity}
             </p>
             <p className="text-sm">
-              {item.item_details.item_qoutation_details.unit_price}
+              {item.item_details.item_quotation_details.unit_price}
             </p>
             <p className="text-sm">
               {Number(
-                item.item_details.item_qoutation_details.item_details.quantity
-              ) * Number(item.item_details.item_qoutation_details.unit_price)}
+                item.item_details.item_quotation_details.item_details.quantity
+              ) * Number(item.item_details.item_quotation_details.unit_price)}
             </p>
-            <p className="text-sm">{item.quantity_delivered}</p>
+            {/* <p className="text-sm">{item.quantity_delivered}</p> */}
           </div>
         ))
       ) : (

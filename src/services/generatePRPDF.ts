@@ -9,7 +9,6 @@ export const generatePRPDF = async (
   data: purchaseRequestType,
   item: itemType[]
 ) => {
-
   const pdfDoc = await PDFDocument.create();
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
   const timesRomanItalicFont = await pdfDoc.embedFont(
@@ -46,22 +45,113 @@ export const generatePRPDF = async (
   const pages = [];
   let pageIndex = 0;
   let page = pdfDoc.addPage([612, pageHeight]);
+  const purposewidth = 580;
   pages.push(page);
   item.forEach((entry) => {
-    const {
-      stock_property_no,
-      unit,
-      item_description,
-      quantity,
-      unit_cost,
-    } = entry;
+    const { stock_property_no, unit, item_description, quantity, unit_cost } =
+      entry;
 
-    const wrappedDescription = wrapText(
-      item_description,
-      maxWidth,
-      9
-    );
+    const wrappedDescription = wrapText(item_description, maxWidth, 9);
     const descriptionHeight = wrappedDescription.length * lineHeight;
+    const purposesplit = wrapText(data.purpose, purposewidth, 12);
+
+    purposesplit.forEach((line, lineIndex) => {
+      page.drawText(line, {
+        x: 123,
+        y: 132 - lineIndex * lineHeight,
+        size: 9,
+        font: timesRomanFont,
+      });
+    });
+    const requestby1 = (data.requisitioner_details.name ?? "").toUpperCase();
+    const requestbywidth = Helveticabold.widthOfTextAtSize(requestby1, 10);
+    const requestbyplace = (119 + 365) / 2;
+    page.drawText(requestby1, {
+      x: requestbyplace - requestbywidth / 2,
+      y: 65,
+      size: 9,
+      font: Helveticabold,
+    });
+    const underlineStartX = requestbyplace - requestbywidth / 2; // Start position of the underline
+    const underlineEndX = requestbyplace + requestbywidth / 2.4; // End position of the underline
+    const underlineY = 63; // Slightly below the text position
+
+    page.drawLine({
+      start: { x: underlineStartX, y: underlineY },
+      end: { x: underlineEndX, y: underlineY },
+      thickness: 1, // Adjust line thickness as needed
+      color: rgb(0, 0, 0), // Black color
+    });
+    const approvedby1 = (data.campus_director_details.name || "").toUpperCase();
+    const approvedbywidth = Helveticabold.widthOfTextAtSize(approvedby1, 10);
+    const approvedbyplace = (365 + 564) / 2;
+    page.drawText(approvedby1, {
+      x: approvedbyplace - approvedbywidth / 2,
+      y: 65,
+      size: 9,
+      font: Helveticabold,
+    });
+    const approvedbyStartX = approvedbyplace - approvedbywidth / 2; // Start position of the underline
+    const approvedbyEndX = approvedbyplace + approvedbywidth / 2.4; // End position of the underline
+
+    page.drawLine({
+      start: { x: approvedbyStartX, y: underlineY },
+      end: { x: approvedbyEndX, y: underlineY },
+      thickness: 1, // Adjust line thickness as needed
+      color: rgb(0, 0, 0), // Black color
+    });
+
+    const designation1 = data.requisitioner_details.designation ?? "";
+    const designationwidth = Helveticafont.widthOfTextAtSize(designation1, 11);
+    const designationplace = (119 + 365) / 2;
+    page.drawText(designation1, {
+      x: designationplace - designationwidth / 2,
+      y: 53,
+      size: 8,
+      font: Helveticafont,
+    });
+
+    const designation2 = data.campus_director_details.designation || "";
+    const designationwidth2 = Helveticafont.widthOfTextAtSize(designation2, 11);
+    const designationplace2 = (385 + 564) / 2;
+    page.drawText(designation2, {
+      x: designationplace2 - designationwidth2 / 2,
+      y: 53,
+      size: 8,
+      font: Helveticafont,
+    });
+    const Budgetname = "BETHANY B. URACA";
+    const Bugdetofficer = Budgetname || "";
+    const Bugdetofficerwidth = Helveticabold.widthOfTextAtSize(
+      Bugdetofficer,
+      11
+    );
+    const Bugdetofficerplace = (119 + 365) / 2;
+    page.drawText(Bugdetofficer, {
+      x: Bugdetofficerplace - Bugdetofficerwidth / 2,
+      y: 185,
+      size: 10,
+      font: Helveticabold,
+    });
+
+    const BugdetofficerStartX = Bugdetofficerplace - Bugdetofficerwidth / 2; // Start position of the underline
+    const BugdetofficerEndX = Bugdetofficerplace + Bugdetofficerwidth / 2.4; // End position of the underline
+    const budgetlabel = "Bugdet Officer II";
+    const budgetlabelwidth = Helveticafont.widthOfTextAtSize(budgetlabel, 11);
+    page.drawText(budgetlabel, {
+      x: Bugdetofficerplace - budgetlabelwidth / 2,
+      y: 172,
+      size: 10,
+      font: Helveticafont,
+    });
+
+    page.drawLine({
+      start: { x: BugdetofficerStartX, y: 183 },
+      end: { x: BugdetofficerEndX, y: 183 },
+      thickness: 1, // Adjust line thickness as needed
+      color: rgb(0, 0, 0), // Black color
+    });
+
     // Calculate total height required for the current item
     const itemHeight = Math.max(descriptionHeight, lineHeight);
     if (yPosition - itemHeight < footerHeight) {
@@ -131,8 +221,11 @@ export const generatePRPDF = async (
       });
     });
 
-    const quantitytext = quantity.toString() || "";
-    const quantitywidth = timesRomanFont.widthOfTextAtSize(quantitytext, 10);
+    const quantitytext = quantity || "";
+    const quantitywidth = timesRomanFont.widthOfTextAtSize(
+      quantitytext.toString(),
+      10
+    );
     const quantityplace = (385 + 393) / 2;
     page.drawText(quantitytext.toString(), {
       x: quantityplace - quantitywidth / 2,
@@ -176,8 +269,12 @@ export const generatePRPDF = async (
   });
 
   drawFooter(page, runningTotal, timesRomanFont, false);
-
-  function drawFooter(page: PDFPage, total: number, font:PDFFont, isSubtotal: boolean) {
+  function drawFooter(
+    page: PDFPage,
+    total: number,
+    font: PDFFont,
+    isSubtotal: boolean
+  ) {
     const label = isSubtotal ? `Subtotal` : `Total Amount`;
     const formattedTotal = new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
@@ -200,6 +297,7 @@ export const generatePRPDF = async (
     });
 
     textandlines(
+      // pdfDoc,
       page,
       timesBoldFont,
       timesRomanFont,
@@ -346,8 +444,14 @@ const textandlines = async (
     size: 11,
     font: timesBoldFont,
   });
+  page.drawText(data.office, {
+    x: 30,
+    y: 650,
+    size: 11,
+    font: timesBoldFont,
+  });
   page.drawText("PR No.:", { x: 125, y: 663, size: 11, font: timesBoldFont });
-    page.drawText(data.pr_no, {
+  page.drawText(data.pr_no, {
     x: 170,
     y: 663,
     size: 11,
@@ -368,7 +472,7 @@ const textandlines = async (
     font: timesBoldFont,
   });
   page.drawText("Date :", { x: 418, y: 663, size: 11, font: timesBoldFont });
-    page.drawText(formatPrDate(data.created_at), {
+  page.drawText(formatPrDate(data.created_at), {
     x: 450,
     y: 663,
     size: 11,
@@ -401,27 +505,13 @@ const textandlines = async (
     font: timesBoldFont,
   });
   page.drawText("Purpose:", { x: 53, y: 138, size: 12, font: timesBoldFont });
-  page.drawText(data.purpose, { x: 100, y: 125, size: 10, font: timesBoldFont });
   page.drawText("Allotment Available:", {
     x: 122,
     y: 210,
     size: 10,
     font: Helveticafont,
   });
-  const Budgetname = "BETHANY B. URACA";
-  page.drawText(Budgetname, { x: 200, y: 185, size: 10, font: Helveticabold });
-  page.drawLine({
-    start: { x: 200, y: 183 },
-    end: { x: 300, y: 183 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  page.drawText("Bugdet Officer II", {
-    x: 213,
-    y: 172,
-    size: 10,
-    font: Helveticafont,
-  });
+
   page.drawText("Requested by:", {
     x: 125,
     y: 92,
@@ -435,40 +525,16 @@ const textandlines = async (
     size: 12,
     font: timesBoldFont,
   });
-  page.drawText(data.requisitioner_details.name, {
-    x: 150  ,
-    y: 65,
-    size: 11,
-    font: timesBoldFont,
-  });
   page.drawText("Designation:", {
     x: 26,
     y: 50,
     size: 12,
     font: timesBoldFont,
   });
-  page.drawText(data.requisitioner_details.designation, {
-    x: 100,
-    y: 50,
-    size: 9,
-    font: timesBoldFont,
-  });
   page.drawText("Approved by:", {
     x: 367,
     y: 92,
     size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText(data.campus_director_details.name, {
-    x: 370,
-    y: 65,
-    size: 12,
-    font: timesBoldFont,
-  });
-  page.drawText(data.campus_director_details.designation, {
-    x: 370,
-    y: 50,
-    size: 9,
     font: timesBoldFont,
   });
   //Vertical Lines

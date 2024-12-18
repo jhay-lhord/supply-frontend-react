@@ -40,7 +40,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status");
       return (
-        <div className="w-[200px]">
+        <div className="w-[250px]">
           <Badge
             className={`${
               status === "Approved"

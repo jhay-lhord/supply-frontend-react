@@ -55,7 +55,8 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   const addItemDisabled =
   status === "Rejected" ||
   status === "Cancelled" ||
-  status === "Forwarded to Procurement";
+  status === "Forwarded to Procurement" ||
+  status === "Received by the Procurement";
 
   const onSubmit = async (data: ItemType) => {
     try {

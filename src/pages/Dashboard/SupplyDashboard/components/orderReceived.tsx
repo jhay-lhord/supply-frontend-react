@@ -16,11 +16,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package, Loader2, AlertCircle } from 'lucide-react';
+import { Package, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
-  useAddInspectionReport,
+  addInspectionReport,
   useAddItemsDelivered,
+  useAddStockItems,
+  useGetItemsDelivered,
+  useUpdateItemsDelivered,
   useUpdatePurchaseOrderStatus,
 } from "@/services/puchaseOrderServices";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,37 +34,66 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { DeliveredFormType, SupplierItemType, deliveredFormSchema } from "@/types/request/purchase-order";
+import {
+  DeliveredFormType,
+  SupplierItemType,
+  _itemsDeliveredType,
+  deliveredFormSchema,
+  StockItemType,
+} from "@/types/request/purchase-order";
 
 interface CategorizedItems {
   completedItems: SupplierItemType[];
   incompleteItems: SupplierItemType[];
-  stockItems: SupplierItemType[];
+  stockItems: StockItemType[];
 }
 
-const categorizeItems = (items: DeliveredFormType['items']): CategorizedItems => {
+const categorizeItems = (
+  items: DeliveredFormType["items"]
+): CategorizedItems => {
   const completedItems: SupplierItemType[] = [];
   const incompleteItems: SupplierItemType[] = [];
-  const stockItems: SupplierItemType[] = [];
+  const stockItems: StockItemType[] = [];
 
   items.forEach((item) => {
-    const orderedQuantity = parseInt(item.item_quotation_details.item_details.quantity || "0", 10);
+    const orderedQuantity = parseInt(
+      item.item_quotation_details.item_details.quantity,
+      10
+    );
     const deliveredQuantity = item.quantity_delivered || 0;
 
-    if (deliveredQuantity === orderedQuantity) {
-      completedItems.push(item);
-    } else if (deliveredQuantity < orderedQuantity) {
+    if (deliveredQuantity < orderedQuantity) {
       incompleteItems.push(item);
+    } else if (deliveredQuantity === orderedQuantity) {
+      completedItems.push(item);
     } else {
-      completedItems.push({...item, quantity_delivered: orderedQuantity});
-      stockItems.push({...item, quantity_delivered: deliveredQuantity - orderedQuantity});
+      completedItems.push({ ...item, quantity_delivered: orderedQuantity });
+      stockItems.push({
+        inspection: '',
+        supplier_item: item.supplier_item_no,
+        quantity_delivered: deliveredQuantity - orderedQuantity,
+        is_complete: true
+      });
     }
   });
 
   return { completedItems, incompleteItems, stockItems };
-}
+};
+
+const isItemIncomplete = (
+  item: SupplierItemType,
+  originalQuantityDelivered: number
+): boolean => {
+  const orderedQuantity = parseInt(
+    item.item_quotation_details.item_details.quantity,
+    10
+  );
+  const totalDeliveredQuantity =
+    (item.quantity_delivered || 0) + originalQuantityDelivered;
+  return totalDeliveredQuantity < orderedQuantity;
+};
 
 interface OrderReceivedDialogProps {
   po_no: string;
@@ -71,18 +103,6 @@ interface OrderReceivedDialogProps {
   items_: SupplierItemType[];
 }
 
-const areAllItemsFullyDelivered = (items: DeliveredFormType) => {
-  return items.items.every((item) => {
-    const orderedQuantity = parseInt(
-      item.item_quotation_details.item_details.quantity || "0",
-      10
-    );
-    const deliveredQuantity = item.quantity_delivered || 0;
-
-    return deliveredQuantity >= orderedQuantity;
-  });
-};
-
 export function OrderReceivedDialog({
   po_no,
   supplier_no,
@@ -90,22 +110,44 @@ export function OrderReceivedDialog({
   isDialogOpen,
   setIsDialogOpen,
 }: OrderReceivedDialogProps) {
-  const [filteredItems, setFilteredItems] = useState<SupplierItemType[]>([]);
+  const [incompleteItems, setIncompleteItems] = useState<SupplierItemType[]>(
+    []
+  );
+
+  const { data, refetch: refetchItemsDelivered } = useGetItemsDelivered();
+
+  const itemDeliveredData = useMemo(() => {
+    return Array.isArray(data?.data) ? data.data : [];
+  }, [data?.data]);
 
   const { mutate: updateStatusMutation, isPending: updateStatusPending } =
     useUpdatePurchaseOrderStatus();
-  const { mutate: addInspectionMutation, isPending: addInspectionPending } =
-    useAddInspectionReport();
+
   const { mutate: addItemsDeliveredMutation, isPending: addItemsPending } =
     useAddItemsDelivered();
 
+  const { mutate: addStockMutation } = useAddStockItems();
+  const {
+    mutate: updateItemsDeliveredMutation,
+    isPending: updateItemsPending,
+  } = useUpdateItemsDelivered();
+
   const isLoading =
-    updateStatusPending || addInspectionPending || addItemsPending;
+    updateStatusPending || addItemsPending || updateItemsPending;
 
   useEffect(() => {
     if (isDialogOpen) {
-      const filteredItems = items_.filter((item) => item.supplier_details.supplier_no === supplier_no);
-      setFilteredItems(filteredItems);
+      const filteredItems = items_
+        .filter((item) => item.supplier_details.supplier_no === supplier_no)
+        .filter((item) => {
+          const orderedQuantity = parseInt(
+            item.item_quotation_details.item_details.quantity,
+            10
+          );
+          const deliveredQuantity = item.quantity_delivered || 0;
+          return deliveredQuantity < orderedQuantity;
+        });
+      setIncompleteItems(filteredItems);
     }
   }, [items_, supplier_no, isDialogOpen]);
 
@@ -116,70 +158,149 @@ export function OrderReceivedDialog({
     },
   });
 
-
-  const { fields, append } = useFieldArray({
+  const { fields, replace } = useFieldArray({
     name: "items",
     control: form.control,
   });
 
   useEffect(() => {
-    form.reset({ items: [] });
-    filteredItems.forEach((item) => append(item));
-  }, [filteredItems, append, form]);
+    replace(incompleteItems);
+  }, [incompleteItems, replace]);
 
-  const onSubmit = (values: DeliveredFormType) => {
-    const {completedItems, incompleteItems, stockItems} = categorizeItems(values.items)
+  const onSubmit = async (values: DeliveredFormType) => {
+    const { completedItems, incompleteItems, stockItems } = categorizeItems(
+      values.items
+    );
 
-    const allItemsDelivered = areAllItemsFullyDelivered(values);
+    console.log(completedItems);
+    console.log(incompleteItems);
+    console.log(stockItems);
+
     const inspectionData = {
       inspection_no: uuidv4(),
-      purchase_request: values.items[0].supplier_details.aoq_details.pr_details.pr_no,
+      purchase_request:
+        values.items[0].supplier_details.aoq_details.pr_details.pr_no,
       purchase_order: po_no,
     };
-    addInspectionMutation(inspectionData, {
-      onSuccess: async (inspectionResponse) => {
-        const inspectionNo = inspectionResponse.data?.inspection_no;
 
-        const itemDeliveredData = values.items.map((data) => {
-          return {
-            inspection: inspectionNo!,
-            supplier_item: data.supplier_item_no,
-            quantity_delivered: data.quantity_delivered!,
-          };
-        });
+    try {
+      const inspectionResponse = await addInspectionReport(inspectionData);
+      const inspectionNo = inspectionResponse.data?.inspection_no;
 
-        await Promise.all(
-          itemDeliveredData.map((data) => {
-            addItemsDeliveredMutation(data);
-          })
+      const itemDeliveredPromises = values.items.map(async (data) => {
+        const newQuantityDelivered = data.quantity_delivered || 0;
+        const originalItem = items_.find(
+          (item) => item.supplier_item_no === data.supplier_item_no
         );
-        updateStatusMutation({
-          po_no: po_no,
-          status: allItemsDelivered ? "Completed" : "Lacking",
-        });
-      },
+        const originalQuantityDelivered =
+          originalItem?.old_delivered_quantity || 0;
 
-    });
+        if (newQuantityDelivered !== 0) {
+          const updateData = {
+            supplier_item: data.supplier_item_no,
+            quantity_delivered:
+              newQuantityDelivered + originalQuantityDelivered,
+            is_complete: !isItemIncomplete(data, originalQuantityDelivered),
+            inspection: inspectionNo!,
+          };
 
-    setIsDialogOpen(false)
+          const existingDelivery = itemDeliveredData.find(
+            (item) =>
+              item.item_details.supplier_item_no === data.supplier_item_no
+          );
+
+          if (existingDelivery) {
+            // Update existing delivery
+            return updateItemsDeliveredMutation({
+              data: { ...updateData },
+              id: existingDelivery.id,
+            });
+          } else {
+            // Add new delivery
+            return addItemsDeliveredMutation(updateData);
+          }
+        }
+        return Promise.resolve(); // No change needed for this item
+      });
+
+      await Promise.all(itemDeliveredPromises);
+
+      // Refetch the updated items delivered data
+      const { data: refetchedData } = await refetchItemsDelivered();
+      const latestItemDeliveredData = Array.isArray(refetchedData?.data)
+        ? refetchedData.data
+        : [];
+
+      // Combine the newly submitted data with the latest fetched data
+      const updatedDeliveries = [...latestItemDeliveredData];
+      values.items.forEach((item) => {
+        const originalItem = items_.find(
+          (origItem) => origItem.supplier_item_no === item.supplier_item_no
+        );
+        const originalQuantityDelivered = originalItem?.quantity_delivered || 0;
+        console.log(originalQuantityDelivered);
+        if (originalItem) {
+          originalItem.quantity_delivered =
+            Number(originalItem.quantity_delivered) + originalQuantityDelivered;
+        } else if (originalQuantityDelivered > 0) {
+          updatedDeliveries.push({
+            supplier_item: item.supplier_item_no,
+            quantity_delivered: originalQuantityDelivered,
+          } as _itemsDeliveredType);
+        }
+      });
+
+      const allItemsComplete = items_.every((item) => {
+        const orderedQuantity = Number(
+          item.item_quotation_details.item_details.quantity
+        );
+        const latestDelivery = updatedDeliveries.find(
+          (deliveredItem) =>
+            deliveredItem.supplier_item === item.supplier_item_no
+        );
+        const totalDeliveredQuantity = Number(
+          latestDelivery?.quantity_delivered || 0
+        );
+        console.log("Item:", item.supplier_item_no);
+        console.log("Ordered Quantity:", orderedQuantity);
+        console.log("Total Delivered Quantity:", totalDeliveredQuantity);
+        return totalDeliveredQuantity >= orderedQuantity;
+      });
+
+      const newStatus = allItemsComplete ? "Completed" : "In Progress";
+
+      await updateStatusMutation({
+        po_no: po_no,
+        status: newStatus,
+      });
+
+      if (stockItems.length > 0) {
+        stockItems.forEach((stock) => addStockMutation({...stock, inspection: inspectionNo!}));
+      }
+
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error processing order:", error);
+      // Handle error (e.g., show error message to user)
+    }
+    setIsDialogOpen(false);
   };
-
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            Order Received
+            To Recieve Items
           </DialogTitle>
           <p>{po_no}</p>
         </DialogHeader>
-        {filteredItems.length === 0 ? (
-          <Alert variant="destructive">
+        {incompleteItems.length === 0 ? (
+          <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
+            <AlertTitle>No To Recieve Items</AlertTitle>
             <AlertDescription>
-              No order items found. Please check your order data.
+              All items in this order have been fully delivered.
             </AlertDescription>
           </Alert>
         ) : (
@@ -189,7 +310,7 @@ export function OrderReceivedDialog({
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8"
               >
-                <ScrollArea className="h-[30vh] mt-4">
+                <ScrollArea className="h-[45vh] mt-4">
                   <div className="rounded-md border">
                     <Table>
                       <TableHeader>
@@ -198,6 +319,7 @@ export function OrderReceivedDialog({
                           <TableHead className="w-[150px]">
                             Ordered Quantity
                           </TableHead>
+                          <TableHead className="w-[150px]">Remaining</TableHead>
                           <TableHead className="w-[150px]">Unit Cost</TableHead>
                           <TableHead className="w-[200px]">
                             Quantity Delivered
@@ -208,11 +330,18 @@ export function OrderReceivedDialog({
                         {fields.map((field, index) => (
                           <TableRow key={field.id}>
                             <TableCell>
-                              {field.item_quotation_details.item_details.item_description}
+                              {
+                                field.item_quotation_details.item_details
+                                  .item_description
+                              }
                             </TableCell>
                             <TableCell>
-                              {field.item_quotation_details.item_details.quantity}
+                              {
+                                field.item_quotation_details.item_details
+                                  .quantity
+                              }
                             </TableCell>
+                            <TableCell>{field.remaining_quantity}</TableCell>
                             <TableCell>
                               ₱
                               {parseFloat(

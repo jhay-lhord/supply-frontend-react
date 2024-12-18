@@ -24,6 +24,8 @@ export type supplierType_ = {
 export type supplierItemType_ = {
   supplier_item_no: string
   total_amount: string
+  remaining_quantity: number
+  old_delivered_quantity: number
   item_quotation_details: {
     item_quotation_no: string
     brand_model: string

@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, PackageOpen, XCircle } from "lucide-react";
+import { CheckCircle, EllipsisVerticalIcon, PackageOpen, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -20,26 +20,38 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { OrderReceivedDialog } from "./orderReceived";
 import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
-import { useState } from "react";
-import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
+import { useMemo, useState } from "react";
+import {
+  useGetAllPurchaseOrder,
+  useGetItemsDelivered,
+  useGetStockItems,
+  useUpdatePurchaseOrderStatus,
+} from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
 import CancelOrderDialog from "./cancelOrder";
+import { useNavigate } from "react-router-dom";
 
 export default function PurchaseOrderInProgess() {
   const [poNo, setPoNo] = useState<string>("");
-  const [aoqNo, setAoqNo] = useState<string>("");
+  const [supplierNo, setSupplierNo] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState<boolean>(false);
-  const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({})
+  const [openDropdowns, setOpenDropdowns] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const { data, isLoading } = useGetAllPurchaseOrder();
   const { data: supplier_item } = useGetAllSupplierItem();
+  const { data: items_delivered } = useGetItemsDelivered();
+  const { data: stock_items} = useGetStockItems()
+  const { mutate: updatePOMutation} = useUpdatePurchaseOrderStatus()
+  const navigate = useNavigate()
 
-  const { data: items } = useGetAllSupplierItem();
-  const itemsData = Array.isArray(items?.data) ? items.data : [];
-  const itemCount = (aoq_no:string) => (
-    itemsData.filter(item => item.supplier_details.aoq_details.aoq_no === aoq_no).length
-  )
+  console.log(stock_items?.data)
+
+  const itemsDeliveredData = useMemo(() => {
+    return Array.isArray(items_delivered?.data) ? items_delivered?.data : [];
+  }, [items_delivered?.data]);
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
   const inProgressOrders = purchaseOrderData.filter(
@@ -49,11 +61,54 @@ export default function PurchaseOrderInProgess() {
     ? supplier_item.data
     : [];
 
-  const handleOpenOrderRecieveForm = (aoq_no:string) => {
+
+  const getIncompleteItems = (supplier_no: string) => {
+    return supplierItemData.filter((item) => {
+      if (item.supplier_details.supplier_no !== supplier_no) {
+        return false;
+      }
+
+      const deliveredItem = itemsDeliveredData.find(
+        (delivered) =>
+          delivered.item_details.supplier_item_no === item.supplier_item_no
+      );
+
+      if (!deliveredItem) {
+        // If the item is not found in itemsDeliveredData, it's completely undelivered
+        item.remaining_quantity = parseInt(
+          item.item_quotation_details.item_details.quantity,
+          10
+        );
+        return true;
+      }
+
+      const orderedQuantity = parseInt(
+        item.item_quotation_details.item_details.quantity,
+        10
+      );
+      const deliveredQuantity = Number(deliveredItem.quantity_delivered || 0);
+      const remainingQuantity = orderedQuantity - deliveredQuantity;
+      item.old_delivered_quantity = deliveredQuantity;
+
+      if (remainingQuantity > 0) {
+        item.remaining_quantity = remainingQuantity;
+        return true;
+      }
+
+      return false;
+    });
+  };
+
+  const itemsInSupplierCount = (supplier_no: string) =>
+    supplierItemData.filter(
+      (data) => data.supplier_details.supplier_no === supplier_no
+    ).length;
+
+  const handleOpenOrderRecieveForm = (supplier_no: string, po_no: string) => {
     setIsDialogOpen(true);
-    setAoqNo(aoq_no)
-    setOpenDropdowns({[aoq_no]: false})
-    setPoNo(aoq_no)
+    setSupplierNo(supplier_no);
+    setOpenDropdowns({ [po_no]: false });
+    setPoNo(po_no);
   };
 
   const handleCancelOrder = (po_no: string) => {
@@ -61,12 +116,16 @@ export default function PurchaseOrderInProgess() {
     setPoNo(po_no);
   };
 
+  const handleCompleteOrder = (po_no: string) => {
+    updatePOMutation({po_no: po_no, status: "Completed"})
+  };
+
   const toggleDropdown = (poNo: string) => {
-    setOpenDropdowns(prev => ({
+    setOpenDropdowns((prev) => ({
       ...prev,
-      [poNo]: !prev[poNo]
-    }))
-  }
+      [poNo]: !prev[poNo],
+    }));
+  };
 
   if (isLoading) return <Loading />;
 
@@ -88,49 +147,61 @@ export default function PurchaseOrderInProgess() {
             {inProgressOrders.length > 0 ? (
               inProgressOrders.map((order) => (
                 <TableRow key={order.po_no}>
-                  <TableCell>{order.po_no}</TableCell>
-                  <TableCell>{itemCount(order.aoq_details.aoq_no)}</TableCell>
+                  <TableCell className="hover:underline hover:cursor-pointer" onClick={() => navigate(`/bac/purchase-order/${order.po_no}`)}>{order.po_no}</TableCell>
                   <TableCell>
-                  ₱{Number(order.total_amount).toFixed(2)}
+                    {itemsInSupplierCount(order.supplier_details.supplier_no)}
+                  </TableCell>
+                  <TableCell>
+                    ₱{Number(order.total_amount).toFixed(2)}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="capitalize">
                       {order.status}
                     </Badge>
                   </TableCell>
+                  <TableCell>{formatDate(order.created_at)}</TableCell>
                   <TableCell>
-                    {formatDate(order.created_at)}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu
-                       open={openDropdowns[order.po_no]}
-                       onOpenChange={() => toggleDropdown(order.po_no)}
-                    >
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <Button>Open Menu</Button>
+                    <div className="flex justify-between items-center ">
+                      <DropdownMenu
+                        open={openDropdowns[order.po_no]}
+                        onOpenChange={() => toggleDropdown(order.po_no)}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button  className="">
+                            <p>Open Menu</p>
+                            <EllipsisVerticalIcon className="h-5 w-5"/>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleOpenOrderRecieveForm(
+                                order.supplier_details.supplier_no,
+                                order.po_no
+                              )
+                            }
+                            className="bg-green-200"
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            <span>Order Received</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleCancelOrder(order.po_no)}
+                            className="bg-red-200"
+                          >
+                            <XCircle className="mr-2 h-4 w-4" />
+                            <span>Cancel Order</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <div>
+                        <Button onClick={() => handleCompleteOrder(order.po_no)} variant={"outline"} className="">
+                          Complete
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() => handleOpenOrderRecieveForm(order.aoq_details.aoq_no)}
-                          className="bg-green-200"
-                        >
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          <span>Order Received</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleCancelOrder(order.po_no)}
-                          className="bg-red-200"
-                        >
-                          <XCircle className="mr-2 h-4 w-4" />
-                          <span>Cancel Order</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      </div>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -154,9 +225,8 @@ export default function PurchaseOrderInProgess() {
       </div>
       <OrderReceivedDialog
         po_no={poNo}
-        aoq_no={aoqNo}
-        items_={supplierItemData}
-        orderData={inProgressOrders}
+        supplier_no={supplierNo}
+        items_={getIncompleteItems(supplierNo)}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
       />

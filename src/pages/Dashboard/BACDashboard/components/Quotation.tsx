@@ -43,8 +43,10 @@ export const Quotation = () => {
 
   const itemQuotation = items?.data?.filter((data) => data.rfq === rfq_no);
   const quotation = data && data.data;
+  const rfqData = data?.data
+
   const handlePrint = async () => {
-    const url = await generateRFQPDF(itemQuotation!);
+    const url = await generateRFQPDF(itemQuotation!, rfqData!);
     return window.open(url, "_blank");
   };
 
