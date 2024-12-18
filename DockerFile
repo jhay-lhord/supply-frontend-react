@@ -1,13 +1,20 @@
+# Use a lightweight Node.js image
 FROM node:17-alpine
 
-WORKDIR ./supply-react
+# Set the working directory
+WORKDIR /app
 
-COPY package.json .
+# Copy only the package.json and package-lock.json (if available) to leverage Docker cache
+COPY package.json package-lock.json ./
 
+# Install dependencies
 RUN npm install
 
-COPY . . 
+# Copy the rest of the application files
+COPY . .
 
-EXPOSE 3000
+# Expose the port that Vite runs on (default is 5173 for Vite)
+EXPOSE 5173
 
+# Start the development server
 CMD ["npm", "run", "dev"]
