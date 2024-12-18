@@ -26,7 +26,7 @@ export const RecentActivities = () => {
           <Avatar className="h-12 w-12">
             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
             <AvatarFallback className="bg-gradient-to-r from-orange-200 to-orange-300 text-base">
-              {trimmedUserRole}
+              {trimmedUserRole(recent.user_role)}
             </AvatarFallback>
           </Avatar>
           <div className="space-y-1 flex flex-col items-center ">

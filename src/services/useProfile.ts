@@ -10,10 +10,10 @@ export const getUserInformation = () => {
   const userRole = getRoleFromToken(token!);
   const userEmail = getEmailFromToken(token!);
   const userFullname = getFullnameFromToken(token!);
-  const trimmedUserRole = userRole
-    .split(" ")
+  const trimmedUserRole = (role = userRole) => 
+    role.split(" ")
     .map((word) => word[0])
     .join("");
 
-  return { userEmail, userFullname, trimmedUserRole };
+  return { userEmail, userFullname, userRole, trimmedUserRole };
 };

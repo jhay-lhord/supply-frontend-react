@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
   const navigate = useNavigate();
-  const {userEmail, userFullname, trimmedUserRole} = getUserInformation()
+  const {userEmail, userFullname, trimmedUserRole, userRole} = getUserInformation()
 
   const handleLogoutUser = () => {
     logoutUser();
@@ -31,7 +31,7 @@ export const CustomSidebarFooter = () => {
             <SidebarMenuButton className="py-8 rounded-md bg-gradient-to-r from-orange-300 to-amber-200 hover:bg-orange-100">
               <Avatar className="h-10 w-10">
                 <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                <AvatarFallback>{trimmedUserRole}</AvatarFallback>
+                <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
                 <p className="text-sm">{userFullname}</p>
@@ -46,7 +46,7 @@ export const CustomSidebarFooter = () => {
               <Avatar className=" w-8 h-8 bg-orange-200">
                 <AvatarImage src="/avatars/01.png" alt="@shadcn" />
                 <AvatarFallback className="bg-orange-200">
-                  {trimmedUserRole}
+                  {trimmedUserRole(userRole)}
                 </AvatarFallback>
               </Avatar>
             </div>
