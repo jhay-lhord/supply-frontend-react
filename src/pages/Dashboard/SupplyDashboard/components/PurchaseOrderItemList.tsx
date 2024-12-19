@@ -84,7 +84,7 @@ export default function PurchaseOrderItemList() {
 
   return (
     <Layout>
-      <div className="m-6 w-full">
+      <div className=" w-full">
         {isLoading && <Loading/>}
         <Card className="w-full bg-slate-100">
           <CardHeader className="flex flex-col">

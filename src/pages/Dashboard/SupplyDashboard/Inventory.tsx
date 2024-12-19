@@ -29,7 +29,7 @@ export default function ModernInventory() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6">
+      <div className="w-full">
         <h1 className="text-3xl font-bold mb-6 flex items-center">
           <Package className="mr-2" />
           Inventory Management

@@ -40,7 +40,7 @@ export default function PurchaseRequestDataTable() {
 
   return (
     <>
-      <div className="hidden w-full flex-col md:flex p-6">
+      <div className="hidden w-full flex-col md:flex">
         <div>
           <Button
             className="mb-4 hover:bg-orange-300 text-black"

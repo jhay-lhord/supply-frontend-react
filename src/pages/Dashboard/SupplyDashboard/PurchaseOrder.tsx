@@ -61,7 +61,7 @@ const PurchaseOrder: React.FC = () => {
 
   return (
     <Layout>
-      <Card className="w-full m-6">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Purchase Orders</CardTitle>
           <CardDescription>
