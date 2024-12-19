@@ -61,7 +61,7 @@ const PurchaseOrder: React.FC = () => {
 
   return (
     <Layout>
-      <Card className="w-full">
+      <Card className="w-full bg-slate-100">
         <CardHeader>
           <CardTitle>Purchase Orders</CardTitle>
           <CardDescription>
@@ -70,7 +70,7 @@ const PurchaseOrder: React.FC = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="to-order" className="w-full rounded-full">
-            <TabsList className="grid grid-cols-4 rounded-md w-full p-2 ">
+            <TabsList className="grid grid-cols-4 rounded-md w-full p-2 border-2 border-orange-200  ">
               {[
                 {
                   label: "To Order",
@@ -92,11 +92,6 @@ const PurchaseOrder: React.FC = () => {
                   value: "cancelled",
                   count: counts?.cancelled,
                 },
-                // {
-                //   label: "Lacking Items",
-                //   value: "lacking-items",
-                //   count: counts?.lackingItems,
-                // },
               ].map((tab) => (
                 <TabsTrigger
                   key={tab.value}

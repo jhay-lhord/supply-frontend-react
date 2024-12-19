@@ -59,8 +59,8 @@ const SupplyDashboard: React.FC = () => {
     <Layout>
       <ScrollArea className="w-full">
         <main className=" flex-grow">
-          <div className="md:hidden"></div>
-          <div className="hidden flex-col md:flex">
+          <div className=""></div>
+          <div className=" flex-col md:flex">
             <div className=" space-y-4">
               <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
@@ -175,8 +175,8 @@ const SupplyDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 ">
-                <Card className="col-span-4  bg-slate-100">
+              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-5">
+                <Card className="col-span-3 bg-slate-100">
                   <CardHeader>
                     <CardTitle>Weekly Reports</CardTitle>
                     <CardDescription>
@@ -233,7 +233,7 @@ const SupplyDashboard: React.FC = () => {
                     </ChartContainer>
                   </CardContent>
                 </Card>
-                <Card className="col-span-3 bg-slate-100 border-none">
+                <Card className="col-span-2 bg-slate-100">
                   <CardHeader className="sticky top-0 rounded-m z-50">
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>History as of this month</CardDescription>
