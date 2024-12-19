@@ -145,7 +145,7 @@ export default function PurchaseRequestItemList() {
   if (error) return <div>{error.message}</div>;
 
   return (
-    <div className="m-8">
+    <div className="">
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
           <CardTitle className="">

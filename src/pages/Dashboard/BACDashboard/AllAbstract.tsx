@@ -25,11 +25,7 @@ import Layout from "./components/Layout/BACDashboardLayout";
 import Loading from "../shared/components/Loading";
 import { useState } from "react";
 import { DeleteDialog } from "../shared/components/DeleteDialog";
-import {
-  BuildingIcon,
-  CalendarIcon,
-  TrashIcon,
-} from "lucide-react";
+import { BuildingIcon, CalendarIcon, Loader2, TrashIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export const AllAbstract = () => {
@@ -37,14 +33,15 @@ export const AllAbstract = () => {
   const [aoqNo, setAoqNo] = useState<string | null>(null);
 
   const { data: aoq_data, isLoading } = useAbstractOfQuotation();
-  const { data: supplier } = useGetAllSupplier()
+  const { data: supplier, isLoading: supplier_loading } = useGetAllSupplier();
   const { mutate: deleteAOQMutation } = useDeleteAbstractOfQuotation();
 
   const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
 
-  const supplierName = supplierData.map(
-    (data) => data.rfq_details.supplier_name
-  );
+  const supplierName = (aoq_no: string) =>
+    supplierData
+      .filter((data) => data.aoq_details.aoq_no === aoq_no)
+      .map((data) => data.rfq_details.supplier_name);
 
   const navigate = useNavigate();
   const abstract = Array.isArray(aoq_data?.data) ? aoq_data.data : [];
@@ -81,7 +78,7 @@ export const AllAbstract = () => {
                             <p>{formatDate(data.created_at)}</p>
                           </div>
                         </div>
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={100}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -109,15 +106,19 @@ export const AllAbstract = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pb-2 space-y-4 ">
-                    {
-                      supplierName.map(name => (
+                    <p>All Suppliers</p>
+                    {supplier_loading ? (
+                      <p className="flex">
+                        <Loader2 className="animate-spin mx-2" /> Loading...
+                      </p>
+                    ) : (
+                      supplierName(data.aoq_no).map((name) => (
                         <div className="flex items-center space-x-2">
-                        <BuildingIcon className="w-4 h-4" />
-                        <p>{name}</p>
-                      </div>
+                          <BuildingIcon className="w-4 h-4" />
+                          <p>{name}</p>
+                        </div>
                       ))
-                    }
-                
+                    )}
                     <Separator />
                   </CardContent>
                   <CardFooter className="flex items-center justify-center">

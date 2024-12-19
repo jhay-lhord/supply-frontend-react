@@ -14,6 +14,7 @@ import {
   CalendarIcon,
   ClipboardIcon,
   CreditCardIcon,
+  Loader2,
   MapPinIcon,
   PrinterIcon,
 } from "lucide-react";
@@ -37,7 +38,7 @@ import { useGetRequestForQuotation } from "@/services/requestForQoutationService
 export const AbstractItemContentList = () => {
   const [isInformationDialogOpen, setIsInformationDialogOpen] =
     useState<boolean>(false);
-  const [rfqNo, setRfqNo] = useState<string | undefined>(undefined)
+  const [rfqNo, setRfqNo] = useState<string | undefined>(undefined);
 
   const { aoq_no } = useParams();
 
@@ -45,7 +46,7 @@ export const AbstractItemContentList = () => {
     useGetAbstractOfQuotation(aoq_no!);
   const { data: items, isLoading } = useGetAllSupplierItem();
 
-  const supplierItemData = Array.isArray(items?.data) ? items.data : []
+  const supplierItemData = Array.isArray(items?.data) ? items.data : [];
 
   const abstractData = abstract && abstract.data;
 
@@ -58,7 +59,7 @@ export const AbstractItemContentList = () => {
 
   const handleOpenSupplierInformation = (rfq_no: string) => {
     setIsInformationDialogOpen(true);
-    setRfqNo(rfq_no)
+    setRfqNo(rfq_no);
   };
 
   return (
@@ -80,7 +81,7 @@ export const AbstractItemContentList = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button onClick={handlePDFPrint} >
+                  <Button onClick={handlePDFPrint}>
                     <PrinterIcon width={20} height={20} className="mx-2" />
                     Generate PDF
                   </Button>
@@ -123,7 +124,9 @@ export const AbstractItemContentList = () => {
 
                   <p
                     className="text-gray-500 col-span-2 underline hover:cursor-pointer"
-                    onClick={() => handleOpenSupplierInformation(item.rfq_details.rfq_no)}
+                    onClick={() =>
+                      handleOpenSupplierInformation(item.rfq_details.rfq_no)
+                    }
                   >
                     {item.rfq_details.supplier_name}
                   </p>
@@ -171,8 +174,8 @@ export const SupplierInformation: React.FC<SupplierInformationProps> = ({
   isInformationDialogOpen,
   setIsInformationDialogOpen,
 }) => {
-  const { data } = useGetRequestForQuotation(rfqNo)
-  const rfqData = data?.data
+  const { data, isLoading } = useGetRequestForQuotation(rfqNo);
+  const rfqData = data?.data;
 
   return (
     <Dialog
@@ -183,32 +186,34 @@ export const SupplierInformation: React.FC<SupplierInformationProps> = ({
         <DialogTitle></DialogTitle>
       </DialogHeader>
       <DialogContent>
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center">
-            <BuildingIcon className="w-5 h-5 mr-1" />
-            <p className="text-lg font-thin">
-              {rfqData?.supplier_name}
-            </p>
+        {isLoading ? (
+          <p className="flex">
+            <Loader2 className="animate-spin mx-2" /> Loading...
+          </p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center">
+              <BuildingIcon className="w-5 h-5 mr-1" />
+              <p className="text-lg font-thin">{rfqData?.supplier_name}</p>
+            </div>
+            <Separator />
+            <div className="flex items-center">
+              <MapPinIcon className="w-5 h-5 mr-1" />
+              <p className="text-lg font-thin">{rfqData?.supplier_address}</p>
+            </div>
+            <Separator />
+            <div className="flex items-center">
+              <CreditCardIcon className="w-4 h-4 mr-1" />
+              <p className="text-lg font-thin">{rfqData?.tin}</p>
+            </div>
+            <Separator />
+            <Badge variant={"outline"} className="flex items-center">
+              <p className="text-lg font-thin">
+                {rfqData?.is_VAT ? "VAT" : "non-VAT"}
+              </p>
+            </Badge>
           </div>
-          <Separator/>
-          <div className="flex items-center">
-            <MapPinIcon className="w-5 h-5 mr-1" />
-            <p className="text-lg font-thin">
-              {rfqData?.supplier_address}
-            </p>
-          </div>
-          <Separator/>
-          <div className="flex items-center">
-            <CreditCardIcon className="w-4 h-4 mr-1" />
-            <p className="text-lg font-thin">{rfqData?.tin}</p>
-          </div>
-          <Separator/>
-          <Badge variant={"outline"} className="flex items-center">
-            <p className="text-lg font-thin">
-              {rfqData?.is_VAT ? "VAT" : "non-VAT"}
-            </p>
-          </Badge>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

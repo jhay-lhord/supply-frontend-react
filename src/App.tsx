@@ -33,6 +33,7 @@ import SupplyAOQ from "./pages/Dashboard/SupplyDashboard/components/AbstractOfQu
 import Stocks from "./pages/Dashboard/SupplyDashboard/Stocks";
 import PurchaseOrderItemList from "./pages/Dashboard/SupplyDashboard/components/PurchaseOrderItemList";
 import BACPurchaseRequestIncoming from "./pages/Dashboard/BACDashboard/BACPurchaseRequestIncoming";
+import ItemDistribution from "./pages/Dashboard/SupplyDashboard/ItemDistribution";
 
 const App = () => {
   return (
@@ -75,6 +76,10 @@ const App = () => {
           <Route path="/supply/inventory" element={<Inventory />} />
 
           <Route path="/supply/stocks" element={<Stocks />} />
+          <Route
+            path="/supply/item-distribution"
+            element={<ItemDistribution />}
+          />
           <Route path="/supply/not-found" element={<ItemNotFound />} />
 
           {/* Pages in BAC Dashboard */}

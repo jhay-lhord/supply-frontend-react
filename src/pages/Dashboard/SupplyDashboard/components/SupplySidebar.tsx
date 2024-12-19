@@ -3,6 +3,7 @@ import {
   Clipboard,
   ClipboardPenLine,
   LayoutGrid,
+  PackageCheck,
 } from "lucide-react";
 
 import {
@@ -60,6 +61,14 @@ const inventory = [
   // },
 ];
 
+const distribution = [
+  {
+    title: "Item Distribution",
+    url: "/supply/item-distribution",
+    icon: PackageCheck
+  }
+]
+
 const SupplySidebar = () => {
   const { open } = useSidebar();
 
@@ -112,6 +121,19 @@ const SupplySidebar = () => {
             <SidebarGroupLabel>Inventory</SidebarGroupLabel>
             <SidebarMenu>
               {inventory.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
+                    <Link to={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+            <SidebarGroupLabel>Distribution</SidebarGroupLabel>
+            <SidebarMenu>
+              {distribution.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
                     <Link to={item.url}>
