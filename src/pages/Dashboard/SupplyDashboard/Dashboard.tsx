@@ -21,7 +21,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useGetSupplyDailyReport } from "@/services/DailyReport";
 
 const chartConfig = {
@@ -193,6 +193,14 @@ const SupplyDashboard: React.FC = () => {
                           tickMargin={10}
                           axisLine={false}
                           tickFormatter={(value) => value.slice(0, 3)}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tickMargin={10}
+                          allowDecimals={false}
+                          tickFormatter={(value) => value.toFixed(0)}
+                          tick={{ fill: "#4b5563" }}
                         />
                         <ChartTooltip
                           cursor={false}
