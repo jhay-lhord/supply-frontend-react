@@ -53,7 +53,7 @@ export const Quotation = () => {
   if (isLoading || item_loading) return <Loading />;
 
   return (
-    <div className="m-6 w-full">
+    <div className=" w-full">
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
           <CardTitle className="">

@@ -104,7 +104,7 @@ export default function PurchaseRequestItemList() {
   };
 
   return (
-    <div className="m-8">
+    <div className="">
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
           <CardTitle className="">

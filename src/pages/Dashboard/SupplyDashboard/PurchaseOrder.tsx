@@ -70,7 +70,7 @@ const PurchaseOrder: React.FC = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="to-order" className="w-full rounded-full">
-            <TabsList className="grid grid-cols-4 rounded-md w-full p-2 border-2 border-orange-200  ">
+            <TabsList className="grid grid-cols-4 rounded-md w-full p-2 border bg-background">
               {[
                 {
                   label: "To Order",
@@ -112,7 +112,7 @@ const PurchaseOrder: React.FC = () => {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>To Order</AlertTitle>
                 <AlertDescription>
-                  These purchase orders are ready to be placed.
+                  These items are ready to placed.
                 </AlertDescription>
               </Alert>
               <SupplyAOQ />

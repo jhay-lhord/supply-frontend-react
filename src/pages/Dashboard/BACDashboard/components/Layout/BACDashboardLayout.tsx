@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <h1 className="text-xl font-normal">{greetings()}</h1>
           </div>
         </div>
-        <div className="flex   p-4">{children}</div>
+        <div className="flex p-10">{children}</div>
       </main>
     </SidebarProvider>
   );

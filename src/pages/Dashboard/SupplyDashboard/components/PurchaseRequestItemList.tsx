@@ -35,6 +35,7 @@ import { DeleteDialog } from "./DeleteDialog";
 import Loading from "../../shared/components/Loading";
 import EditItemForm from "./EditItemForm";
 import {
+  ArrowLeftIcon,
   CalendarIcon,
   CheckCircleIcon,
   CircleMinusIcon,
@@ -64,7 +65,6 @@ export default function PurchaseRequestItemList() {
 
   const { pr_no } = useParams();
   const { setStatus, status } = useStatusStore();
-
 
   const items = FilteredItemInPurchaseRequest(pr_no!);
   const {
@@ -119,10 +119,10 @@ export default function PurchaseRequestItemList() {
   }, [setStatus, purchaseData]);
 
   const actionDisabled =
-  status === "Rejected" ||
-  status === "Cancelled" ||
-  status === "Forwarded to Procurement" ||
-  status === "Received by the Procurement";
+    status === "Rejected" ||
+    status === "Cancelled" ||
+    status === "Forwarded to Procurement" ||
+    status === "Received by the Procurement";
 
   let sortedItems;
   if (!isLoading) {
@@ -146,6 +146,13 @@ export default function PurchaseRequestItemList() {
 
   return (
     <div className="">
+      <Button className="mb-2" onClick={() => navigate(-1)}>
+        <span className="flex gap-2 items-center">
+          <ArrowLeftIcon className="h-5 w-5" />
+          <p>Back</p>
+        </span>
+      </Button>
+
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
           <CardTitle className="">
