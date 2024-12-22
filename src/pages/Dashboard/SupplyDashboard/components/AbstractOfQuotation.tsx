@@ -23,7 +23,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { generatePOPDF } from "@/services/generatePOPDF";
 
 export default function SupplyAOQ() {
   const [supplierNo, setSupplierNo] = useState<string>("");

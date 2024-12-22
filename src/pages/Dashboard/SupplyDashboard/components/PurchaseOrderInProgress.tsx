@@ -1,5 +1,10 @@
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, EllipsisVerticalIcon, PackageOpen, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  EllipsisVerticalIcon,
+  PackageOpen,
+  XCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -24,8 +29,6 @@ import { useMemo, useState } from "react";
 import {
   useGetAllPurchaseOrder,
   useGetItemsDelivered,
-  useGetStockItems,
-  useUpdatePurchaseOrderStatus,
 } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
 import CancelOrderDialog from "./cancelOrder";
@@ -43,11 +46,9 @@ export default function PurchaseOrderInProgess() {
   const { data, isLoading } = useGetAllPurchaseOrder();
   const { data: supplier_item } = useGetAllSupplierItem();
   const { data: items_delivered } = useGetItemsDelivered();
-  const { data: stock_items} = useGetStockItems()
-  const { mutate: updatePOMutation} = useUpdatePurchaseOrderStatus()
-  const navigate = useNavigate()
-
-  console.log(stock_items?.data)
+  // const { mutate: updatePOMutation } = useUpdatePurchaseOrderStatus();
+  // const { mutate: updatePRMutation } = useUpdatePurchaseRequestStatus();
+  const navigate = useNavigate();
 
   const itemsDeliveredData = useMemo(() => {
     return Array.isArray(items_delivered?.data) ? items_delivered?.data : [];
@@ -60,7 +61,6 @@ export default function PurchaseOrderInProgess() {
   const supplierItemData = Array.isArray(supplier_item?.data)
     ? supplier_item.data
     : [];
-
 
   const getIncompleteItems = (supplier_no: string) => {
     return supplierItemData.filter((item) => {
@@ -99,6 +99,35 @@ export default function PurchaseOrderInProgess() {
     });
   };
 
+  const isAllCompleted = useMemo(() => {
+    inProgressOrders.forEach(order => {
+      const incompleteItems = getIncompleteItems(order.supplier_details.supplier_no)
+      console.log(incompleteItems)
+    })
+  }, [inProgressOrders])
+
+  console.log(isAllCompleted)
+
+  // useEffect(() => {
+  //   inProgressOrders.forEach((order) => {
+  //     const incompleteItems = getIncompleteItems(
+  //       order.supplier_details.supplier_no
+  //     );
+  //     if (incompleteItems.length === 0) {
+  //       updatePOMutation({ po_no: order.po_no, status: "Completed" });
+  //       updatePRMutation({
+  //         pr_no: order.pr_details.pr_no,
+  //         status: "Items Delivered",
+  //       });
+  //     }
+  //   });
+  // }, [
+  //   inProgressOrders,
+  //   supplierItemData,
+  //   itemsDeliveredData,
+  //   updatePOMutation,
+  // ]);
+
   const itemsInSupplierCount = (supplier_no: string) =>
     supplierItemData.filter(
       (data) => data.supplier_details.supplier_no === supplier_no
@@ -114,10 +143,6 @@ export default function PurchaseOrderInProgess() {
   const handleCancelOrder = (po_no: string) => {
     setIsCancelDialogOpen(true);
     setPoNo(po_no);
-  };
-
-  const handleCompleteOrder = (po_no: string) => {
-    updatePOMutation({po_no: po_no, status: "Completed"})
   };
 
   const toggleDropdown = (poNo: string) => {
@@ -140,14 +165,21 @@ export default function PurchaseOrderInProgess() {
               <TableHead>Total Amount</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created At</TableHead>
-              <TableHead>Action</TableHead>
+              {/* <TableHead>Action</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
             {inProgressOrders.length > 0 ? (
               inProgressOrders.map((order) => (
                 <TableRow key={order.po_no}>
-                  <TableCell className="hover:underline hover:cursor-pointer" onClick={() => navigate(`/bac/purchase-order/${order.po_no}`)}>{order.po_no}</TableCell>
+                  <TableCell
+                    className="hover:underline hover:cursor-pointer"
+                    onClick={() =>
+                      navigate(`/bac/purchase-order/${order.po_no}`)
+                    }
+                  >
+                    {order.po_no}
+                  </TableCell>
                   <TableCell>
                     {itemsInSupplierCount(order.supplier_details.supplier_no)}
                   </TableCell>
@@ -167,9 +199,9 @@ export default function PurchaseOrderInProgess() {
                         onOpenChange={() => toggleDropdown(order.po_no)}
                       >
                         <DropdownMenuTrigger asChild>
-                          <Button  className="">
+                          <Button className="">
                             <p>Open Menu</p>
-                            <EllipsisVerticalIcon className="h-5 w-5"/>
+                            <EllipsisVerticalIcon className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -196,11 +228,6 @@ export default function PurchaseOrderInProgess() {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      <div>
-                        <Button onClick={() => handleCompleteOrder(order.po_no)} variant={"outline"} className="">
-                          Complete
-                        </Button>
-                      </div>
                     </div>
                   </TableCell>
                 </TableRow>

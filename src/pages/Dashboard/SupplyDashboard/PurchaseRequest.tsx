@@ -13,8 +13,8 @@ import PurchaseRequestForm from "./components/PurchaseRequestForm";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { usePurchaseRequest } from "@/services/purchaseRequestServices";
 import { arraySort } from "@/services/itemServices";
-import { generateNOWPDF } from "@/services/generateNOWPDF";
-import { pdf } from "@react-pdf/renderer";
+// import { generateNOWPDF } from "@/services/generateNOWPDF";
+// import { pdf } from "@react-pdf/renderer";
 
 const PurchaseRequest: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -34,47 +34,47 @@ const PurchaseRequest: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleGeneratePDF = async () => {
-    try {
+  // const handleGeneratePDF = async () => {
+  //   try {
       
-      const awardNoticeData = {
-        date: 'January 12, 2024',
-        recipient: {
-          name: 'CGR PRINT SHOP',
-          address: ['Udlog St., Cansojong', 'Talisay City, Cebu'],
-        },
-        awardDetails: {
-          officeSupply: 'OFFICE SUPPLY FOR REGISTRAR\'S OFFICE',
-          date: 'JANUARY 05, 2024',
-          amount: 19950,
-        },
-        signatory: {
-          name: 'ENGILBERT C. BENOLIRAO, DEV.ED.D.',
-          title: 'Campus Director / Head of Procuring Entity',
-        },
-      }
+  //     const awardNoticeData = {
+  //       date: 'January 12, 2024',
+  //       recipient: {
+  //         name: 'CGR PRINT SHOP',
+  //         address: ['Udlog St., Cansojong', 'Talisay City, Cebu'],
+  //       },
+  //       awardDetails: {
+  //         officeSupply: 'OFFICE SUPPLY FOR REGISTRAR\'S OFFICE',
+  //         date: 'JANUARY 05, 2024',
+  //         amount: 19950,
+  //       },
+  //       signatory: {
+  //         name: 'ENGILBERT C. BENOLIRAO, DEV.ED.D.',
+  //         title: 'Campus Director / Head of Procuring Entity',
+  //       },
+  //     }
 
-      // Generate PDF blob
-      const doc = generateNOWPDF(awardNoticeData)
-      const blob = await pdf(doc).toBlob()
+  //     // Generate PDF blob
+  //     const doc = generateNOWPDF(awardNoticeData)
+  //     const blob = await pdf(doc).toBlob()
       
-      // Create object URL
-      const url = URL.createObjectURL(blob)
+  //     // Create object URL
+  //     const url = URL.createObjectURL(blob)
       
-      // Open PDF in a new window
-      const newWindow = window.open(url, '_blank');
-      if (newWindow) {
-        newWindow.document.title = 'NOA.pdf';
-      }
+  //     // Open PDF in a new window
+  //     const newWindow = window.open(url, '_blank');
+  //     if (newWindow) {
+  //       newWindow.document.title = 'NOA.pdf';
+  //     }
       
-      // Cleanup
-      URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error generating PDF:', error)
-    } finally {
-      setIsGenerating(false)
-    }
-  }
+  //     // Cleanup
+  //     URL.revokeObjectURL(url)
+  //   } catch (error) {
+  //     console.error('Error generating PDF:', error)
+  //   } finally {
+  //     setIsGenerating(false)
+  //   }
+  // }
 
   return (
     <Layout>
