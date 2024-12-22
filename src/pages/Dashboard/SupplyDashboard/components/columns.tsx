@@ -5,6 +5,19 @@ import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 
+export const CustomStyle = (status: string) => {
+  switch (status) {
+    case "Accepted":
+    case "Completed":
+      return "bg-green-200 hover:bg-green-300 text-green-500";
+    case "Cancelled":
+      return "bg-red-100 hover:bg-red-200 text-red-400"
+  
+    default:
+      return "bg-orange-100 text-orange-400"
+  }
+}
+
 export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     accessorKey: "pr_no",
@@ -38,17 +51,11 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="STATUS" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const status: string = row.getValue("status");
       return (
         <div className="w-[250px]">
           <Badge
-            className={`${
-              status === "Approved"
-                ? "bg-green-200 hover:bg-green-300 text-green-500"
-                : status === "Cancelled"
-                ? "bg-red-100 hover:bg-red-200 text-red-400"
-                : "bg-orange-100 text-orange-400"
-            }`}
+            className={CustomStyle(status)}
           >
             {row.getValue("status")}
           </Badge>

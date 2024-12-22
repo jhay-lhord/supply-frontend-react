@@ -226,7 +226,13 @@ export const useUpdatePurchaseRequestStatus = () => {
   };
 };
 
-type PurchaseRequestStatus = "Approved" | "Rejected" | "Cancelled" | "Forwarded to Procurement" | "Received by the Procurement";
+type PurchaseRequestStatus =
+  | "Approved"
+  | "Rejected"
+  | "Cancelled"
+  | "Forwarded to Procurement"
+  | "Received by the Procurement"
+  | "Items Delivered";
 
 export const usePurchaseRequestActions = () => {
   const mutation = useUpdatePurchaseRequestStatus();
@@ -266,15 +272,20 @@ export const usePurchaseRequestActions = () => {
     handleApprove: (pr_no: string) => handleAction("Approved", pr_no),
     handleReject: (pr_no: string) => handleAction("Rejected", pr_no),
     handleCancel: (pr_no: string) => handleAction("Cancelled", pr_no),
-    handleForward: (pr_no: string) => handleAction("Forwarded to Procurement", pr_no),
+    handleForward: (pr_no: string) =>
+      handleAction("Forwarded to Procurement", pr_no),
     isPendingApprove,
     isPendingReject,
     isPendingCancel,
-    isPendingForward
+    isPendingForward,
   };
 };
 
-type MOPStatus = "Direct Contracting" | "Small Value Procurement" | "Shopping" | "Public Bidding"
+type MOPStatus =
+  | "Direct Contracting"
+  | "Small Value Procurement"
+  | "Shopping"
+  | "Public Bidding";
 
 export const updatePurchaseRequestMOP = async ({
   pr_no,
@@ -329,4 +340,3 @@ export const useUpdatePurchaseRequestMOP = () => {
     isPending,
   };
 };
-

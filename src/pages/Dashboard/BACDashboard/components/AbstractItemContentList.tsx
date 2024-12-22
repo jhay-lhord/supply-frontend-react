@@ -10,15 +10,17 @@ import {
 import { formatDate } from "@/services/formatDate";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import {
+  ArrowLeftIcon,
   BuildingIcon,
   CalendarIcon,
   ClipboardIcon,
   CreditCardIcon,
+  FileTextIcon,
   Loader2,
   MapPinIcon,
   PrinterIcon,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../../shared/components/Loading";
 import {
   useGetAbstractOfQuotation,
@@ -30,6 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog } from "@radix-ui/react-dialog";
 import {
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -41,6 +44,7 @@ export const AbstractItemContentList = () => {
   const [rfqNo, setRfqNo] = useState<string | undefined>(undefined);
 
   const { aoq_no } = useParams();
+  const navigate = useNavigate()
 
   const { data: abstract, isLoading: abstract_loading } =
     useGetAbstractOfQuotation(aoq_no!);
@@ -64,13 +68,14 @@ export const AbstractItemContentList = () => {
 
   return (
     <div className="w-full">
+      <Button className="my-2" onClick={() => navigate(-1)}><ArrowLeftIcon className="h-4 w-4"/> Back</Button>
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
           <CardTitle className="">
             <div>
               <div className="flex items-center justify-between">
                 <div className="">
-                  <p className="font-thin">{abstractData?.aoq_no}</p>
+                  <p className="">{abstractData?.aoq_no}</p>
                   <div className="flex items-center pt-2">
                     <CalendarIcon className="w-3 h-3 mr-1" />
                     <p className="text-sm font-thin">
@@ -214,6 +219,9 @@ export const SupplierInformation: React.FC<SupplierInformationProps> = ({
             </Badge>
           </div>
         )}
+      <DialogFooter>
+        <Button> <FileTextIcon className="h-4 w-4 mr-2"/> Generate NOA</Button>
+      </DialogFooter>
       </DialogContent>
     </Dialog>
   );

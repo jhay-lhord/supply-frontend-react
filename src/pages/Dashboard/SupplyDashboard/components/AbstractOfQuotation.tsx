@@ -14,9 +14,16 @@ import {
 } from "@/components/ui/table";
 import { formatDate } from "@/utils/formateDate";
 import { Button } from "@/components/ui/button";
-import { PackageOpen, ShoppingCart } from "lucide-react";
+import { PackageOpen, PrinterIcon, ShoppingCart } from "lucide-react";
 import { PurchaseOrderForm } from "./PurchaseOrderForm";
 import Loading from "../../shared/components/Loading";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { generatePOPDF } from "@/services/generatePOPDF";
 
 export default function SupplyAOQ() {
   const [supplierNo, setSupplierNo] = useState<string>("");
@@ -27,6 +34,8 @@ export default function SupplyAOQ() {
   const { data: purchase_order, isLoading } = useGetAllPurchaseOrder();
   const { data: items } = useGetAllSupplierItem();
   const { data: supplier } = useGetAllSupplier();
+
+  console.log(items)
 
   const purchaseOrderData = useMemo(() => {
     return Array.isArray(purchase_order?.data) ? purchase_order.data : [];
@@ -93,6 +102,14 @@ export default function SupplyAOQ() {
     setTotalAmount(total_amount);
   };
 
+  const handleGeneratePDF = async (supplier_name: string) => {
+    const supplierItems = supplierItemData.filter(data => data.rfq_details.supplier_name.toLowerCase() === supplier_name.toLowerCase())
+    console.log(supplierItems)
+
+    // const pdfURL = await generatePOPDF(purchaseOrderData!, supplierItems);
+    // return window.open(pdfURL!, "_blank")
+  };
+
   useEffect(() => {
     if (!isDialogOpen) {
       setSupplierNo("");
@@ -125,7 +142,19 @@ export default function SupplyAOQ() {
               </TableCell>
               <TableCell>₱{totalAmountPerSupplier(item.supplier_no)}</TableCell>
               <TableCell>{formatDate(item.created_at)}</TableCell>
-              <TableCell>
+              <TableCell className="flex items-center gap-2">
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button variant={"outline"} onClick={() => handleGeneratePDF(item.rfq_details.supplier_name)}>
+                        <PrinterIcon className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Print NTP 
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <Button
                   onClick={() =>
                     handleOpenForm(

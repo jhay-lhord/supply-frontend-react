@@ -109,7 +109,7 @@ const SupplySidebar = () => {
             <SidebarMenu>
               {procurement.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
+                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url || location.pathname.includes(item.url)}>
                     <Link to={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
