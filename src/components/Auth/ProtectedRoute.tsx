@@ -1,83 +1,40 @@
-import { jwtDecode, JwtPayload } from "jwt-decode";
-import api from "../../api";
-import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../constants";
-import { useState, useEffect } from "react";
-import Loading from "@/pages/Dashboard/shared/components/Loading";
-import Login from "@/pages/Forms/Login";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from './authStore';
+import Loading from '@/pages/Dashboard/shared/components/Loading';
+import Login from '@/pages/Forms/Login';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
-  const [isLoading, setIsloading] = useState<boolean>(true);
-
+  const { isAuthenticated, checkAuth } = useAuthStore();
+  const [isChecking, setIsChecking] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = () => {
-      try {
-        auth();
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsloading(false);
-      }
+    const verifyAuth = async () => {
+      setIsChecking(true);
+      await checkAuth();
+      setIsChecking(false);
     };
-    checkAuth();
-  }, []);
 
-  const refresh_token = async () => {
-    const refresh_token = localStorage.getItem(REFRESH_TOKEN);
-    console.log("trying to refresh the token");
-    try {
-      const request = await api.post("/api/token/refresh/", {
-        refresh: refresh_token,
-      });
-      if (request.status === 200) {
-        localStorage.setItem(ACCESS_TOKEN, request.data.access);
-        setIsAuthorized(true);
-      } else {
-        setIsAuthorized(false);
-      }
-    } catch (error) {
-      setIsAuthorized(false);
-      console.error(error);
-    }
-  };
-
-  const auth = async () => {
-    const access_token = localStorage.getItem("access");
-
-    if (!access_token) {
-      return setIsAuthorized(false);
-    }
-
-    const decoded_token = jwtDecode<JwtPayload>(access_token);
-    const tokenExpiration: number | undefined = decoded_token?.exp;
-    const nowInSeconds: number = Date.now() / 1000;
-    const isTokenExpired = tokenExpiration && tokenExpiration < nowInSeconds;
-    console.log(`The Token is Expired: ${isTokenExpired}`);
-    if (!isTokenExpired) {
-      setIsAuthorized(true);
-    } else {
-      await refresh_token();
-    }
-  };
+    verifyAuth();
+  }, [checkAuth]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthorized) {
-      navigate("/login");
+    if (!isChecking && !isAuthenticated) {
+      navigate('/login');
     }
-  }, [isLoading, isAuthorized, navigate]);
+  }, [isChecking, isAuthenticated, navigate]);
 
-  if (isLoading) {
+  if (isChecking) {
     return <Loading />;
   }
 
-  return isAuthorized ? children : <Login />;
+  return isAuthenticated ? children : <Login />;
 };
 
 export default ProtectedRoute;
+

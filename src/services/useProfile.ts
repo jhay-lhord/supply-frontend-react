@@ -1,17 +1,12 @@
-import { ACCESS_TOKEN } from "@/constants";
-import {
-  getEmailFromToken,
-  getFullnameFromToken,
-  getRoleFromToken,
-} from "@/utils/jwtHelper";
+import useAuthStore from "@/components/Auth/authStore";
 
-export const getUserInformation = () => {
-  const token = localStorage.getItem(ACCESS_TOKEN)
-  const userRole = getRoleFromToken(token!);
-  const userEmail = getEmailFromToken(token!);
-  const userFullname = getFullnameFromToken(token!);
+export const useGetUserInformation = () => {
+  const { user } = useAuthStore();
+  const userRole = user?.role;
+  const userEmail = user?.email
+  const userFullname = user?.fullname
   const trimmedUserRole = (role = userRole) => 
-    role.split(" ")
+    role?.split(" ")
     .map((word) => word[0])
     .join("");
 

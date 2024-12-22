@@ -6,18 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import ErrorCard from "@/components/ErrorCard";
 import { InputOTPForm } from "@/pages/Forms/InputOTPForm";
-import { useNavigate } from "react-router-dom";
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userLoginSchema, userLoginType } from "@/types/request/user";
-import { loginUser } from "@/services/LoginUserServices";
 import { useToast } from "@/hooks/use-toast";
+import useAuthStore from "@/components/Auth/authStore";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isOTPSent, setIsOTPSent] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const { checkUser, errorMessage, otpSent } = useAuthStore();
+
 
   const { toast } = useToast();
 
@@ -33,28 +33,25 @@ const Login = () => {
     },
   });
 
-  const navigate = useNavigate();
-
   const onSubmit = async (data: userLoginType) => {
     setIsLoading(true);
-    setError(null);
-
-    const { status, isOTPSent, errorMessage } = await loginUser(data);
-
-    setIsOTPSent(isOTPSent);
-
-    if (isOTPSent)
-      return toast({
-        title: "Success",
-        description: "OTP sent to your email, please verify",
-      });
-
-    if (status === 200 && !isOTPSent) {
-      navigate("/");
-    } else {
-      setError(errorMessage);
-    }
-    setError(errorMessage);
+    await checkUser(
+      data.email,
+      data.password,
+      (successMessage) => {
+        toast({
+          title: 'Success',
+          description: successMessage,
+        });
+      },
+      (errorMessage) => {
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
+    );
     setIsLoading(false);
   };
 
@@ -121,16 +118,15 @@ const Login = () => {
             className="w-full h-auto object-contain"
           />
         </div>
-
         <div className="flex justify-center items-center w-1/2 p-7">
-          {!isOTPSent ? (
+          {!otpSent ? (
             <div className="w-full flex flex-col justify-between space-y-4">
               <div>
                 <p className="text-3xl font-normal text-gray-900 text-center mt-0 mb-6">
                   Sign in to Supply Office
                 </p>
 
-                {error && <ErrorCard description={error} />}
+                {errorMessage && <ErrorCard description={errorMessage} />}
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                   {renderField({ label: "Email", field_name: "email", errors })}

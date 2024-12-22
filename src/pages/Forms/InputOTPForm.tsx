@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import api from "../../api";
-import { toast } from "sonner";
 
 import {
   Form,
@@ -22,7 +20,8 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useState } from "react";
-import { saveTokenToLocalStorage } from "@/services/LoginUserServices";
+import useAuthStore from "@/components/Auth/authStore";
+import { useToast } from "@/hooks/use-toast";
 
 const FormSchema = z.object({
   otp_code: z.string().min(6, {
@@ -39,37 +38,33 @@ export function InputOTPForm() {
   });
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [otpError, setOtpError] = useState<string>("");
+  const { verifyOTP, email } = useAuthStore();
 
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const email = localStorage.getItem("email");
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const otp_code = data.otp_code;
     setIsloading(true);
     setOtpError("");
-    api
-      .post("/api/user/login_verify_otp/", { email, otp_code })
-      .then((response) => {
-        console.log(response);
-        if (response.status === 200) {
-          saveTokenToLocalStorage(response, email!);
-          navigate("/");
-          toast("Login successful!", {
-            description: " Welcome back, CTU AC Supply Management System",
-          });
-        } else {
-          navigate("/login");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        if (error.code === "ERR_BAD_REQUEST") {
-          setOtpError(error.response?.data?.error);
-        }
-      })
-      .finally(() => {
-        setIsloading(false);
-      });
+    await verifyOTP(
+      email!,
+      otp_code,
+      (successMessage) => {
+        toast({
+          title: successMessage,
+          description: " Welcome back, CTU AC Supply Management System",
+        });
+        navigate("/")
+      },
+      (errorMessage) => {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    );
   };
 
   return (

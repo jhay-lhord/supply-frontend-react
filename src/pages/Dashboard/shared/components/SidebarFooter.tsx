@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import { getUserInformation } from "@/services/useProfile";
+import { useGetUserInformation } from "@/services/useProfile";
 import { ChevronsUpDownIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
   const navigate = useNavigate();
-  const {userEmail, userFullname, trimmedUserRole, userRole} = getUserInformation()
+  const {userEmail, userFullname, trimmedUserRole, userRole} = useGetUserInformation()
 
   const handleLogoutUser = () => {
     logoutUser();
