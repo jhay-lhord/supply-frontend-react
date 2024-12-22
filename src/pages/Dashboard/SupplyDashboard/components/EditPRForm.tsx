@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -6,12 +6,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Description } from "@radix-ui/react-dialog";
 import Loading from "../../shared/components/Loading";
 import { Loader2 } from "lucide-react";
 import {
@@ -63,15 +63,6 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
   });
 
   const { mutate } = useUpdatePurchaseRequest();
-
-  useEffect(() => {
-    if (purchaseData) {
-      setValue("purpose", purchaseData.purpose || "");
-      setValue("office", purchaseData.office || "");
-      setValue("requisitioner", purchaseData.requisitioner_details.name || "");
-    }
-  }, [purchaseData, setValue]);
-  console.log(purchaseData);
 
   const loadRequisitionerOptions = async (
     inputValue: string
@@ -136,7 +127,7 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
           <DialogHeader>
             <DialogTitle className="py-6">Edit Purchase Request</DialogTitle>
           </DialogHeader>
-          <Description>
+          <DialogDescription>
             {purchaseRequestLoading ? (
               <Loading />
             ) : (
@@ -159,7 +150,7 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
                     "Requested By",
                     "requisitioner",
                     <AsyncSelect
-                      value={{value: purchaseData?.requisitioner_details.requisition_id ?? "", label:purchaseData?.requisitioner_details.name ?? ""}}
+                      defaultValue={{value: purchaseData?.requisitioner_details.requisition_id ?? "", label:purchaseData?.requisitioner_details.name ?? ""}}
                       defaultOptions
                       loadOptions={loadRequisitionerOptions}
                       onChange={handleRequisitionerChange}
@@ -182,7 +173,7 @@ const EditPRForm: React.FC<EditPRFormProps> = ({
                 </div>
               </form>
             )}
-          </Description>
+          </DialogDescription>
         </ScrollArea>
       </DialogContent>
     </Dialog>
