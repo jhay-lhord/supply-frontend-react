@@ -10,16 +10,17 @@ import { useGetUserInformation } from "@/services/useProfile";
 import { ChevronsUpDownIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { logoutUser } from "@/services/LogoutUserServices";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "@/components/Auth/authStore";
 
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const {userEmail, userFullname, trimmedUserRole, userRole} = useGetUserInformation()
+  const { logout } = useAuthStore();
 
   const handleLogoutUser = () => {
-    logoutUser();
+    logout();
     navigate("/login");
   };
 

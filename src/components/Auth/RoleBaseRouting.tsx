@@ -1,22 +1,33 @@
-import BACDashboard from "@/pages/Dashboard/BACDashboard/BACDashboard";
-import SupplyDashboard from "@/pages/Dashboard/SupplyDashboard/Dashboard";
-import AdminDashboard from "@/pages/Dashboard/AdminDashboard/Dashboard";
-import useAuthStore from "./authStore";
+import React, { lazy, Suspense } from 'react';
+import useAuthStore from './authStore';
+import Loading from '@/pages/Dashboard/shared/components/Loading';
 
-const RoleBaseRouting = () => {
+const BACDashboard = lazy(() => import("@/pages/Dashboard/BACDashboard/BACDashboard"));
+const SupplyDashboard = lazy(() => import("@/pages/Dashboard/SupplyDashboard/Dashboard"));
+const AdminDashboard = lazy(() => import("@/pages/Dashboard/AdminDashboard/Dashboard"));
 
+const RoleBaseRouting: React.FC = () => {
   const { user } = useAuthStore();
 
-  switch (user?.role) {
-    case "Supply Officer":
-      return <SupplyDashboard />;
-    case "Admin":
-      return <AdminDashboard />;
-    case "BAC Officer":
-      return <BACDashboard />;
-    default:
-      return <div>Access Denied</div>;
-  }
+  const DashboardComponent = React.useMemo(() => {
+    switch (user?.role) {
+      case "Supply Officer":
+        return SupplyDashboard;
+      case "Admin":
+        return AdminDashboard;
+      case "BAC Officer":
+        return BACDashboard;
+      default:
+        return () => <div>Access Denied</div>;
+    }
+  }, [user?.role]);
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <DashboardComponent />
+    </Suspense>
+  );
 };
 
 export default RoleBaseRouting;
+

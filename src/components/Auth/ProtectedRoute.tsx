@@ -1,39 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from './authStore';
+import RoleBaseRouting from './RoleBaseRouting';
 import Loading from '@/pages/Dashboard/shared/components/Loading';
-import Login from '@/pages/Forms/Login';
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, checkAuth } = useAuthStore();
+const ProtectedRoute: React.FC = () => {
+  const { isAuthenticated, checkAuth, user } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
-  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const verifyAuth = async () => {
-      setIsChecking(true);
-      await checkAuth();
-      setIsChecking(false);
+      try {
+        await checkAuth();
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setIsChecking(false);
+      }
     };
 
     verifyAuth();
   }, [checkAuth]);
 
-  useEffect(() => {
-    if (!isChecking && !isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isChecking, isAuthenticated, navigate]);
-
   if (isChecking) {
     return <Loading />;
   }
 
-  return isAuthenticated ? children : <Login />;
+  if (!isAuthenticated) {
+    // Redirect to login while preserving the intended destination
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (!user) {
+    return <Loading />;
+  }
+
+  return <RoleBaseRouting />;
 };
 
 export default ProtectedRoute;
