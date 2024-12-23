@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const purchaseRequestFormSchema = z.object({
   pr_no: z.string().min(1, 'Required'),
   office: z.string().min(1, 'Required'),
-  fund_cluster: z.string().min(1, 'Required'),
+  fund_cluster: z.string().optional(),
   purpose: z.string().min(1, 'Required'),
   status: z.string().min(1, 'Required').default("Not Approved"),
   mode_of_procurement: z.string().default("Direct Contracting"),

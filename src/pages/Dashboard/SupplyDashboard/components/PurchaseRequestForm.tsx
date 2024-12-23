@@ -80,7 +80,9 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
       return (
         campus_directors.data
           ?.filter((campus_director) =>
-            campus_director.name.toLowerCase().includes(inputValue.toLowerCase())
+            campus_director.name
+              .toLowerCase()
+              .includes(inputValue.toLowerCase())
           )
           .map((campus_director) => ({
             value: campus_director.cd_id,
@@ -112,7 +114,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     setValue("campus_director", selectedOption?.value ?? "");
   };
 
-
   const onSubmit = async (data: PurchaseRequestData) => {
     setIsLoading(true);
     if (purchaseRequestFormSchema.safeParse(data).success) {
@@ -132,7 +133,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     name: keyof PurchaseRequestData,
     component: React.ReactNode
   ) => (
-    <div>
+    <div className="w-full">
       <Label>{label}</Label>
       {component}
       {errors[name] && (
@@ -144,24 +145,33 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogContent className="max-w-full w-[45rem]">
-        <ScrollArea className="h-[32rem] mb-8">
-          <DialogTitle className="pb-6">Create Purchase Request</DialogTitle>
+        <DialogTitle className="pb-6">Create Purchase Request</DialogTitle>
+        <ScrollArea className="h-[30rem] mb-8">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4">
-              {renderField(
-                "PR No.",
-                "pr_no",
-                <Input
-                  {...register("pr_no")}
-                  value={generatePrNo(currentPurchaseNumber)}
-                  readOnly
-                />
-              )}
+              <div className="flex gap-4">
+                {renderField(
+                  "PR No.",
+                  "pr_no",
+                  <Input
+                    {...register("pr_no")}
+                    value={generatePrNo(currentPurchaseNumber)}
+                    readOnly
+                  />
+                )}
+                {renderField(
+                  "Fund Cluster",
+                  "fund_cluster",
+                  <Input {...register("fund_cluster")} />
+                )}
+              </div>
+
               {renderField(
                 "Office",
                 "office",
                 <Input {...register("office")} />
               )}
+
               {renderField(
                 "Purpose",
                 "purpose",
@@ -175,7 +185,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   loadOptions={loadRequisitionerOptions}
                   onChange={handleRequisitionerChange}
                   placeholder="Search for a Requisitioner..."
-                  className="mb-4 text-sm"
+                  className="text-sm"
                 />
               )}
               {renderField(
@@ -186,7 +196,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
                   loadOptions={loadCampusDirectorOptions}
                   onChange={handleCampusDirectorChange}
                   placeholder="Search for a Campus Director..."
-                  className="mb-4 text-sm"
+                  className="text-sm"
                 />
               )}
               <div className="mt-6 fixed bottom-6 right-10">

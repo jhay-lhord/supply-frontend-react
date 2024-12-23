@@ -3,6 +3,7 @@ export type purchaseRequestType = {
   user: string,
   item_no: string,
   office: string,
+  fund_cluster: string,
   purpose: string,
   status: string,
   requisitioner_details: {
