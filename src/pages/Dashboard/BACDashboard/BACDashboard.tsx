@@ -11,7 +11,7 @@ import { RecentActivities } from "../shared/components/RecentActivities";
 import Layout from "./components/Layout/BACDashboardLayout";
 
 import { Loader2 } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { usePurchaseRequestInProgressCount } from "@/services/purchaseRequestServices";
 import { useRequestForQuotationCount } from "@/services/requestForQoutationServices";
 import { useAbstractOfQuotationCount } from "@/services/AbstractOfQuotationServices";
@@ -51,6 +51,7 @@ const BACDashboard: React.FC = () => {
   const { data } = useGetBACDailyReport();
 
   const chartData = data?.data;
+  const reversedChartData = Array.isArray(chartData) ? [...chartData].reverse() : [];
 
 
   return (
@@ -170,14 +171,21 @@ const BACDashboard: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig}>
-                      <BarChart accessibilityLayer data={chartData}>
+                      <BarChart accessibilityLayer data={reversedChartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                           dataKey="day"
                           tickLine={false}
                           tickMargin={10}
                           axisLine={false}
-                          tickFormatter={(value) => value.slice(0, 3)}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tickMargin={10}
+                          allowDecimals={false}
+                          tickFormatter={(value) => value.toFixed(0)}
+                          tick={{ fill: "#4b5563" }}
                         />
                         <ChartTooltip
                           cursor={false}
@@ -186,22 +194,21 @@ const BACDashboard: React.FC = () => {
                         <Bar
                           dataKey="total_approved"
                           fill="var(--color-total_approved)"
-                          radius={10}
-                          width={20}
-                        />
+                          stackId={"a"}
+                          barSize={25}
+                          />
 
                         <Bar
                           dataKey="total_quotation"
                           fill={"var(--color-total_quotation)"}
-                          radius={10}
-                          width={20}
+                          stackId={"a"}
+                          minPointSize={2}
                         />
 
                         <Bar
                           dataKey="total_abstract"
                           fill="var(--color-total_abstract)"
-                          radius={10}
-                          width={20}
+                          stackId={"a"}
                         />
                       </BarChart>
                     </ChartContainer>

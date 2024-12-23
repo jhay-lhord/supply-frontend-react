@@ -53,7 +53,8 @@ const SupplyDashboard: React.FC = () => {
 
   const { data } = useGetSupplyDailyReport();
 
-  const chartData = data?.data;
+  const chartData = data?.data
+  const reversedChartData = Array.isArray(data?.data) ?  [...chartData]?.reverse() : [];
 
   return (
     <Layout>
@@ -185,14 +186,13 @@ const SupplyDashboard: React.FC = () => {
                   </CardHeader>
                   <CardContent className="">
                     <ChartContainer config={chartConfig}>
-                      <BarChart accessibilityLayer data={chartData}>
+                      <BarChart accessibilityLayer data={reversedChartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                           dataKey="day"
                           tickLine={false}
                           tickMargin={10}
                           axisLine={false}
-                          tickFormatter={(value) => value.slice(0, 3)}
                         />
                         <YAxis
                           axisLine={false}
@@ -209,25 +209,23 @@ const SupplyDashboard: React.FC = () => {
                         <Bar
                           dataKey="total_active_pr"
                           fill="var(--color-total_active_pr)"
-                          radius={[4, 4, 0, 0]}
-                          barSize={20}
+                          stackId={"a"}
+                          barSize={25}
                           minPointSize={2}
                         />
 
                         <Bar
                           dataKey="total_inprogress_pr"
                           fill={"var(--color-total_inprogress_pr)"}
-                          radius={[4, 4, 0, 0]}
-                          barSize={20}
-                          minPointSize={2}
+                          stackId={"a"}
+                          barSize={25}
                         />
 
                         <Bar
                           dataKey="total_inprogress_po"
                           fill="var(--color-total_inprogress_po)"
-                          radius={[4, 4, 0, 0]}
-                          barSize={20}
-                          minPointSize={2}
+                          stackId={"a"}
+                          barSize={25}
                         />
                       </BarChart>
                     </ChartContainer>

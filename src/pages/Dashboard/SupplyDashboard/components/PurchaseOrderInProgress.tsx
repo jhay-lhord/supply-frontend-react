@@ -29,10 +29,12 @@ import { useMemo, useState } from "react";
 import {
   useGetAllPurchaseOrder,
   useGetItemsDelivered,
+  useUpdatePurchaseOrderStatus,
 } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
 import CancelOrderDialog from "./cancelOrder";
 import { useNavigate } from "react-router-dom";
+import { useUpdatePurchaseRequestStatus } from "@/services/purchaseRequestServices";
 
 export default function PurchaseOrderInProgess() {
   const [poNo, setPoNo] = useState<string>("");
@@ -46,8 +48,8 @@ export default function PurchaseOrderInProgess() {
   const { data, isLoading } = useGetAllPurchaseOrder();
   const { data: supplier_item } = useGetAllSupplierItem();
   const { data: items_delivered } = useGetItemsDelivered();
-  // const { mutate: updatePOMutation } = useUpdatePurchaseOrderStatus();
-  // const { mutate: updatePRMutation } = useUpdatePurchaseRequestStatus();
+  const { mutate: updatePOMutation } = useUpdatePurchaseOrderStatus();
+  const { mutate: updatePRMutation } = useUpdatePurchaseRequestStatus();
   const navigate = useNavigate();
 
   const itemsDeliveredData = useMemo(() => {
@@ -103,10 +105,19 @@ export default function PurchaseOrderInProgess() {
     inProgressOrders.forEach(order => {
       const incompleteItems = getIncompleteItems(order.supplier_details.supplier_no)
       console.log(incompleteItems)
+      if (incompleteItems.length === 0) {
+        updatePOMutation({ po_no: order.po_no, status: "Completed" });
+        updatePRMutation({
+          pr_no: order.pr_details.pr_no,
+          status: "Items Delivered",
+        });
+        console.log('updated successfully')
+      }
     })
   }, [inProgressOrders])
 
   console.log(isAllCompleted)
+
 
   // useEffect(() => {
   //   inProgressOrders.forEach((order) => {
