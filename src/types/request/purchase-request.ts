@@ -5,7 +5,7 @@ export const purchaseRequestFormSchema = z.object({
   office: z.string().min(1, 'Required'),
   fund_cluster: z.string().optional(),
   purpose: z.string().min(1, 'Required'),
-  status: z.string().min(1, 'Required').default("Not Approved"),
+  status: z.string().min(1, 'Required').default("Pending for Approval"),
   mode_of_procurement: z.string().default("Direct Contracting"),
   requisitioner: z.string().min(1, 'Required'),
   campus_director: z.string().min(1, 'Required'),

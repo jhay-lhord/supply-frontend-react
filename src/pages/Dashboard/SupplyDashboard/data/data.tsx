@@ -6,7 +6,7 @@ import {CheckCircleIcon, CircleArrowUpIcon, CircleXIcon } from "lucide-react"
 
 export const statuses = [
   {
-    value: "Not Approved",
+    value: "Pending for Approval",
     label: "Pending",
     icon: QuestionMarkCircledIcon,
   },

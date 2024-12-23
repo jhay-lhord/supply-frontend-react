@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { OrderReceivedDialog } from "./orderReceived";
 import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useGetAllPurchaseOrder,
   useGetItemsDelivered,
@@ -101,43 +101,27 @@ export default function PurchaseOrderInProgess() {
     });
   };
 
-  const isAllCompleted = useMemo(() => {
-    inProgressOrders.forEach(order => {
-      const incompleteItems = getIncompleteItems(order.supplier_details.supplier_no)
-      console.log(incompleteItems)
-      if (incompleteItems.length === 0) {
+  const allOrdersCompleted = useMemo(() => {
+    return inProgressOrders.every(order => {
+      const incompleteItems = getIncompleteItems(order.supplier_details.supplier_no);
+      return incompleteItems.length === 0;
+    });
+  }, [inProgressOrders]);
+  
+  useEffect(() => {
+    if (allOrdersCompleted) {
+      inProgressOrders.forEach(order => {
         updatePOMutation({ po_no: order.po_no, status: "Completed" });
         updatePRMutation({
           pr_no: order.pr_details.pr_no,
           status: "Items Delivered",
         });
-        console.log('updated successfully')
-      }
-    })
-  }, [inProgressOrders])
-
-  console.log(isAllCompleted)
-
-
-  // useEffect(() => {
-  //   inProgressOrders.forEach((order) => {
-  //     const incompleteItems = getIncompleteItems(
-  //       order.supplier_details.supplier_no
-  //     );
-  //     if (incompleteItems.length === 0) {
-  //       updatePOMutation({ po_no: order.po_no, status: "Completed" });
-  //       updatePRMutation({
-  //         pr_no: order.pr_details.pr_no,
-  //         status: "Items Delivered",
-  //       });
-  //     }
-  //   });
-  // }, [
-  //   inProgressOrders,
-  //   supplierItemData,
-  //   itemsDeliveredData,
-  //   updatePOMutation,
-  // ]);
+      });
+      console.log('All orders updated successfully');
+    }
+  }, [allOrdersCompleted, inProgressOrders, updatePOMutation, updatePRMutation]);
+  
+  console.log('Are all orders completed?', allOrdersCompleted);
 
   const itemsInSupplierCount = (supplier_no: string) =>
     supplierItemData.filter(

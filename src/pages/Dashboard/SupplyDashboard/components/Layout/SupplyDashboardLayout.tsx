@@ -1,6 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { greetings } from "@/services/greeting";
 import SupplySidebar from "../SupplySidebar";
+import FloatingPDFGenerator from "../pdf-generator";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <h1 className="text-xl font-normal">{greetings()}</h1>
           </div>
         </div>
+        <FloatingPDFGenerator/>
         <div className="flex p-10">{children}</div>
       </main>
     </SidebarProvider>

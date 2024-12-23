@@ -11,6 +11,7 @@ export const CustomStyle = (status: string) => {
     case "Completed":
       return "bg-green-200 hover:bg-green-300 text-green-500";
     case "Cancelled":
+    case "Rejected":
       return "bg-red-100 hover:bg-red-200 text-red-400"
   
     default:
