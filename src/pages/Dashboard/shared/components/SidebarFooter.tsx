@@ -2,12 +2,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { useGetUserInformation } from "@/services/useProfile";
-import { ChevronsUpDownIcon } from "lucide-react";
+import { ChevronsUpDownIcon, LogOut, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +15,8 @@ import useAuthStore from "@/components/Auth/authStore";
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
   const navigate = useNavigate();
-  const {userEmail, userFullname, trimmedUserRole, userRole} = useGetUserInformation()
+  const { userEmail, userFullname, trimmedUserRole, userRole } =
+    useGetUserInformation();
   const { logout } = useAuthStore();
 
   const handleLogoutUser = () => {
@@ -57,13 +57,31 @@ export const CustomSidebarFooter = () => {
           side="top"
           className="w-[--radix-popper-anchor-width]"
         >
-          <DropdownMenuLabel>User Profile</DropdownMenuLabel>
           <DropdownMenuItem>
-            <span>Account</span>
+            <div className="w-full flex items-center gap-2 bg-orange-200 p-2 rounded">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src="/avatars/01.png" alt="@shadcn" />
+                <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <p className="text-xs">
+                  {userEmail}
+                </p>
+              </div>
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <div className="flex gap-2">
+              <User className="h-4 w-4" />
+              <p>Account</p>
+            </div>
           </DropdownMenuItem>
           <Separator />
           <DropdownMenuItem onClick={handleLogoutUser}>
-            <span>Sign out</span>
+          <div className="flex gap-2">
+              <LogOut className="h-4 w-4" />
+              <p>Log out</p>
+            </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
