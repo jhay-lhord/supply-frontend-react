@@ -51,11 +51,11 @@ export function InputOTPForm() {
       email!,
       otp_code,
       (successMessage) => {
+        navigate("/")
         toast({
           title: successMessage,
           description: " Welcome back, CTU AC Supply Management System",
         });
-        navigate("/")
       },
       (errorMessage) => {
         toast({

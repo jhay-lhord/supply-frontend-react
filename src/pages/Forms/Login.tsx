@@ -17,8 +17,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { checkUser, errorMessage, otpSent } = useAuthStore();
-
-
   const { toast } = useToast();
 
   const {
