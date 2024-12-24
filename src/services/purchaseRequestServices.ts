@@ -103,7 +103,7 @@ export const usePurchaseRequestInProgressCount = () => {
       return data;
     })
     .filter((data) => {
-      return data.status === "Forwarded to Procurement";
+      return data.status === "Received by the Procurement";
     });
   const inProgressCount = purchase_request_in_progress?.length ?? 0;
   return { inProgressCount, isLoading };

@@ -96,7 +96,7 @@ const useAuthStore = create<AuthState>()(
           set({
             isAuthenticated: true,
             otpSent: false,
-            user: response.data,
+            user: response.data.user,
           });
           onSuccess?.(response.data.message);
         } catch (error) {
