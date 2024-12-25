@@ -4,10 +4,10 @@ import api from "@/api";
 import { AxiosError } from "axios";
 import { deleteAuthStorage, deleteCookies } from "@/utils/deleteCookies";
 
-interface User {
+export interface User {
   email: string;
   fullname: string;
-  role: string;
+  role?: string;
 }
 
 interface AuthState {
@@ -137,7 +137,8 @@ const useAuthStore = create<AuthState>()(
           const response = await api.post("/api/user/logout/");
 
           clearState();
-          await get().checkAuth();
+          // await get().checkAuth();
+          window.location.href = "/login";
           onSuccess?.(response?.data?.message);
         } catch (error) {
           console.error("Logout error:", error);

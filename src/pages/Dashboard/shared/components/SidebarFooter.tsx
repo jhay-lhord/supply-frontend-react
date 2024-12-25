@@ -9,21 +9,18 @@ import { useGetUserInformation } from "@/services/useProfile";
 import { ChevronsUpDownIcon, LogOut, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/components/Auth/authStore";
+import useAuthStore from "@/components/Auth/AuthStore";
 import { useToast } from "@/hooks/use-toast";
 
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { userEmail, userFullname, trimmedUserRole, userRole } =
     useGetUserInformation();
   const { logout } = useAuthStore();
 
   const handleLogoutUser = () => {
     logout((successMessage) => {
-      navigate("/login");
       toast({
         title: successMessage,
         description:

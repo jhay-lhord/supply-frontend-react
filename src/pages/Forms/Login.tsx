@@ -10,7 +10,7 @@ import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userLoginSchema, userLoginType } from "@/types/request/user";
 import { useToast } from "@/hooks/use-toast";
-import useAuthStore from "@/components/Auth/authStore";
+import useAuthStore from "@/components/Auth/AuthStore";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -38,15 +38,15 @@ const Login = () => {
       data.password,
       (successMessage) => {
         toast({
-          title: 'Success',
+          title: "Success",
           description: successMessage,
         });
       },
       (errorMessage) => {
         toast({
-          title: 'Error',
+          title: "Error",
           description: errorMessage,
-          variant: 'destructive',
+          variant: "destructive",
         });
       }
     );

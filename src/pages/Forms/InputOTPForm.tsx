@@ -20,7 +20,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useState } from "react";
-import useAuthStore from "@/components/Auth/authStore";
+import useAuthStore from "@/components/Auth/AuthStore";
 import { useToast } from "@/hooks/use-toast";
 
 const FormSchema = z.object({
@@ -51,7 +51,7 @@ export function InputOTPForm() {
       email!,
       otp_code,
       (successMessage) => {
-        navigate("/")
+        navigate("/");
         toast({
           title: successMessage,
           description: " Welcome back, CTU AC Supply Management System",

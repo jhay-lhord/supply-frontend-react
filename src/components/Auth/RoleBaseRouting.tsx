@@ -1,15 +1,19 @@
-import React, { lazy, Suspense } from 'react';
-import useAuthStore from './authStore';
-import Loading from '@/pages/Dashboard/shared/components/Loading';
+import React, { lazy, Suspense } from "react";
+import useAuthStore from "./AuthStore";
+import Loading from "@/pages/Dashboard/shared/components/Loading";
 
 const BACDashboard = lazy(() => import("@/pages/Dashboard/BACDashboard/BACDashboard"));
 const SupplyDashboard = lazy(() => import("@/pages/Dashboard/SupplyDashboard/Dashboard"));
 const AdminDashboard = lazy(() => import("@/pages/Dashboard/AdminDashboard/Dashboard"));
+const Login = lazy(() => import("@/pages/Forms/Login"));
 
-const RoleBaseRouting: React.FC = () => {
-  const { user } = useAuthStore();
+
+const RoleBasedRouting: React.FC = () => {
+  const { user, isLoading } = useAuthStore();
 
   const DashboardComponent = React.useMemo(() => {
+    if (isLoading) return Loading;
+
     switch (user?.role) {
       case "Supply Officer":
         return SupplyDashboard;
@@ -18,16 +22,16 @@ const RoleBaseRouting: React.FC = () => {
       case "BAC Officer":
         return BACDashboard;
       default:
-        return () => <div>Access Denied</div>;
+        return Login;
     }
-  }, [user?.role]);
+  }, [user?.role, isLoading]);
 
   return (
-    <Suspense fallback={<Loading />}>
-      <DashboardComponent />
-    </Suspense>
+      <Suspense fallback={<Loading />}>
+        <DashboardComponent />
+      </Suspense>
   );
 };
 
-export default RoleBaseRouting;
+export default RoleBasedRouting;
 

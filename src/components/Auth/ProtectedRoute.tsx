@@ -1,45 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import useAuthStore from './authStore';
-import Loading from '@/pages/Dashboard/shared/components/Loading';
-interface ProtectedRouteProps {
-  children: React.ReactNode;
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import useAuthStore, { User } from "./AuthStore";
+type ProtectedRouteProps =  {
+  allowedRoles?: User["role"][];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
-  const { isAuthenticated, checkAuth, user } = useAuthStore();
-  const [isChecking, setIsChecking] = useState(true);
-  const location = useLocation();
-
-  useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        await checkAuth();
-      } catch (error) {
-        console.error('Auth check failed:', error);
-      } finally {
-        setIsChecking(false);
-      }
-    };
-
-    verifyAuth();
-  }, [checkAuth]);
-
-  if (isChecking) {
-    return <Loading />;
-  }
-
+const ProtectedRoutes: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
+  const { isAuthenticated, user } = useAuthStore();
+  
   if (!isAuthenticated) {
-    // Redirect to login while preserving the intended destination
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" />;
   }
 
-  if (!user) {
-    return <Loading />;
+  if (!allowedRoles?.includes(user?.role || "")) {
+    return <Navigate to="/not-authorized" replace />;
   }
 
-  return children;
+  return <Outlet />;
+
 };
 
-export default ProtectedRoute;
-
+export default ProtectedRoutes;
