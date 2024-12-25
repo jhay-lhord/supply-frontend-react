@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api from "@/api";
 import { AxiosError } from "axios";
+import { deleteAuthStorage, deleteCookies } from "@/utils/deleteCookies";
 
 interface User {
   email: string;
@@ -30,7 +31,7 @@ interface AuthState {
     onSuccess?: (message: string) => void,
     onError?: (error: string) => void
   ) => Promise<void>;
-  logout: () => void;
+  logout: (onSuccess?: (succes: string) => void, onError?: (error: string) => void ) => Promise<void>;
 }
 
 const useAuthStore = create<AuthState>()(
@@ -46,15 +47,18 @@ const useAuthStore = create<AuthState>()(
 
       checkAuth: async () => {
         if (get().isAuthenticated && get().user) {
+          console.log("Already authenticated");
           return; // Skip check if already authenticated
         }
         set({ isLoading: true });
         try {
-          const response = await api.get("/api/user/");
+          console.log("Checking authentication...");
+          const response = await api.get("/api/user/check_auth");
           const { email, role, fullname } = response.data;
           set({ isAuthenticated: true, user: { email, role, fullname } });
         } catch (error) {
           set({ isAuthenticated: false, user: null });
+          localStorage.removeItem('auth-storage');
           console.error("Authentication check failed:", error);
         } finally {
           set({ isLoading: false });
@@ -111,15 +115,37 @@ const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
-        set({
-          isAuthenticated: false,
-          otpSent: false,
-          user: null,
-          email: null,
-          errorMessage: null,
-          successMessage: null,
-        });
+      logout: async (onSuccess?: (succes: string) => void, onError?: (error: string) => void) => {
+        set({ isLoading: true });
+
+        const clearState = () => {
+          set({
+            isAuthenticated: false,
+            otpSent: false,
+            user: null,
+            email: null,
+            errorMessage: null,
+            successMessage: null,
+            isLoading: false
+          });
+          deleteAuthStorage()
+          deleteCookies()
+          
+        };
+
+        try {
+          const response = await api.post("/api/user/logout/");
+
+          clearState();
+          await get().checkAuth();
+          onSuccess?.(response?.data?.message);
+        } catch (error) {
+          console.error("Logout error:", error);
+          const errorMsg = error instanceof Error ? error.message : "An unknown error occurred during logout";
+          onError?.(errorMsg);
+          set({ isLoading: false });
+          clearState(); 
+        }
       },
     }),
     {

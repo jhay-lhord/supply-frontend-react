@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from './authStore';
-import RoleBaseRouting from './RoleBaseRouting';
 import Loading from '@/pages/Dashboard/shared/components/Loading';
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
 
-const ProtectedRoute: React.FC = () => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
   const { isAuthenticated, checkAuth, user } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
   const location = useLocation();
@@ -36,7 +38,7 @@ const ProtectedRoute: React.FC = () => {
     return <Loading />;
   }
 
-  return <RoleBaseRouting />;
+  return children;
 };
 
 export default ProtectedRoute;

@@ -11,17 +11,25 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@/components/Auth/authStore";
+import { useToast } from "@/hooks/use-toast";
 
 export const CustomSidebarFooter = () => {
   const { open } = useSidebar();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { userEmail, userFullname, trimmedUserRole, userRole } =
     useGetUserInformation();
   const { logout } = useAuthStore();
 
   const handleLogoutUser = () => {
-    logout();
-    navigate("/login");
+    logout((successMessage) => {
+      navigate("/login");
+      toast({
+        title: successMessage,
+        description:
+          "You have been successfully logged out. See you next time!",
+      });
+    });
   };
 
   return (
@@ -64,9 +72,7 @@ export const CustomSidebarFooter = () => {
                 <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <p className="text-xs">
-                  {userEmail}
-                </p>
+                <p className="text-xs">{userEmail}</p>
               </div>
             </div>
           </DropdownMenuItem>
@@ -78,7 +84,7 @@ export const CustomSidebarFooter = () => {
           </DropdownMenuItem>
           <Separator />
           <DropdownMenuItem onClick={handleLogoutUser}>
-          <div className="flex gap-2">
+            <div className="flex gap-2">
               <LogOut className="h-4 w-4" />
               <p>Log out</p>
             </div>

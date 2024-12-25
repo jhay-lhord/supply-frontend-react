@@ -10,7 +10,7 @@ const baseURL = react_env === "development" ? development_url : production_url;
 
 const api = axios.create({
   baseURL,
-  withCredentials: true, // Ensure cookies are sent with requests
+  withCredentials: true,
 });
 
 // Request interceptor (optional if no additional headers are required)
@@ -35,12 +35,24 @@ api.interceptors.response.use(
 
       try {
         // Call the refresh endpoint to get a new access token
-        await axios.post(`${baseURL}/api/token/refresh/`, {}, { withCredentials: true });
+        const response = await axios.post(
+          `${baseURL}/api/token/refresh/`,
+          {},
+          { withCredentials: true }
+        );
+
+        // Store the new access token (e.g., in cookies or localStorage)
+        const { access_token } = response.data; // Assuming your refresh endpoint returns the new token
+        document.cookie = `access_token=${access_token}; path=/;`;
+
+        // Update the original request headers with the new access token
+        originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
 
         // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
+        // Optionally handle user logout if refresh fails
         return Promise.reject(refreshError);
       }
     }
@@ -50,4 +62,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
