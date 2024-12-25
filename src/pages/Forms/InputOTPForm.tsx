@@ -86,6 +86,7 @@ export function InputOTPForm() {
     if (resendTimer > 0) return;
 
     setIsResending(true);
+    setResendTimer(60)
     await resendOTP(
       email!,
       (successMessage) => {
@@ -142,7 +143,7 @@ export function InputOTPForm() {
 
           <Button
             className="w-full mt-4 rounded-full"
-            disabled={resendTimer > 0}
+            disabled={isLoading}
           >
             {isLoading ? <Loader2 className="animate-spin" /> : "Submit"}
           </Button>
