@@ -9,10 +9,9 @@ const Login = lazy(() => import("@/pages/Forms/Login"));
 
 
 const RoleBasedRouting: React.FC = () => {
-  const { user, isLoading } = useAuthStore();
+  const { user } = useAuthStore();
 
   const DashboardComponent = React.useMemo(() => {
-    if (isLoading) return Loading;
 
     switch (user?.role) {
       case "Supply Officer":
@@ -24,10 +23,10 @@ const RoleBasedRouting: React.FC = () => {
       default:
         return Login;
     }
-  }, [user?.role, isLoading]);
+  }, [user?.role]);
 
   return (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<Loading/>}>
         <DashboardComponent />
       </Suspense>
   );

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import api from "@/api";
 import { AxiosError } from "axios";
 import { deleteAuthStorage, deleteCookies } from "@/utils/deleteCookies";
@@ -48,7 +48,7 @@ const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         if (get().isAuthenticated && get().user) {
           console.log("Already authenticated");
-          return; // Skip check if already authenticated
+          return; 
         }
         set({ isLoading: true });
         try {
@@ -137,7 +137,6 @@ const useAuthStore = create<AuthState>()(
           const response = await api.post("/api/user/logout/");
 
           clearState();
-          // await get().checkAuth();
           window.location.href = "/login";
           onSuccess?.(response?.data?.message);
         } catch (error) {
@@ -151,10 +150,7 @@ const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        user: state.user,
-      }),
+      storage: createJSONStorage(() => sessionStorage)
     }
   )
 );
