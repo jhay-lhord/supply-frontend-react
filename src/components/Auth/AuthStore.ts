@@ -31,7 +31,15 @@ interface AuthState {
     onSuccess?: (message: string) => void,
     onError?: (error: string) => void
   ) => Promise<void>;
-  logout: (onSuccess?: (succes: string) => void, onError?: (error: string) => void ) => Promise<void>;
+  resendOTP: (
+    email: string,
+    onSuccess?: (message: string) => void,
+    onError?: (error: string) => void
+  ) => Promise<void>;
+  logout: (
+    onSuccess?: (succes: string) => void,
+    onError?: (error: string) => void
+  ) => Promise<void>;
 }
 
 const useAuthStore = create<AuthState>()(
@@ -48,7 +56,7 @@ const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         if (get().isAuthenticated && get().user) {
           console.log("Already authenticated");
-          return; 
+          return;
         }
         set({ isLoading: true });
         try {
@@ -58,7 +66,7 @@ const useAuthStore = create<AuthState>()(
           set({ isAuthenticated: true, user: { email, role, fullname } });
         } catch (error) {
           set({ isAuthenticated: false, user: null });
-          localStorage.removeItem('auth-storage');
+          localStorage.removeItem("auth-storage");
           console.error("Authentication check failed:", error);
         } finally {
           set({ isLoading: false });
@@ -114,8 +122,34 @@ const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         }
       },
+      resendOTP: async (
+        email: string,
+        onSuccess?: (message: string) => void,
+        onError?: (error: string) => void
+      ) => {
+        set({ isLoading: true, errorMessage: null, successMessage: null });
+        try {
+          const response = await api.post("api/user/login_resend_otp/", {
+            email,
+          });
+          set({ successMessage: response.data.message });
+          onSuccess?.(response.data.message);
+        } catch (error) {
+          const axiosError = error as AxiosError;
+          const errorMsg =
+            (axiosError.response?.data as { error?: string })?.error ||
+            "Failed to resend OTP. Please try again.";
+          set({ errorMessage: errorMsg });
+          onError?.(errorMsg);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-      logout: async (onSuccess?: (succes: string) => void, onError?: (error: string) => void) => {
+      logout: async (
+        onSuccess?: (succes: string) => void,
+        onError?: (error: string) => void
+      ) => {
         set({ isLoading: true });
 
         const clearState = () => {
@@ -126,11 +160,10 @@ const useAuthStore = create<AuthState>()(
             email: null,
             errorMessage: null,
             successMessage: null,
-            isLoading: false
+            isLoading: false,
           });
-          deleteAuthStorage()
-          deleteCookies()
-          
+          deleteAuthStorage();
+          deleteCookies();
         };
 
         try {
@@ -141,19 +174,21 @@ const useAuthStore = create<AuthState>()(
           onSuccess?.(response?.data?.message);
         } catch (error) {
           console.error("Logout error:", error);
-          const errorMsg = error instanceof Error ? error.message : "An unknown error occurred during logout";
+          const errorMsg =
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred during logout";
           onError?.(errorMsg);
           set({ isLoading: false });
-          clearState(); 
+          clearState();
         }
       },
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => sessionStorage)
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
 
 export default useAuthStore;
-

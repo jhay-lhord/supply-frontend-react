@@ -67,8 +67,9 @@ const SupplyDashboard: React.FC = () => {
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+
                  <Card
-                  className={`bg-gradient-to-br from-orange-400 to-orange-600 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4`}
                   onClick={() => {
                     navigate("/supply/purchase-request");
                   }}
@@ -92,14 +93,14 @@ const SupplyDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                    <Card
-                  className={`bg-gradient-to-br from-orange-400 to-orange-600 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4`}
                   onClick={() => {
                     navigate("/supply/in-progress");
                   }}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
-                    PR in Progress
+                    Pending Request
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -116,14 +117,14 @@ const SupplyDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                  <Card
-                  className={`bg-gradient-to-br from-orange-400 to-orange-600 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4`}
                   onClick={() => {
                     navigate("/supply/purchase-order");
                   }}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
-                    Order in Progress
+                    Pending Orders
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

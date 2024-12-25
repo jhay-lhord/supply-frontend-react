@@ -34,14 +34,14 @@ export const CustomSidebarFooter = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           {open ? (
-            <SidebarMenuButton className="py-8 rounded-md bg-gradient-to-r from-orange-300 to-amber-200 hover:bg-orange-100">
+            <SidebarMenuButton className="py-8 rounded-md bg-gradient-to-bl from-orange-300 to-orange-400 hover:bg-orange-100">
               <Avatar className="h-10 w-10">
                 <AvatarImage src="/avatars/01.png" alt="@shadcn" />
                 <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <p className="text-sm">{userFullname}</p>
-                <p className="text-xs leading-none text-muted-foreground">
+                <p className="text-sm text-white">{userFullname}</p>
+                <p className="text-xs leading-none text-white">
                   {userEmail}
                 </p>
               </div>

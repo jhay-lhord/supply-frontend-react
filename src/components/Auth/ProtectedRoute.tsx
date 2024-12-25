@@ -9,6 +9,7 @@ type ProtectedRouteProps =  {
 const ProtectedRoutes: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   const { isAuthenticated, user } = useAuthStore();
   
+  
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }

@@ -68,9 +68,13 @@ const BACDashboard: React.FC = () => {
                 <div className="flex items-center space-x-2"></div>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+
                 <Card
-                  className={`bg-gradient-to-br from-orange-400 to-orange-600 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400  border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                 >
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <Activity className="w-32 h-32" />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
                       Active Request
@@ -90,8 +94,11 @@ const BACDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 <Card
-                  className={`bg-gradient-to-br from-orange-400 to-orange-600 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                 >
+                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <FileText className="w-32 h-32" />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
                       Request for Quotation
@@ -112,8 +119,11 @@ const BACDashboard: React.FC = () => {
                 </Card>
 
                 <Card
-                  className={`bg-gradient-to-br from-orange-400 to-orange-600 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                 >
+                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <FileText className="w-32 h-32" />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
                       Abstract of Quotation
@@ -128,7 +138,7 @@ const BACDashboard: React.FC = () => {
                           abstractCount
                         )}
                       </span>
-                      <Activity className="h-6 w-6 text-white/80" />
+                      <FileText className="h-6 w-6 text-white/80" />
                     </div>
                   </CardContent>
                 </Card>

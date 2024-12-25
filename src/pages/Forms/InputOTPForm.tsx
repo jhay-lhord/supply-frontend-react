@@ -19,7 +19,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "@/components/Auth/AuthStore";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,16 +37,31 @@ export function InputOTPForm() {
     },
   });
   const [isLoading, setIsloading] = useState<boolean>(false);
-  const [otpError, setOtpError] = useState<string>("");
-  const { verifyOTP, email } = useAuthStore();
+  const [otpMessage, setOtpMessage] = useState<{
+    text: string;
+    type: "error" | "success" | null;
+  }>({ text: "", type: null });
+  const [isResending, setIsResending] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
+  const { verifyOTP, resendOTP, email } = useAuthStore();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const otp_code = data.otp_code;
     setIsloading(true);
-    setOtpError("");
+    setOtpMessage({ text: "", type: null });
     await verifyOTP(
       email!,
       otp_code,
@@ -63,6 +78,23 @@ export function InputOTPForm() {
           description: errorMessage,
           variant: "destructive",
         });
+      }
+    );
+  };
+
+  const handleResendOTP = async () => {
+    if (resendTimer > 0) return;
+
+    setIsResending(true);
+    await resendOTP(
+      email!,
+      (successMessage) => {
+        setOtpMessage({ text: successMessage, type: "success" });
+        setIsResending(false);
+      },
+      (errorMessage) => {
+        setOtpMessage({ text: errorMessage, type: "error" });
+        setIsResending(false);
       }
     );
   };
@@ -95,15 +127,50 @@ export function InputOTPForm() {
                   Please enter the one-time password sent to your email.
                 </FormDescription>
                 <FormMessage />
-                {otpError && <p className="text-red-500 text-sm">{otpError}</p>}
+                {otpMessage && (
+                  <p
+                    className={`${
+                      otpMessage.type === "error" && "text-red-400"
+                    } text-green-400 text-sm`}
+                  >
+                    {otpMessage.text}
+                  </p>
+                )}
               </FormItem>
             )}
           />
 
-          <Button className="w-full mt-4 rounded-full">
+          <Button
+            className="w-full mt-4 rounded-full"
+            disabled={resendTimer > 0}
+          >
             {isLoading ? <Loader2 className="animate-spin" /> : "Submit"}
           </Button>
         </form>
+        <div className="mt-4 text-center">
+          <button
+            disabled={isResending || resendTimer > 0}
+            className={`text-sm ${
+              resendTimer > 0
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-black"
+            } focus:outline-none transition duration-300 ease-in-out`}
+          >
+            {isResending ? (
+              <span className="flex items-center justify-center">
+                <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                Resending...
+              </span>
+            ) : resendTimer > 0 ? (
+              `Resend OTP in ${resendTimer}s`
+            ) : (
+              <p>
+                Didn't receive the code?{" "}
+                <span onClick={handleResendOTP}>Resend OTP</span>
+              </p>
+            )}
+          </button>
+        </div>
       </Form>
     </div>
   );
