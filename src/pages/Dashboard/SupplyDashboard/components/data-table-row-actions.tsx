@@ -8,13 +8,11 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { deletePurchaseRequest, usePurchaseRequestActions } from "@/services/purchaseRequestServices";
+import { deletePurchaseRequest } from "@/services/purchaseRequestServices";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, MoveRightIcon } from "lucide-react";
 import { abstractType_ } from "@/types/response/abstract-of-quotation";
 
 interface DataTableRowActionsProps {
@@ -31,7 +29,6 @@ export const DataTableRowActions = ({
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { handleForward, isPendingForward} = usePurchaseRequestActions()
 
   const deletePurchasePurchaseMutation = useMutation({
     mutationFn: deletePurchaseRequest,
@@ -75,29 +72,6 @@ export const DataTableRowActions = ({
             </TooltipTrigger>
             <TooltipContent side="top">Open</TooltipContent>
           </Tooltip>
-
-          {purchaseData.status === "Approved" && (
-            <>
-              <Separator className="h-10" orientation="vertical" decorative />
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => handleForward(pr_no)}
-                    variant="outline"
-                    className="flex data-[state=open]:bg-muted hover:rounded-full bg- hover:bg-green-300 hover:border-none text-gray-950"
-                  >
-                    <p className="mx-1 text-sm font-thin">{isPendingForward ? <Loader2 className="animate-spin"/>: "Forward"}</p>
-                    <MoveRightIcon className="h-4 w-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  Forward to Procurement
-                </TooltipContent>
-              </Tooltip>
-            </>
-          )}
         </div>
       </TooltipProvider>
 

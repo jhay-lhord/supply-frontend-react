@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { AlertOctagon, ThumbsUp, Lightbulb } from 'lucide-react'
+import { AlertOctagon, Lightbulb, CheckCircle } from 'lucide-react'
 
 interface MessageDialogProps {
   type: 'error' | 'success' | 'info'
@@ -12,21 +12,21 @@ interface MessageDialogProps {
 
 export function MessageDialog({ type, title, message, open, onOpenChange }: MessageDialogProps) {
   const iconMap = {
-    error: <AlertOctagon className="h-12 w-12 text-destructive" />,
-    success: <ThumbsUp className="h-12 w-12 text-success" />,
-    info: <Lightbulb className="h-12 w-12 text-warning" />
+    error: <AlertOctagon className="h-12 w-12 text-red-300" />,
+    success: <CheckCircle className="h-12 w-12 text-green-300" />,
+    info: <Lightbulb className="h-12 w-12 text-orange-300" />
   }
 
   const bgColorMap = {
-    error: 'bg-red-50',
-    success: 'bg-green-50',
-    info: 'bg-yellow-50'
+    error: 'bg-red-100',
+    success: 'bg-green-100',
+    info: 'bg-yellow-100'
   }
 
   const buttonColorMap = {
-    error: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-    success: 'bg-success text-success-foreground hover:bg-success/90',
-    info: 'bg-warning text-warning-foreground hover:bg-warning/90'
+    error: 'bg-red-400 text-destructive-foreground hover:bg-destructive/90',
+    success: 'bg-green-400 text-success-foreground hover:bg-success/90',
+    info: 'bg-orange-400 text-warning-foreground hover:bg-warning/90'
   }
 
   return (

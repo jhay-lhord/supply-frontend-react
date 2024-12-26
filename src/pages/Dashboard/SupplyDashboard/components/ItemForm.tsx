@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,12 +12,33 @@ import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import { arraySort } from "@/services/itemServices";
 import { v4 as uuidv4 } from "uuid";
 import useStatusStore from "@/store";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { MessageDialog } from "../../shared/components/MessageDialog";
+
 interface ItemFormProps {
   pr_no: string;
 }
 
+interface messageDialogProps {
+  open: boolean;
+  message: string;
+  type: "success" | "error" | "info";
+  title: string;
+}
+
 const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
+  const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
+    open: false,
+    type: "success" as const,
+    title: "",
+    message: "",
+  });
+
   const items = FilteredItemInPurchaseRequest(pr_no);
   const sortedItems = arraySort(items!, "stock_property_no");
   const nextStockNo = generateStockPropertyNo(sortedItems).toString();
@@ -43,20 +64,19 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     },
   });
 
-
   useEffect(() => {
     setValue("item_no", item_no);
     setValue("stock_property_no", nextStockNo);
   }, [nextStockNo, item_no, setValue]);
 
   const { mutate, isPending } = useAddItem();
-  const { status } = useStatusStore()
+  const { status } = useStatusStore();
 
   const addItemDisabled =
-  status === "Rejected" ||
-  status === "Cancelled" ||
-  status === "Forwarded to Procurement" ||
-  status === "Received by the Procurement";
+    status === "Rejected" ||
+    status === "Cancelled" ||
+    status === "Forwarded to Procurement" ||
+    status === "Received by the Procurement";
 
   const onSubmit = async (data: ItemType) => {
     try {
@@ -67,7 +87,27 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
       });
 
       if (result.success) {
-        mutate(data);
+        mutate(data, {
+          onSuccess: (response) => {
+            if (response.status === "success") {
+              setMessageDialog({
+                open: true,
+                message: "Item Added Successfully",
+                title: "Success",
+                type: "success",
+              });
+              reset();
+            }
+          },
+          onError: (error) => {
+            setMessageDialog({
+              open: true,
+              message: error.message,
+              title: "Error",
+              type: "error",
+            });
+          },
+        });
         reset();
       }
     } catch (error) {
@@ -78,7 +118,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     <form onSubmit={handleSubmit((data) => onSubmit(data))}>
       <div className="">
         <div className="grid grid-cols-7 gap-2 mb-4 items-center">
-          <Label className="text-base" >Unit</Label>
+          <Label className="text-base">Unit</Label>
           <Label className="col-span-2 text-base">Description</Label>
           <Label className="text-base">Quantity</Label>
           <Label className="text-base">UnitCost</Label>
@@ -155,28 +195,42 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
             readOnly
           />
 
-           <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <Button
-                      disabled={addItemDisabled}
-                      className="flex bg-orange-200 hover:rounded-full text-gray-950"
-                    >
-                      <p className="mx-1 text-sm font-thin">{isPending ? <Loader2 className="animate-spin" /> : "Add Item"}</p>
-                      <span className="sr-only">Add Items</span>
-                    </Button>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  {addItemDisabled
-                    ? `You cannot add new items to this purchase request because it has already been ${status}`
-                    : "Click to add Items"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button
+                    disabled={addItemDisabled}
+                    className="flex bg-orange-200 hover:rounded-full text-gray-950"
+                  >
+                    <p className="mx-1 text-sm font-thin">
+                      {isPending ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        "Add Item"
+                      )}
+                    </p>
+                    <span className="sr-only">Add Items</span>
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {addItemDisabled
+                  ? `You cannot add new items to this purchase request because it has already been ${status}`
+                  : "Click to add Items"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
+
+      <MessageDialog
+        message={messageDialog?.message}
+        title={messageDialog?.title}
+        type={messageDialog?.type}
+        open={messageDialog?.open}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+      />
     </form>
   );
 };

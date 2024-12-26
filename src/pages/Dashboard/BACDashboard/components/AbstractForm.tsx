@@ -60,6 +60,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { MessageDialog } from "../../shared/components/MessageDialog";
+import { AxiosError } from "axios";
 
 interface AbstractFormProps {
   prNoFromProps: string;
@@ -79,11 +81,24 @@ interface Quotation {
   items: SelectedItems[];
 }
 
+interface messageDialogProps {
+  open: boolean;
+  message: string;
+  title: string;
+  type: "success" | "error" | "info";
+}
+
 export const AbstractForm: React.FC<AbstractFormProps> = ({
   prNoFromProps,
   isDialogOpen,
   setIsDialogOpen,
 }) => {
+  const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
+    open: false,
+    message: "",
+    title: "",
+    type: "success" as const,
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [rfqNo, setRfqNo] = useState<string | null>(null);
   const [aoqNo, setAoqNo] = useState<string>("");
@@ -103,7 +118,6 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     return _items.filter((data) => data.rfq === rfqNo);
   }, [items_?.data, rfqNo]);
 
-  // const { data: item_quote } = useAllItemSelectedQuote();
   const { data: abstract } = useAbstractOfQuotation();
 
   const quotations_ = useMemo(() => {
@@ -127,7 +141,6 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   });
 
   console.log(errors);
-
 
   useEffect(() => {
     const abstract_data = Array.isArray(abstract?.data) ? abstract.data : [];
@@ -267,11 +280,35 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
           setIsDialogOpen(false);
           setIsLoading(false);
+          setMessageDialog({
+            open: true,
+            message: "Abstract added successfully",
+            title: "Success",
+            type: "success",
+          });
+        },
+        onError: () => {
+          setIsDialogOpen(false);
+          setIsLoading(false);
+          setMessageDialog({
+            open: true,
+            message: "Something went wrong, please try again later",
+            title: "Error",
+            type: "error",
+          });
         },
       });
     } catch (error) {
-      console.error("Error saving items:", error);
+      setIsDialogOpen(false);
       setIsLoading(false);
+      setMessageDialog({
+        open: true,
+        message:
+          (error as AxiosError).message ??
+          "Something went wrong, please try again later",
+        title: "Error",
+        type: "error",
+      });
     }
   };
 
@@ -293,7 +330,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                     <Carousel
                       opts={{
                         align: "start",
-                        loop: true
+                        loop: true,
                       }}
                       className=" mx-10"
                     >
@@ -322,7 +359,6 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                       <CarouselPrevious />
                       <CarouselNext />
                     </Carousel>
- 
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="">
@@ -432,6 +468,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                         isLoading && "px-16"
                       }`}
                       type="submit"
+                      disabled={isLoading}
                     >
                       {isLoading ? (
                         <Loader2 className="animate-spin" />
@@ -446,6 +483,14 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      <MessageDialog
+        open={messageDialog.open}
+        message={messageDialog.message}
+        title={messageDialog.title}
+        type={messageDialog.type}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+      />
     </>
   );
 };

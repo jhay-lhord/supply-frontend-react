@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -17,6 +17,7 @@ import { itemSchema, ItemType } from "@/types/request/item";
 import { useGetItem, useUpdateItem } from "@/services/itemServices";
 import Loading from "../../shared/components/Loading";
 import { Loader2 } from "lucide-react";
+import { MessageDialog } from "../../shared/components/MessageDialog";
 
 interface EditItemFormProps {
   isEditDialogOpen: boolean;
@@ -24,16 +25,32 @@ interface EditItemFormProps {
   item_no: string;
 }
 
+interface messageDialogProps {
+  open: boolean;
+  message: string;
+  type: "success" | "error" | "info";
+  title: string;
+}
+
 const EditItemForm: React.FC<EditItemFormProps> = ({
   isEditDialogOpen,
   setIsEditDialogOpen,
   item_no,
 }) => {
+  const [isEditLoading, setIsEditLoading] = useState<boolean>(false);
+  const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
+    open: false,
+    type: "success" as const,
+    title: "",
+    message: "",
+  });
+
   const { isLoading, data: item } = useGetItem(item_no!);
-  const { mutate, isPending } = useUpdateItem();
+  const { mutate } = useUpdateItem();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
     getValues,
     setValue,
@@ -64,55 +81,100 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     }
   }, [item, setValue]);
 
-
   const onSubmit = async (data: ItemType) => {
+    setIsEditLoading(true);
+
     try {
       const result = itemSchema.safeParse(data);
 
       if (result.success) {
-        mutate(data);
-        setIsEditDialogOpen(false)
+        await mutate(data, {
+          onSuccess: (response) => {
+            if (response.status === "success") {
+              setIsEditDialogOpen(false);
+              setIsEditDialogOpen(false);
+              reset();
+
+              setMessageDialog({
+                open: true,
+                message: "Item Edited Successfully",
+                title: "success",
+                type: "success",
+              });
+            } else {
+              setIsEditDialogOpen(false);
+              setIsEditDialogOpen(false);
+              reset();
+
+              setMessageDialog({
+                open: true,
+                message: "Something went wrong, please try again",
+                title: "Error",
+                type: "error",
+              });
+            }
+          },
+          onError: (error) => {
+            setIsEditDialogOpen(false);
+            setIsEditDialogOpen(false);
+            reset();
+
+            setMessageDialog({
+              open: true,
+              message: error.message,
+              title: "Error",
+              type: "error",
+            });
+          },
+        });
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const renderField = (
+    label: string,
+    name: keyof ItemType,
+    component: React.ReactNode
+  ) => (
+    <div className="mb-4 text-gray-950">
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">{errors[name]?.message}</span>
+      )}
+    </div>
+  );
+
   return (
-    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-      <DialogContent className="max-w-full w-[40rem]">
-        <ScrollArea className="h-[30rem] mb-8">
-          <DialogHeader>
-            <DialogTitle className="py-6">Edit Item</DialogTitle>
-          </DialogHeader>
-          <Description>
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <form onSubmit={handleSubmit((item) => onSubmit(item))}>
+    <>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-full w-[40rem]">
+          <ScrollArea className="h-[30rem] mb-8">
+            <DialogHeader>
+              <DialogTitle className="py-6">Edit Item</DialogTitle>
+            </DialogHeader>
+            <Description>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <form onSubmit={handleSubmit((item) => onSubmit(item))}>
                   <div className=" gap-2 mb-4">
-                    <div>
-                      <Label>Unit</Label>
+                    {renderField(
+                      "Unit",
+                      "unit",
                       <Input {...register("unit")} />
-                      {errors?.unit && (
-                        <span className="text-xs text-red-500">
-                          {errors?.unit?.message}
-                        </span>
-                      )}
-                    </div>
+                    )}
 
-                    <div className="col-span-2">
-                      <Label>Description</Label>
-
+                    {renderField(
+                      "Description",
+                      "item_description",
                       <Textarea {...register("item_description")} />
-                      {errors?.item_description && (
-                        <span className="text-xs text-red-500">
-                          {errors?.item_description?.message}
-                        </span>
-                      )}
-                    </div>
+                    )}
 
-                    <div>
+
+                    <div className="mb-4">
                       <Label>Quantity</Label>
                       <Input
                         {...register("quantity", {
@@ -134,7 +196,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                       )}
                     </div>
 
-                    <div>
+                    <div className="mb-4">
                       <Label>UnitCost</Label>
                       <Input
                         {...register("unit_cost", {
@@ -169,8 +231,9 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                       <Button
                         className="text-slate-950 bg-orange-200 hover:bg-orange-300 px-10"
                         type="submit"
+                        disabled={isEditLoading}
                       >
-                        {isPending ? (
+                        {isEditLoading ? (
                           <Loader2 className="animate-spin" />
                         ) : (
                           "Save Changes"
@@ -178,12 +241,21 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
                       </Button>
                     </div>
                   </div>
-              </form>
-            )}
-          </Description>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+                </form>
+              )}
+            </Description>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      <MessageDialog
+        message={messageDialog?.message}
+        title={messageDialog?.title}
+        type={messageDialog?.type}
+        open={messageDialog?.open}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+      />
+    </>
   );
 };
 

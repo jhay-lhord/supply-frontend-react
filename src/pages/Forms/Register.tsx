@@ -234,7 +234,7 @@ const Register = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full mt-4">
+            <Button type="submit" className="w-full mt-4" disabled={isloading}>
               {isloading ? <Loader2 className="animate-spin" /> : "Register"}
             </Button>
 

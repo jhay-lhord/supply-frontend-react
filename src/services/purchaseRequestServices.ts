@@ -240,6 +240,9 @@ export const usePurchaseRequestActions = () => {
   const [isPendingReject, setIsPendingReject] = useState(false);
   const [isPendingCancel, setIsPendingCancel] = useState(false);
   const [isPendingForward, setIsPendingForward] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
+
 
   const handleAction = async (status: PurchaseRequestStatus, pr_no: string) => {
     let setPendingState = (_state: boolean) => {}; // Default no-op function
@@ -262,7 +265,21 @@ export const usePurchaseRequestActions = () => {
     setPendingState(true);
 
     try {
-      await mutation.mutateAsync({ pr_no, status });
+      await mutation.mutateAsync(
+        { pr_no, status },
+        {
+          onSuccess: (response) => {
+            if (response.status === "success") {
+              setIsSuccess(true);
+            } else {
+              setIsError(true);
+            }
+          },
+          onError: () => {
+            setIsError(true);
+          },
+        }
+      );
     } finally {
       setPendingState(false);
     }
@@ -278,6 +295,8 @@ export const usePurchaseRequestActions = () => {
     isPendingReject,
     isPendingCancel,
     isPendingForward,
+    isError,
+    isSuccess,
   };
 };
 

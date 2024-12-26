@@ -42,7 +42,9 @@ import {
   CircleXIcon,
   FileTextIcon,
   Loader2,
+  MoveRightIcon,
   PencilLineIcon,
+  TargetIcon,
   UserIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -58,10 +60,24 @@ import { formatDate } from "@/services/formatDate";
 import EditPRForm from "./EditPRForm";
 import { generatePRPDF } from "@/services/generatePRPDF";
 import useStatusStore from "@/store";
+import { MessageDialog } from "../../shared/components/MessageDialog";
+
+interface messageDialogProps {
+  open: boolean;
+  message: string;
+  type: "success" | "error" | "info";
+  title: string;
+}
 
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
+    open: false,
+    type: "success" as const,
+    title: "",
+    message: "",
+  });
 
   const { pr_no } = useParams();
   const { setStatus, status } = useStatusStore();
@@ -77,10 +93,15 @@ export default function PurchaseRequestItemList() {
     handleApprove,
     handleReject,
     handleCancel,
+    handleForward,
     isPendingApprove,
     isPendingReject,
     isPendingCancel,
+    isPendingForward,
+    isError,
+    isSuccess,
   } = usePurchaseRequestActions();
+
   const purchaseData = purchase_request?.data;
 
   const navigate = useNavigate();
@@ -131,6 +152,27 @@ export default function PurchaseRequestItemList() {
 
   const handleOpenEditForm = () => setIsEditDialogOpen(true);
 
+  const handleForwardToProcurement = async () => {
+    await handleForward(pr_no!);
+    if (isSuccess) {
+      setMessageDialog({
+        open: true,
+        message: "Forwarded to Procurement Successfully ",
+        title: "Success",
+        type: "success",
+      });
+    }
+
+    if (isError) {
+      setMessageDialog({
+        open: true,
+        message: "Something went wrong, Please try again later",
+        title: "Error",
+        type: "error",
+      });
+    }
+  };
+
   const handleGeneratePDF = async () => {
     const purchaseRequestData = purchase_request?.data;
     const itemsData = items ? items : [];
@@ -158,8 +200,17 @@ export default function PurchaseRequestItemList() {
           <CardTitle className="">
             <div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <p className="font-thin">{purchaseData?.pr_no}</p>
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="font-thin">{purchaseData?.pr_no}</p>
+                    <div className="flex items-center pt-2">
+                      <CalendarIcon className="w-3 h-3 mr-1" />
+                      <p className="text-sm font-thin">
+                        {purchaseData?.created_at &&
+                          formatDate(purchaseData?.created_at)}
+                      </p>
+                    </div>
+                  </div>
                   <Button
                     type="button"
                     disabled={actionDisabled}
@@ -192,29 +243,25 @@ export default function PurchaseRequestItemList() {
                 </div>
                 <Separator orientation="vertical" className="h-6" />
                 <div className="flex items-center">
-                  <CalendarIcon className="w-4 h-4 mr-1" />
-                  <p className="text-lg font-thin">
-                    {purchaseData?.created_at &&
-                      formatDate(purchaseData?.created_at)}
-                  </p>
+                  <TargetIcon className="w-4 h-4 mr-1" />
+                  <p className="text-lg font-thin">{purchaseData?.purpose}</p>
                 </div>
               </div>
             </div>
           </CardTitle>
-          <div className="flex justify-between pt-8 pb-2">
+          <div className="flex justify-between pt-4 pb-2">
             <TooltipProvider delayDuration={100} skipDelayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
                     <Button
-                      variant="outline"
                       disabled={items?.length === 0}
                       onClick={handleGeneratePDF}
-                      className="flex data-[state=open]:bg-muted hover:rounded-full bg- hover:bg-green-300 hover:border-none text-gray-950"
+                      className="flex bg-green-300 hover:rounded-full hover:bg-green-300 hover:border-none text-gray-950"
                     >
                       <p className="mx-1 text-sm font-thin">Generate PDF</p>
                       <FileTextIcon className="w-4 h-4 mr-2" />
-                      <span className="sr-only">Delete</span>
+                      <span className="sr-only">Generate PDF</span>
                     </Button>
                   </div>
                 </TooltipTrigger>
@@ -278,6 +325,34 @@ export default function PurchaseRequestItemList() {
                           )}
                         </Button>
                       )}
+
+                      {purchaseData?.status === "Approved" && (
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                onClick={handleForwardToProcurement}
+                                variant="outline"
+                                disabled={isPendingForward}
+                                className="flex data-[state=open]:bg-muted hover:rounded-full bg- hover:bg-green-300 hover:border-none text-gray-950"
+                              >
+                                <p className="mx-1 text-sm font-thin">
+                                  {isPendingForward ? (
+                                    <Loader2 className="animate-spin" />
+                                  ) : (
+                                    "Forward"
+                                  )}
+                                </p>
+                                <MoveRightIcon className="h-4 w-4" />
+                                <span className="sr-only">Delete</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              Forward to Procurement
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                     </>
                   )}
               </>
@@ -301,6 +376,14 @@ export default function PurchaseRequestItemList() {
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
         lastPrNo={pr_no}
+      />
+
+      <MessageDialog
+        message={messageDialog?.message}
+        title={messageDialog?.title}
+        type={messageDialog?.type}
+        open={messageDialog?.open}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
       />
     </div>
   );

@@ -147,7 +147,7 @@ export default function PurchaseRequestItemList() {
                 className="bg-green-400 hover:bg-green-500"
                 onClick={() => navigate(`/bac/request-for-quotation/${pr_no}`)}
               >
-                <p className="mr-2">View Request for Quotation</p>
+                <p className="mr-2">View Supplier</p>
                 <SquareArrowOutUpRightIcon className="w-4 h-4 mr-2" />
               </Button>
               <div className="flex gap-4">
