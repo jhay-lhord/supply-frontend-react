@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4 m-6 p-6 bg-slate-100 rounded">
       <DataTableToolbar table={table}/>
       <div className="rounded-md border">
-        <Table className="table-auto">
+        <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

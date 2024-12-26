@@ -126,6 +126,7 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
       setIsLoading(false);
       setIsDialogOpen(false);
     }
+    setIsLoading(false);
   };
 
   const renderField = (

@@ -17,6 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
+import { Link } from "react-router-dom";
 
 
 const AdminNav = [
@@ -82,10 +83,10 @@ const AdminSidebar = () => {
               {AdminNav.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <p>{item.title}</p>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

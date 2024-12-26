@@ -1,36 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { UsersType } from "@/types/response/users";
 
-//Step 4: define the columns
 
 export const columns: ColumnDef<UsersType>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -96,29 +70,6 @@ export const columns: ColumnDef<UsersType>[] = [
     },
   },
 
-  {
-    accessorKey: "date_joined",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date Joined" />
-    ),
-    cell: ({ row }) => {
-      const dateJoined = row.getValue("date_joined") as string | number;
-      const formattedDate = new Date(dateJoined).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {formattedDate}
-          </span>
-        </div>
-      );
-    },
-  },
   {
     accessorKey: "last_login",
     header: ({ column }) => (

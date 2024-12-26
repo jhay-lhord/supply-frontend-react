@@ -1,9 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
-import { DataTableRowActions } from "./data-table-row-actions";
 import { RequisitionerType } from "@/types/request/requisitioner";
+import { RequisitionerDataTableRowActions } from "./requisitionerAction";
 
-//Step 4: define the columns
 
 export const requisitioner_columns: ColumnDef<RequisitionerType>[] = [
   {
@@ -75,7 +74,7 @@ export const requisitioner_columns: ColumnDef<RequisitionerType>[] = [
       <DataTableColumnHeader column={column} title="Actions" />
     ),
     cell: ({ row }) => (
-      <DataTableRowActions
+      <RequisitionerDataTableRowActions
         id={row.original.requisition_id}
         _data={row.original}
       />

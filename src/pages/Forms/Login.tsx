@@ -145,7 +145,7 @@ const Login = () => {
 
               <p className="mt-4 text-center">
                 Don't have an account?{" "}
-                <span className="text-sky-500">
+                <span className="text-orange-300">
                   <Link to="/register">Register</Link>
                 </span>
               </p>

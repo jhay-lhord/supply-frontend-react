@@ -48,23 +48,6 @@ const Register = () => {
 
     const result = registerFormSchema.safeParse(data);
 
-    // if (result.success) {
-    //   mutate(data, {
-    //     onSuccess: (response as AxiosResponse) => {
-    //       console.log(response);
-    //       if (response.statusCode === 200) {
-    //         setIsloading(false);
-    //         navigate("/");
-    //       }
-    //       else {
-    //         setErrorMessage(response.data.)
-    //       }
-    //     },
-    //     onError: (error) => {
-    //       setErrorMessage(error.message);
-    //     },
-    //   });
-    // }
     if (result.success) {
       mutate(data, {
         onSuccess: (response: ApiResponse<UserResponse>) => {
@@ -257,7 +240,7 @@ const Register = () => {
 
             <p className="mt-4 text-center">
               Already have an Account?{" "}
-              <span className="text-sky-500">
+              <span className="text-orange-300">
                 <Link to="/">Login</Link>
               </span>
             </p>
