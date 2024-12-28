@@ -13,7 +13,7 @@ import {
   usePurchaseRequestInProgressCount,
 } from "@/services/purchaseRequestServices";
 import { usePurchaseOrderCount } from "@/services/puchaseOrderServices";
-import { Activity, Loader2 } from "lucide-react";
+import { Activity, ClockArrowUp, Loader2 } from "lucide-react";
 import Layout from "./components/Layout/SupplyDashboardLayout";
 import {
   ChartConfig,
@@ -69,11 +69,14 @@ const SupplyDashboard: React.FC = () => {
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
 
                  <Card
-                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                   onClick={() => {
                     navigate("/supply/purchase-request");
                   }}
                 >
+                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <Activity className="w-32 h-32" />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
                       Active Request
@@ -93,11 +96,14 @@ const SupplyDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                    <Card
-                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                   onClick={() => {
                     navigate("/supply/in-progress");
                   }}
                 >
+                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <ClockArrowUp className="w-32 h-32" />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
                     Pending Request
@@ -112,16 +118,19 @@ const SupplyDashboard: React.FC = () => {
                         inProgressCount
                       )}
                       </span>
-                      <Activity className="h-6 w-6 text-white/80" />
+                      <ClockArrowUp className="h-6 w-6 text-white/80" />
                     </div>
                   </CardContent>
                 </Card>
                  <Card
-                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4`}
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                   onClick={() => {
                     navigate("/supply/purchase-order");
                   }}
                 >
+                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <ClockArrowUp className="w-32 h-32" />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
                     Pending Orders
@@ -136,7 +145,7 @@ const SupplyDashboard: React.FC = () => {
                         purchase_order_count
                       )}
                       </span>
-                      <Activity className="h-6 w-6 text-white/80" />
+                      <ClockArrowUp className="h-6 w-6 text-white/80" />
                     </div>
                   </CardContent>
                 </Card>
