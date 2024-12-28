@@ -1,157 +1,28 @@
-import {
-  ShoppingCart,
-  Clipboard,
-  ClipboardPenLine,
-  LayoutGrid,
-  PackageCheck,
-} from "lucide-react";
-
+import { SidebarUserHeader } from "../../shared/components/SidebarHeader"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import { CustomSidebarFooter } from "../../shared/components/SidebarFooter";
-import { Link } from "react-router-dom";
+  SidebarRail,
+} from "@/components/ui/sidebar"
+import { CustomSidebarFooter } from "../../shared/components/SidebarFooter"
+import { SidebarItem } from "./SupplySidebarItem"
 
-const dashboard = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: LayoutGrid,
-  },
-];
 
-const procurement = [
-  {
-    title: "Purchase Request",
-    url: "/supply/purchase-request",
-    icon: ClipboardPenLine,
-  },
-  {
-    title: "Purchase Order",
-    url: "/supply/purchase-order",
-    icon: ShoppingCart,
-  },
-];
-
-const inventory = [
-  // {
-  //   title: "Stocks",
-  //   url: "/supply/stocks",
-  //   icon: Layers,
-  // },
-  {
-    title: "Inventory",
-    url: "/supply/inventory",
-    icon: Clipboard,
-  },
-  // {
-  //   title: "Reports",
-  //   url: "/supply/reports",
-  //   icon: ClipboardList,
-  // },
-];
-
-const distribution = [
-  {
-    title: "Item Distribution",
-    url: "/supply/item-distribution",
-    icon: PackageCheck
-  }
-]
-
-const SupplySidebar = () => {
-  const { open } = useSidebar();
-
+export default function SupplySidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="flex flex-row items-center">
-        {open ? (
-          <div className="flex gap-2 items-center rounded-md shadow-sm p-2 w-full">
-            <img src="/CTU_new_logotransparent.svg" alt="Logo" width={50} height={50} />
-            <div>
-              <p className="text-xl">CTU-AC</p>
-              <p className="text-xs text-orange-400">
-                SUPPLY MANAGEMENT SYSTEM
-              </p>
-            </div>
-          </div>
-        ) : (
-          <img src="/CTU_new_logotransparent.svg" alt="Logo" width={50} height={50} />
-        )}
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <SidebarUserHeader/>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarGroupLabel>Analytics</SidebarGroupLabel>
-            <SidebarMenu>
-              {dashboard.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <p>{item.title}</p>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-            <SidebarGroupLabel>Procurement</SidebarGroupLabel>
-            <SidebarMenu>
-              {procurement.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url || location.pathname.includes(item.url)}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <p>{item.title}</p>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-            <SidebarGroupLabel>Inventory</SidebarGroupLabel>
-            <SidebarMenu>
-              {inventory.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <p>{item.title}</p>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-            <SidebarGroupLabel>Distribution</SidebarGroupLabel>
-            <SidebarMenu>
-              {distribution.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="px-4 py-6" isActive={location.pathname === item.url}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <p>{item.title}</p>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarItem/>
       </SidebarContent>
       <SidebarFooter>
-        <CustomSidebarFooter />
+        <CustomSidebarFooter/>
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
-  );
-};
-
-export default SupplySidebar;
+  )
+}

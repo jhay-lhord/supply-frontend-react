@@ -58,9 +58,8 @@ const BACDashboard: React.FC = () => {
   return (
     <Layout>
       <ScrollArea className="w-full">
-        <main className=" flex-grow">
-          <div className="md:hidden"></div>
-          <div className="hidden flex-col md:flex">
+        <main className="flex-grow">
+          <div className=" flex-col md:flex">
             <div className=" space-y-4">
               <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>

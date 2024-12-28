@@ -1,19 +1,27 @@
+import { ChevronsUpDown, LogOut, User } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import { useGetUserInformation } from "@/services/useProfile";
-import { ChevronsUpDownIcon, LogOut, User } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import useAuthStore from "@/components/Auth/AuthStore";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
+import useAuthStore from "@/components/Auth/AuthStore";
+import { useGetUserInformation } from "@/services/useProfile";
 
-export const CustomSidebarFooter = () => {
-  const { open } = useSidebar();
+export function CustomSidebarFooter() {
+  const { isMobile } = useSidebar();
   const { toast } = useToast();
   const { userEmail, userFullname, trimmedUserRole, userRole } =
     useGetUserInformation();
@@ -30,64 +38,62 @@ export const CustomSidebarFooter = () => {
   };
 
   return (
-    <div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          {open ? (
-            <SidebarMenuButton className="py-8 rounded-md bg-gradient-to-bl from-orange-300 to-orange-400 hover:bg-orange-100">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <p className="text-sm text-white">{userFullname}</p>
-                <p className="text-xs leading-none text-white">
-                  {userEmail}
-                </p>
-              </div>
-              <ChevronsUpDownIcon className="ml-auto" />
-            </SidebarMenuButton>
-          ) : (
-            <div className="flex items-center justify-center">
-              <Avatar className=" w-8 h-8 bg-orange-200">
-                <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                <AvatarFallback className="bg-orange-200">
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground py-8 rounded-md bg-gradient-to-bl from-orange-300 to-orange-400 hover:bg-orange-100"
+            >
+              <Avatar className="h-8 w-8 rounded-full">
+                <AvatarImage src={userFullname} alt={userFullname} />
+                <AvatarFallback className="rounded-lg">
                   {trimmedUserRole(userRole)}
                 </AvatarFallback>
               </Avatar>
-            </div>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side="top"
-          className="w-[--radix-popper-anchor-width]"
-        >
-          <DropdownMenuItem>
-            <div className="w-full flex items-center gap-2 bg-orange-200 p-2 rounded">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                <AvatarFallback>{trimmedUserRole(userRole)}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <p className="text-xs">{userEmail}</p>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">{userFullname}</span>
+                <span className="truncate text-xs">{userEmail}</span>
               </div>
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <div className="flex gap-2">
-              <User className="h-4 w-4" />
-              <p>Account</p>
-            </div>
-          </DropdownMenuItem>
-          <Separator />
-          <DropdownMenuItem onClick={handleLogoutUser}>
-            <div className="flex gap-2">
-              <LogOut className="h-4 w-4" />
-              <p>Log out</p>
-            </div>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+              <ChevronsUpDown className="ml-auto size-4" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            side={isMobile ? "bottom" : "right"}
+            align="end"
+            sideOffset={4}
+          >
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={userFullname} alt={userFullname} />
+                  <AvatarFallback className="rounded-lg">
+                    {trimmedUserRole(userRole)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{userFullname}</span>
+                  <span className="truncate text-xs">{userEmail}</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <User className="size-4 mr-2" />
+                Account
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogoutUser}>
+              <LogOut className="size-4 mr-2" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
-};
+}
