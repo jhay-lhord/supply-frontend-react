@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MessageDialog } from "../../shared/components/MessageDialog";
+import { RESTRICTED_ACTION_STATUS } from "@/constants";
 
 interface ItemFormProps {
   pr_no: string;
@@ -72,11 +73,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   const { mutate, isPending } = useAddItem();
   const { status } = useStatusStore();
 
-  const addItemDisabled =
-    status === "Rejected" ||
-    status === "Cancelled" ||
-    status === "Forwarded to Procurement" ||
-    status === "Received by the Procurement";
+  const addItemDisabled = RESTRICTED_ACTION_STATUS.includes(status!);
 
   const onSubmit = async (data: ItemType) => {
     try {

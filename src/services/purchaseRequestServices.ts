@@ -232,7 +232,9 @@ type PurchaseRequestStatus =
   | "Cancelled"
   | "Forwarded to Procurement"
   | "Received by the Procurement"
-  | "Items Delivered";
+  | "Items Delivered"
+  | "Ready to Order"
+  | "Order Placed"
 
 export const usePurchaseRequestActions = () => {
   const mutation = useUpdatePurchaseRequestStatus();
@@ -240,9 +242,10 @@ export const usePurchaseRequestActions = () => {
   const [isPendingReject, setIsPendingReject] = useState(false);
   const [isPendingCancel, setIsPendingCancel] = useState(false);
   const [isPendingForward, setIsPendingForward] = useState(false);
+  const [isPendingReadyToOrder, setIsPendingReadyToOrder] = useState(false);
+  const [isPendingOrderPlaced, setIsPendingOrderPlaced] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
-
 
   const handleAction = async (status: PurchaseRequestStatus, pr_no: string) => {
     let setPendingState = (_state: boolean) => {}; // Default no-op function
@@ -260,6 +263,12 @@ export const usePurchaseRequestActions = () => {
       case "Forwarded to Procurement":
         setPendingState = setIsPendingForward;
         break;
+      case "Ready to Order":
+        setPendingState = setIsPendingReadyToOrder;
+        break;
+      case "Order Placed":
+        setPendingState = setIsPendingOrderPlaced;
+        break;
     }
 
     setPendingState(true);
@@ -271,12 +280,15 @@ export const usePurchaseRequestActions = () => {
           onSuccess: (response) => {
             if (response.status === "success") {
               setIsSuccess(true);
+              setPendingState(false);
             } else {
               setIsError(true);
+              setPendingState(false);
             }
           },
           onError: () => {
             setIsError(true);
+            setPendingState(false);
           },
         }
       );
@@ -291,10 +303,16 @@ export const usePurchaseRequestActions = () => {
     handleCancel: (pr_no: string) => handleAction("Cancelled", pr_no),
     handleForward: (pr_no: string) =>
       handleAction("Forwarded to Procurement", pr_no),
+    handleReadyToOrder: (pr_no: string) =>
+      handleAction("Ready to Order", pr_no),
+    handleOrderPlaced: (pr_no: string) =>
+      handleAction("Order Placed", pr_no),
     isPendingApprove,
     isPendingReject,
     isPendingCancel,
     isPendingForward,
+    isPendingReadyToOrder,
+    isPendingOrderPlaced,
     isError,
     isSuccess,
   };

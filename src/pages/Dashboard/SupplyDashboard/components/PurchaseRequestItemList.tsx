@@ -61,6 +61,7 @@ import EditPRForm from "./EditPRForm";
 import { generatePRPDF } from "@/services/generatePRPDF";
 import useStatusStore from "@/store";
 import { MessageDialog } from "../../shared/components/MessageDialog";
+import { RESTRICTED_ACTION_STATUS } from "@/constants";
 
 interface messageDialogProps {
   open: boolean;
@@ -139,11 +140,7 @@ export default function PurchaseRequestItemList() {
     };
   }, [setStatus, purchaseData]);
 
-  const actionDisabled =
-    status === "Rejected" ||
-    status === "Cancelled" ||
-    status === "Forwarded to Procurement" ||
-    status === "Received by the Procurement";
+  const actionDisabled = RESTRICTED_ACTION_STATUS.includes(status!)
 
   let sortedItems;
   if (!isLoading) {
@@ -276,7 +273,8 @@ export default function PurchaseRequestItemList() {
               <>
                 {purchaseData?.status !== "Cancelled" &&
                   purchaseData?.status !== "Forwarded to Procurement" &&
-                  purchaseData?.status !== "Received by the Procurement" && (
+                  purchaseData?.status !== "Received by the Procurement" &&
+                  purchaseData?.status !== "Ready to Order" && (
                     <>
                       {purchaseData?.status !== "Approved" &&
                         purchaseData?.status !== "Rejected" && (
@@ -408,11 +406,7 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
     },
   });
 
-  const actionDisabled =
-    status === "Rejected" ||
-    status === "Cancelled" ||
-    status === "Forwarded to Procurement" ||
-    status === "Received by the Procurement";
+  const actionDisabled = RESTRICTED_ACTION_STATUS.includes(status!)
 
   const handleItemDelete = () => {
     deleteItemMutation.mutate(selectedItemNo!);

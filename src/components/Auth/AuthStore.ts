@@ -170,8 +170,9 @@ const useAuthStore = create<AuthState>()(
           const response = await api.post("/api/user/logout/");
 
           clearState();
-          window.location.href = "/login";
+          set({ isLoading: false });
           onSuccess?.(response?.data?.message);
+          window.location.href = "/login";
         } catch (error) {
           console.error("Logout error:", error);
           const errorMsg =

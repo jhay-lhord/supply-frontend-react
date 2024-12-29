@@ -51,8 +51,10 @@ export const usePurchaseOrderCount = () => {
 export const addPurchaseOrder = async (data: purchaseOrderType):Promise<ApiResponse<purchaseOrderType>> => {
   try {
     const response = await api.post<purchaseOrderType>("api/purchase-order/", data);
+    console.log(response)
     return handleSucess(response)
   } catch (error) {
+    console.log(error)
     return handleError(error) 
   }
 }
@@ -71,8 +73,10 @@ export const useAddPurchaseOrder = () => {
 export const addPurchaseOrderItem = async (data:purchaseOrderItemType):Promise<ApiResponse<purchaseOrderItemType>> => {
   try {
     const response = await api.post<purchaseOrderItemType>("api/purchase-order-item/", data);
+    console.log(response)
     return handleSucess(response)
   } catch (error) {
+    console.log(error)
     return handleError(error)
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,6 +11,7 @@ import { formatDate } from "@/services/formatDate";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import {
   ArrowLeftIcon,
+  ArrowRight,
   BuildingIcon,
   CalendarIcon,
   ClipboardIcon,
@@ -37,15 +38,41 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useGetRequestForQuotation } from "@/services/requestForQoutationServices";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { usePurchaseRequestActions } from "@/services/purchaseRequestServices";
+import { MessageDialog } from "../../shared/components/MessageDialog";
+import LoadingDialog from "../../shared/components/LoadingDialog";
+import useStatusStore from "@/store";
+
+interface messageDialogProps {
+  open: boolean;
+  message: string;
+  title: string;
+  type: "error" | "success" | "info";
+}
 
 export const AbstractItemContentList = () => {
   const [isInformationDialogOpen, setIsInformationDialogOpen] =
     useState<boolean>(false);
   const [rfqNo, setRfqNo] = useState<string | undefined>(undefined);
+  const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
+    open: false,
+    message: "",
+    title: "",
+    type: "success" as const,
+  });
 
   const { aoq_no } = useParams();
-  const navigate = useNavigate()
+  const { status, setStatus } = useStatusStore();
+  const navigate = useNavigate();
 
+  const { handleReadyToOrder, isPendingReadyToOrder, isError, isSuccess } =
+    usePurchaseRequestActions();
   const { data: abstract, isLoading: abstract_loading } =
     useGetAbstractOfQuotation(aoq_no!);
   const { data: items, isLoading } = useGetAllSupplierItem();
@@ -53,8 +80,20 @@ export const AbstractItemContentList = () => {
   const supplierItemData = Array.isArray(items?.data) ? items.data : [];
 
   const abstractData = abstract && abstract.data;
+  const pr_no = abstractData?.pr_details.pr_no;
+
+  useEffect(() => {
+    setStatus(abstractData?.pr_details.status);
+
+    return () => {
+      setStatus("idle");
+    };
+  }, [setStatus, abstractData]);
 
   if (isLoading || abstract_loading) return <Loading />;
+
+  const isAlreadyForwardedToSupply = status === "Ready to Order";
+  console.log(status);
 
   const handlePDFPrint = async () => {
     const url = await generateAOQPDF(supplierItemData!);
@@ -66,9 +105,32 @@ export const AbstractItemContentList = () => {
     setRfqNo(rfq_no);
   };
 
+  const handleForwardToProcurement = async () => {
+    await handleReadyToOrder(pr_no!);
+    if (isSuccess) {
+      setMessageDialog({
+        open: true,
+        message: "Forwarded to Procurement Successfully ",
+        title: "Success",
+        type: "success",
+      });
+    }
+
+    if (isError) {
+      setMessageDialog({
+        open: true,
+        message: "Something went wrong, Please try again later",
+        title: "Error",
+        type: "error",
+      });
+    }
+  };
+
   return (
     <div className="w-full">
-      <Button className="my-2" onClick={() => navigate(-1)}><ArrowLeftIcon className="h-4 w-4"/> Back</Button>
+      <Button className="my-2" onClick={() => navigate(-1)}>
+        <ArrowLeftIcon className="h-4 w-4" /> Back
+      </Button>
       <Card className="w-full bg-slate-100">
         <CardHeader className="flex flex-col">
           <CardTitle className="">
@@ -86,10 +148,34 @@ export const AbstractItemContentList = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button onClick={handlePDFPrint}>
+                  <Button variant={"outline"} onClick={handlePDFPrint}>
                     <PrinterIcon width={20} height={20} className="mx-2" />
                     Generate PDF
                   </Button>
+                  {!isAlreadyForwardedToSupply && (
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Button
+                            onClick={handleForwardToProcurement}
+                            disabled={isAlreadyForwardedToSupply}
+                          >
+                            Forward to Supply
+                            <ArrowRight
+                              width={20}
+                              height={20}
+                              className="mx-2"
+                            />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="font-thin">
+                            Ready to Order? Forward to Supply
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
               </div>
               <Separator className="mt-3" />
@@ -165,6 +251,15 @@ export const AbstractItemContentList = () => {
         isInformationDialogOpen={isInformationDialogOpen}
         setIsInformationDialogOpen={setIsInformationDialogOpen}
       />
+      <MessageDialog
+        open={messageDialog.open}
+        message={messageDialog.message}
+        title={messageDialog.title}
+        type={messageDialog.type}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+      />
+
+      <LoadingDialog open={isPendingReadyToOrder} message="Updating..." />
     </div>
   );
 };
@@ -219,9 +314,12 @@ export const SupplierInformation: React.FC<SupplierInformationProps> = ({
             </Badge>
           </div>
         )}
-      <DialogFooter>
-        <Button> <FileTextIcon className="h-4 w-4 mr-2"/> Generate NOA</Button>
-      </DialogFooter>
+        <DialogFooter>
+          <Button>
+            {" "}
+            <FileTextIcon className="h-4 w-4 mr-2" /> Generate NOA
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
