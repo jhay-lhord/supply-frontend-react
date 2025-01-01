@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -77,7 +77,14 @@ export const AbstractItemContentList = () => {
     useGetAbstractOfQuotation(aoq_no!);
   const { data: items, isLoading } = useGetAllSupplierItem();
 
-  const supplierItemData = Array.isArray(items?.data) ? items.data : [];
+  const supplierItemData = useMemo(() => {
+    return Array.isArray(items?.data) ? items.data : [];
+  }, [items])
+
+  const filteredSupplierItemData = useMemo(() => {
+    return supplierItemData.filter(data => data.supplier_details.aoq_details.aoq_no === aoq_no)
+  }, [supplierItemData, aoq_no])
+  console.log(supplierItemData)
 
   const abstractData = abstract && abstract.data;
   const pr_no = abstractData?.pr_details.pr_no;
@@ -93,10 +100,9 @@ export const AbstractItemContentList = () => {
   if (isLoading || abstract_loading) return <Loading />;
 
   const isAlreadyForwardedToSupply = status === "Ready to Order";
-  console.log(status);
 
   const handlePDFPrint = async () => {
-    const url = await generateAOQPDF(supplierItemData!);
+    const url = await generateAOQPDF(filteredSupplierItemData!);
     return window.open(url!, "_blank");
   };
 
@@ -110,7 +116,7 @@ export const AbstractItemContentList = () => {
     if (isSuccess) {
       setMessageDialog({
         open: true,
-        message: "Forwarded to Procurement Successfully ",
+        message: "Forwarded Successfully ",
         title: "Success",
         type: "success",
       });
@@ -195,8 +201,8 @@ export const AbstractItemContentList = () => {
             <p className="text-base col-span-2">WINNING BIDDER</p>
             <p className="text-base">WINNING PRICE</p>
           </div>
-          {supplierItemData && supplierItemData?.length > 0 ? (
-            supplierItemData?.map((item, index) => {
+          {filteredSupplierItemData && filteredSupplierItemData?.length > 0 ? (
+            filteredSupplierItemData?.map((item, index) => {
               return (
                 <div
                   className="grid grid-cols-8 gap-2 items-center py-6 border-b-2"
@@ -259,7 +265,7 @@ export const AbstractItemContentList = () => {
         onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
       />
 
-      <LoadingDialog open={isPendingReadyToOrder} message="Updating..." />
+      <LoadingDialog open={isPendingReadyToOrder} message="Forwarding..." />
     </div>
   );
 };

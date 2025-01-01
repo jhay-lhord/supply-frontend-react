@@ -1,19 +1,13 @@
-export const generatePONo = (isManySupplier: boolean, pr_no: string, existingPONos: string[] = []) => {
-  if (!isManySupplier) return pr_no;
-
-  let suffix = 'A';
-  let newPONo = `${pr_no}${suffix}`;
-
-  while (existingPONos.includes(newPONo)) {
-    suffix = String.fromCharCode(suffix.charCodeAt(0) + 1);
-    newPONo = `${pr_no}${suffix}`;
-
-    // If all letter is being used, start adding double letters
-    if (suffix > 'Z') {
-      suffix = 'AA';
-      newPONo = `${pr_no}${suffix}`;
-    }
+export function generatePONo(prNo: string, supplierIndex: number, hasMultipleSuppliers: boolean): string {
+  if (!hasMultipleSuppliers) {
+    return prNo;
   }
+  
+  const letterCode = String.fromCharCode(65 + supplierIndex); // 65 is ASCII for 'A'
+  return `${prNo}${letterCode}`;
+}
 
-  return newPONo;
-};
+export function hasMultipleSuppliers(suppliers: any[]): boolean {
+  return suppliers.length > 1;
+}
+

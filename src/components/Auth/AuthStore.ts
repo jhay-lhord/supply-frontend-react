@@ -5,13 +5,22 @@ import { AxiosError } from "axios";
 import { deleteAuthStorage, deleteCookies } from "@/utils/deleteCookies";
 
 export interface User {
+  id: number;
   email: string;
-  fullname: string;
+  first_name: string;
+  last_name: string;
   role?: string;
+}
+
+export type UserUpdateFields = {
+  first_name: string
+  last_name: string
+  email: string
 }
 
 interface AuthState {
   isLoading: boolean;
+  isLoggingOut: boolean;
   isAuthenticated: boolean;
   otpSent: boolean;
   user: User | null;
@@ -22,6 +31,12 @@ interface AuthState {
   checkUser: (
     email: string,
     password: string,
+    onSuccess?: (message: string) => void,
+    onError?: (error: string) => void
+  ) => Promise<void>;
+  updateUser: (
+    id: number,
+    data: UserUpdateFields,
     onSuccess?: (message: string) => void,
     onError?: (error: string) => void
   ) => Promise<void>;
@@ -46,6 +61,7 @@ const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       isLoading: false,
+      isLoggingOut: false,
       isAuthenticated: false,
       otpSent: false,
       user: null,
@@ -62,8 +78,8 @@ const useAuthStore = create<AuthState>()(
         try {
           console.log("Checking authentication...");
           const response = await api.get("/api/user/check_auth");
-          const { email, role, fullname } = response.data;
-          set({ isAuthenticated: true, user: { email, role, fullname } });
+          console.log(response.data.user);
+          set({ isAuthenticated: true, user: response.data.user });
         } catch (error) {
           set({ isAuthenticated: false, user: null });
           localStorage.removeItem("auth-storage");
@@ -98,6 +114,27 @@ const useAuthStore = create<AuthState>()(
         }
       },
 
+      updateUser: async (id, data, onSuccess, onError) => {
+        set({ isLoading: true, errorMessage: null, successMessage: null });
+        try {
+          const response = await api.put(`/api/users/${id}/edit/`, data);
+          set({
+            user: response.data.user,
+            successMessage: response.data.message,
+          });
+          onSuccess?.(response.data.message);
+        } catch (error) {
+          const axiosError = error as AxiosError;
+          const errorMsg =
+            (axiosError.response?.data as { error?: string })?.error ||
+            "hahahah pag sure";
+          set({ otpSent: false, errorMessage: errorMsg });
+          onError?.(errorMsg);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       verifyOTP: async (email, otp_code, onSuccess, onError) => {
         set({ isLoading: true, errorMessage: null, successMessage: null });
         try {
@@ -105,6 +142,7 @@ const useAuthStore = create<AuthState>()(
             email,
             otp_code,
           });
+          console.log(response.data.user);
           set({
             isAuthenticated: true,
             otpSent: false,
@@ -150,7 +188,7 @@ const useAuthStore = create<AuthState>()(
         onSuccess?: (succes: string) => void,
         onError?: (error: string) => void
       ) => {
-        set({ isLoading: true });
+        set({ isLoggingOut: true });
 
         const clearState = () => {
           set({
@@ -160,7 +198,7 @@ const useAuthStore = create<AuthState>()(
             email: null,
             errorMessage: null,
             successMessage: null,
-            isLoading: false,
+            isLoggingOut: false,
           });
           deleteAuthStorage();
           deleteCookies();
@@ -170,7 +208,7 @@ const useAuthStore = create<AuthState>()(
           const response = await api.post("/api/user/logout/");
 
           clearState();
-          set({ isLoading: false });
+          set({ isLoggingOut: false });
           onSuccess?.(response?.data?.message);
           window.location.href = "/login";
         } catch (error) {
@@ -180,7 +218,7 @@ const useAuthStore = create<AuthState>()(
               ? error.message
               : "An unknown error occurred during logout";
           onError?.(errorMsg);
-          set({ isLoading: false });
+          set({ isLoggingOut: false });
           clearState();
         }
       },

@@ -12,14 +12,15 @@ import {
   purchaseRequestFormSchema,
   type PurchaseRequestData,
 } from "@/types/request/purchase-request";
-import { AddPurchaseRequest } from "@/services/purchaseRequestServices";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useAddPurchaseRequest,
+} from "@/services/purchaseRequestServices";
 import { generatePrNo } from "@/services/generatePrNo";
-import { toast } from "sonner";
 import AsyncSelect from "react-select/async";
 import { getAllRequisitioner } from "@/services/requisitionerServices";
 import { Loader2 } from "lucide-react";
 import { getAllCampusDirector } from "@/services/campusDirectorServices";
+import { MessageDialog } from "../../shared/components/MessageDialog";
 
 interface PurchaseRequestFormProps {
   isDialogOpen: boolean;
@@ -32,14 +33,28 @@ type option = {
   label: string;
 };
 
+interface messageDialogProps {
+  open: boolean;
+  message: string;
+  title: string;
+  type: "success" | "error" | "info";
+}
+
 const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
   isDialogOpen,
   setIsDialogOpen,
   lastPrNo,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
+    open: false,
+    message: "",
+    title: "",
+    type: "success" as const,
+  });
+
+  const { mutate: addPurchaseRequestMutation } = useAddPurchaseRequest();
   const currentPurchaseNumber = lastPrNo && lastPrNo;
-  const queryClient = useQueryClient();
 
   const {
     register,
@@ -95,17 +110,6 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
     }
   };
 
-  const addPurchaseRequestMutation = useMutation({
-    mutationFn: AddPurchaseRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
-      toast.success("Added Successfully", {
-        description: "Purchase Request Added Successfully",
-      });
-      reset();
-    },
-  });
-
   const handleRequisitionerChange = (selectedOption: option | null) => {
     setValue("requisitioner", selectedOption?.value ?? "");
   };
@@ -116,17 +120,47 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
 
   const onSubmit = async (data: PurchaseRequestData) => {
     setIsLoading(true);
-    if (purchaseRequestFormSchema.safeParse(data).success) {
-      setIsDialogOpen(false);
-      addPurchaseRequestMutation.mutate({
-        ...data,
+
+    const result = purchaseRequestFormSchema.safeParse(data);
+
+    if (result.success) {
+      addPurchaseRequestMutation(data, {
+        onSuccess: (response) => {
+          if (response.status === "success") {
+            reset()
+            setIsDialogOpen(false);
+            setIsLoading(false);
+            setMessageDialog({
+              open: true,
+              message: "Purchase Request added successfully",
+              title: "Success",
+              type: "success",
+            });
+          } else {
+            reset()
+            setIsDialogOpen(false);
+            setIsLoading(false);
+            setMessageDialog({
+              open: true,
+              message: "Something went wrong, please try again later",
+              title: "Error",
+              type: "error",
+            });
+          }
+        },
+        onError: () => {
+          reset()
+          setIsDialogOpen(false);
+          setIsLoading(false);
+          setMessageDialog({
+            open: true,
+            message: "Something went wrong, please try again later",
+            title: "Error",
+            type: "error",
+          });
+        },
       });
     }
-    if (addPurchaseRequestMutation.isSuccess) {
-      setIsLoading(false);
-      setIsDialogOpen(false);
-    }
-    setIsLoading(false);
   };
 
   const renderField = (
@@ -144,79 +178,88 @@ const PurchaseRequestForm: React.FC<PurchaseRequestFormProps> = ({
   );
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full w-[45rem]">
-        <DialogTitle className="pb-6">Create Purchase Request</DialogTitle>
-        <ScrollArea className="h-[30rem] mb-8">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid gap-4">
-              <div className="flex gap-4">
+    <>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-full w-[45rem]">
+          <DialogTitle className="pb-6">Create Purchase Request</DialogTitle>
+          <ScrollArea className="h-[30rem] mb-8">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="grid gap-4">
+                <div className="flex gap-4">
+                  {renderField(
+                    "PR No.",
+                    "pr_no",
+                    <Input
+                      {...register("pr_no")}
+                      value={generatePrNo(currentPurchaseNumber)}
+                      readOnly
+                    />
+                  )}
+                  {renderField(
+                    "Fund Cluster",
+                    "fund_cluster",
+                    <Input {...register("fund_cluster")} />
+                  )}
+                </div>
+
                 {renderField(
-                  "PR No.",
-                  "pr_no",
-                  <Input
-                    {...register("pr_no")}
-                    value={generatePrNo(currentPurchaseNumber)}
-                    readOnly
+                  "Office",
+                  "office",
+                  <Input {...register("office")} />
+                )}
+
+                {renderField(
+                  "Purpose",
+                  "purpose",
+                  <Textarea {...register("purpose")} />
+                )}
+                {renderField(
+                  "Requested By",
+                  "requisitioner",
+                  <AsyncSelect
+                    defaultOptions
+                    loadOptions={loadRequisitionerOptions}
+                    onChange={handleRequisitionerChange}
+                    placeholder="Search for a Requisitioner..."
+                    className="text-sm"
                   />
                 )}
                 {renderField(
-                  "Fund Cluster",
-                  "fund_cluster",
-                  <Input {...register("fund_cluster")} />
+                  "Approved By",
+                  "campus_director",
+                  <AsyncSelect
+                    defaultOptions
+                    loadOptions={loadCampusDirectorOptions}
+                    onChange={handleCampusDirectorChange}
+                    placeholder="Search for a Campus Director..."
+                    className="text-sm"
+                  />
                 )}
+                <div className="mt-6 fixed bottom-6 right-10">
+                  <Button
+                    className="text-slate-950 bg-orange-200 hover:bg-orange-300"
+                    type="submit"
+                  >
+                    {isLoading ? (
+                      <p className="flex gap-2"><Loader2 className="animate-spin" /> Processing...</p>
+                    ) : (
+                      "Submit Purchase Request"
+                    )}
+                  </Button>
+                </div>
               </div>
-
-              {renderField(
-                "Office",
-                "office",
-                <Input {...register("office")} />
-              )}
-
-              {renderField(
-                "Purpose",
-                "purpose",
-                <Textarea {...register("purpose")} />
-              )}
-              {renderField(
-                "Requested By",
-                "requisitioner",
-                <AsyncSelect
-                  defaultOptions
-                  loadOptions={loadRequisitionerOptions}
-                  onChange={handleRequisitionerChange}
-                  placeholder="Search for a Requisitioner..."
-                  className="text-sm"
-                />
-              )}
-              {renderField(
-                "Approved By",
-                "campus_director",
-                <AsyncSelect
-                  defaultOptions
-                  loadOptions={loadCampusDirectorOptions}
-                  onChange={handleCampusDirectorChange}
-                  placeholder="Search for a Campus Director..."
-                  className="text-sm"
-                />
-              )}
-              <div className="mt-6 fixed bottom-6 right-10">
-                <Button
-                  className="text-slate-950 bg-orange-200 hover:bg-orange-300"
-                  type="submit"
-                >
-                  {isLoading ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    "Submit Purchase Request"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </form>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+            </form>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+      <MessageDialog
+        open={messageDialog.open}
+        message={messageDialog.message}
+        title={messageDialog.title}
+        type={messageDialog.type}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+      />
+    </>
   );
 };
 

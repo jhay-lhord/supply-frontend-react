@@ -12,7 +12,7 @@ import {
   useGetAllSupplier,
   useGetAllSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
-import { generatePONo } from "@/services/generatePONo";
+import { generatePONo, hasMultipleSuppliers } from "@/services/generatePONo";
 import {
   useAddPurchaseOrder,
   useAddPurchaseOrderItem,
@@ -27,7 +27,7 @@ import {
 } from "@/types/request/purchase-order";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileText, Loader2, ShoppingCart } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -35,6 +35,14 @@ import Loading from "../../shared/components/Loading";
 import SupplierInformation from "./SupplierInformation";
 import { MessageDialog } from "../../shared/components/MessageDialog";
 import { AxiosError } from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface PurchaseOrderFormProps {
   usedPos: string[];
@@ -54,8 +62,6 @@ interface messageDialogProps {
 }
 
 export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
-  usedPos,
-  isManySupplier,
   supplier_no,
   pr_no,
   total_amount,
@@ -82,7 +88,6 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   });
 
   const navigate = useNavigate();
-  const poNo = generatePONo(isManySupplier, pr_no, usedPos);
 
   const { data: supplier } = useGetAllSupplier();
   const { data: supplier_item } = useGetAllSupplierItem();
@@ -117,6 +122,15 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
     );
   }, [supplierItemData, pr_no]);
 
+  const filterItemBySupplier = useCallback(
+    (supplier_no: string) => {
+      return filteredSupplierItemData.filter(
+        (data) => data.supplier_details.supplier_no === supplier_no
+      );
+    },
+    [filteredSupplierItemData]
+  );
+
   const aoq_no = useMemo(() => {
     return filteredSupplierItemData.find((supplier) => supplier.rfq_details)
       ?.supplier_details.aoq_details.aoq_no;
@@ -136,7 +150,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
 
   useEffect(() => {
     if (isDialogOpen) {
-      setValue("po_no", poNo!);
+      setValue("po_no", pr_no); //set the initial value of po_no to pr_no, and later it will have a dynamic value when submitting
       setValue("total_amount", total_amount!);
       setValue("purchase_request", pr_no);
       setValue("request_for_quotation", rfq_no!);
@@ -146,7 +160,6 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   }, [
     setValue,
     aoq_no,
-    poNo,
     pr_no,
     isDialogOpen,
     rfq_no,
@@ -155,6 +168,8 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   ]);
 
   const onSubmit = async (data: purchaseOrderType) => {
+    let isOrderPlaced = false;
+    const isMultipleSupplier = hasMultipleSuppliers(supplierData);
     setIsLoading(true);
 
     const result = purchaseOrderSchema.safeParse(data);
@@ -172,12 +187,18 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
       });
     }
 
-    const addPurchaseOrders = supplierData.map(async (supplier) => {
+    const addPurchaseOrders = supplierData.map(async (supplier, index) => {
+      const poNo = generatePONo(
+        data.purchase_request,
+        index,
+        isMultipleSupplier
+      );
       try {
         await addPOMutation(
           {
             ...data,
             supplier: supplier.supplier_no,
+            po_no: poNo,
           },
           {
             onSuccess: async (response) => {
@@ -200,6 +221,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                 reset();
                 setIsLoading(false);
                 setIsDialogOpen(false);
+                isOrderPlaced = true;
 
                 setMessageDialog({
                   open: true,
@@ -252,7 +274,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
     // Execute all purchase orders concurrently
     await Promise.all(addPurchaseOrders);
     //Update the status of purchase request
-    handleOrderPlaced(data.purchase_request);
+    if (isOrderPlaced) return handleOrderPlaced(data.purchase_request);
   };
 
   return (
@@ -302,45 +324,56 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
               </div>
               <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-4">Order Items</h3>
-                <div className="bg-muted p-4 rounded-lg">
-                  <div className="grid grid-cols-6 gap-4 text-sm font-medium text-muted-foreground mb-2">
-                    <div className="">#</div>
-                    <div className="">Unit</div>
-                    <div className="">Description</div>
-                    <div className="">Supplier</div>
-                    <div className="">Quantity</div>
-                    <div className="">Unit Price</div>
-                  </div>
-                  <ScrollArea className="h-[150px]">
-                    {filteredSupplierItemData.map((item, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-6 gap-4 text-sm py-2 border-t border-border"
-                      >
-                        <div className="">{index + 1}</div>
-                        <div className="">
-                          {item.item_quotation_details.item_details.unit}
-                        </div>
-                        <div className="">
-                          {
-                            item.item_quotation_details.item_details
-                              .item_description
-                          }
-                        </div>
-                        <div className="">{item.rfq_details.supplier_name}</div>
-                        <div className="">
-                          {item.item_quotation_details.item_details.quantity}
-                        </div>
-                        <div className="">
-                          ₱
-                          {Number(
-                            item.item_quotation_details.unit_price
-                          ).toFixed(2)}
-                        </div>
+                <ScrollArea className="h-[200px]">
+                  {supplierData?.map((supplier, index) => (
+                    <div key={index} className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2">
+                        {supplier.rfq_details.supplier_name}
+                      </h3>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Item</TableHead>
+                            <TableHead>Quantity</TableHead>
+                            <TableHead>Price</TableHead>
+                            <TableHead>Total</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filterItemBySupplier(supplier.supplier_no).map(
+                            (item, index) => {
+                              const itemDescription =
+                                item.item_quotation_details.item_details
+                                  .item_description;
+                              const itemQuantity = Number(
+                                item.item_quotation_details.item_details
+                                  .quantity
+                              );
+                              const itemUnitPrice = Number(
+                                item.item_quotation_details.unit_price
+                              );
+                              return (
+                                <TableRow key={index}>
+                                  <TableCell>{itemDescription}</TableCell>
+                                  <TableCell>{itemQuantity}</TableCell>
+                                  <TableCell>
+                                    ₱{itemUnitPrice.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell>
+                                    ₱{(itemQuantity * itemUnitPrice).toFixed(2)}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            }
+                          )}
+                        </TableBody>
+                      </Table>
+                      <div className="mt-2 flex justify-end">
+                        <Button>Place Order</Button>
                       </div>
-                    ))}
-                  </ScrollArea>
-                </div>
+                    </div>
+                  ))}
+                </ScrollArea>
               </div>
               <div className="mt-2 flex justify-end">
                 <div className="bg-muted p-2 rounded-lg">

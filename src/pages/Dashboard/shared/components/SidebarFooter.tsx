@@ -18,15 +18,20 @@ import {
 } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
 import useAuthStore from "@/components/Auth/AuthStore";
-import { useGetUserInformation } from "@/services/useProfile";
+import { useGetUserInformation } from "@/services/userProfile";
 import LoadingDialog from "./LoadingDialog";
+import { ProfileTab } from "./ProfileTab";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export function CustomSidebarFooter() {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const { isMobile } = useSidebar();
   const { toast } = useToast();
-  const { userEmail, userFullname, trimmedUserRole, userRole } =
+  const { userEmail, userFirstName, userLastName, trimmedUserRole, userRole } =
     useGetUserInformation();
-  const { logout, isLoading } = useAuthStore();
+  const { logout, isLoggingOut } = useAuthStore();
 
   const handleLogoutUser = () => {
     logout((successMessage) => {
@@ -38,68 +43,85 @@ export function CustomSidebarFooter() {
     });
   };
 
+  const handleProfileClick = () => {
+    setIsDialogOpen(true)
+    setIsDropdownOpen(false)
+  }
+
   return (
     <>
       <SidebarMenu>
         <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground py-8 rounded-md bg-gradient-to-bl from-orange-300 to-orange-400 hover:bg-orange-100"
-              >
-                <Avatar className="h-8 w-8 rounded-full">
-                  <AvatarImage src={userFullname} alt={userFullname} />
-                  <AvatarFallback className="rounded-lg">
-                    {trimmedUserRole(userRole)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{userFullname}</span>
-                  <span className="truncate text-xs">{userEmail}</span>
-                </div>
-                <ChevronsUpDown className="ml-auto size-4" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-              side={isMobile ? "bottom" : "right"}
-              align="end"
-              sideOffset={4}
-            >
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={userFullname} alt={userFullname} />
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground py-8 rounded-md bg-gradient-to-bl from-orange-300 to-orange-400 hover:bg-orange-100"
+                >
+                  <Avatar className="h-8 w-8 rounded-full">
+                    <AvatarImage src={userEmail} alt={userLastName} />
                     <AvatarFallback className="rounded-lg">
                       {trimmedUserRole(userRole)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {userFullname}
+                      {userFirstName} {userLastName}
                     </span>
                     <span className="truncate text-xs">{userEmail}</span>
                   </div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <User className="size-4 mr-2" />
-                  Account
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+                forceMount
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={userFirstName} alt={userFirstName} />
+                      <AvatarFallback className="rounded-lg">
+                        {trimmedUserRole(userRole)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">
+                        {userFirstName} {userLastName}
+                      </span>
+                      <span className="truncate text-xs">{userEmail}</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={handleProfileClick}
+                    >
+                      <User className="size-4 mr-2" />
+                      Account
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogoutUser}>
+                  <LogOut className="size-4 mr-2" />
+                  Log out
                 </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogoutUser}>
-                <LogOut className="size-4 mr-2" />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DialogContent className="max-w-3xl">
+              <ProfileTab />
+            </DialogContent>
+          </Dialog>
         </SidebarMenuItem>
       </SidebarMenu>
-      <LoadingDialog open={isLoading} message="Logging out..."/>
+      <LoadingDialog open={isLoggingOut} message="Logging out..." />
     </>
   );
 }

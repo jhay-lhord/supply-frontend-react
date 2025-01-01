@@ -124,7 +124,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
 
         <div className="grid grid-cols-7 gap-2 mb-4">
           <div>
-            <Input {...register("unit")} />
+            <Input {...register("unit")} disabled={isPending}/>
             {errors?.unit && (
               <span className="text-xs text-red-500">
                 {errors?.unit?.message}
@@ -133,7 +133,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
           </div>
 
           <div className="col-span-2">
-            <Input {...register("item_description")} />
+            <Input {...register("item_description")} disabled={isPending}/>
             {errors?.item_description && (
               <span className="text-xs text-red-500">
                 {errors?.item_description?.message}
@@ -154,6 +154,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
               })}
               type="number"
               defaultValue={getValues("quantity")}
+              disabled={isPending}
             />
             {errors?.quantity && (
               <span className="text-xs text-red-500">
@@ -175,6 +176,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
               })}
               type="number"
               defaultValue={getValues("unit_cost")}
+              disabled={isPending}
             />
             {errors?.unit_cost && (
               <span className="text-xs text-red-500">
@@ -190,6 +192,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
             type="number"
             value={getValues("quantity") * getValues("unit_cost")}
             readOnly
+            disabled={isPending}
           />
 
           <TooltipProvider delayDuration={100} skipDelayDuration={200}>

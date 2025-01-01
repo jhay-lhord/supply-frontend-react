@@ -89,6 +89,7 @@ export default function PurchaseRequestItemList() {
     data: purchase_request,
     error,
   } = usePurchaseRequestList(pr_no!);
+  const isItemEmpty = items && items.length === 0
 
   const {
     handleApprove,
@@ -140,7 +141,7 @@ export default function PurchaseRequestItemList() {
     };
   }, [setStatus, purchaseData]);
 
-  const actionDisabled = RESTRICTED_ACTION_STATUS.includes(status!)
+  const actionDisabled = RESTRICTED_ACTION_STATUS.includes(status!);
 
   let sortedItems;
   if (!isLoading) {
@@ -148,6 +149,27 @@ export default function PurchaseRequestItemList() {
   }
 
   const handleOpenEditForm = () => setIsEditDialogOpen(true);
+
+  const handleApprovePurchaseRequest = async () => {
+    await handleApprove(pr_no!);
+    if (isSuccess) {
+      setMessageDialog({
+        open: true,
+        message: "Approved Successfully ",
+        title: "Success",
+        type: "success",
+      });
+    }
+
+    if (isError) {
+      setMessageDialog({
+        open: true,
+        message: "Something went wrong, Please try again later",
+        title: "Error",
+        type: "error",
+      });
+    }
+  };
 
   const handleForwardToProcurement = async () => {
     await handleForward(pr_no!);
@@ -252,7 +274,7 @@ export default function PurchaseRequestItemList() {
                 <TooltipTrigger asChild>
                   <div>
                     <Button
-                      disabled={items?.length === 0}
+                      disabled={isItemEmpty}
                       onClick={handleGeneratePDF}
                       className="flex bg-green-300 hover:rounded-full hover:bg-green-300 hover:border-none text-gray-950"
                     >
@@ -278,18 +300,27 @@ export default function PurchaseRequestItemList() {
                     <>
                       {purchaseData?.status !== "Approved" &&
                         purchaseData?.status !== "Rejected" && (
-                          <Button
-                            className="bg-green-400 hover:bg-green-500 text-white"
-                            onClick={() => handleApprove(pr_no!)}
-                            disabled={isPendingApprove}
-                          >
-                            <CheckCircleIcon className="w-4 h-4 mr-2" />
-                            {isPendingApprove ? (
-                              <Loader2 className="animate-spin" />
-                            ) : (
-                              "Approve"
-                            )}
-                          </Button>
+                          <TooltipProvider delayDuration={100}>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Button
+                                  className="bg-green-400 hover:bg-green-500 text-white"
+                                  onClick={handleApprovePurchaseRequest}
+                                  disabled={isPendingApprove || isItemEmpty}
+                                >
+                                  <CheckCircleIcon className="w-4 h-4 mr-2" />
+                                  {isPendingApprove ? (
+                                    <Loader2 className="animate-spin" />
+                                  ) : (
+                                    "Approve"
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{isItemEmpty ? "Please add some items to proceed" : "Click to Approved The Purchase Request"}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
 
                       {purchaseData?.status !== "Approved" &&
@@ -406,7 +437,7 @@ const ItemList = ({ sortedItems }: { sortedItems: itemType[] }) => {
     },
   });
 
-  const actionDisabled = RESTRICTED_ACTION_STATUS.includes(status!)
+  const actionDisabled = RESTRICTED_ACTION_STATUS.includes(status!);
 
   const handleItemDelete = () => {
     deleteItemMutation.mutate(selectedItemNo!);

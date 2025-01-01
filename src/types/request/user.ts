@@ -16,3 +16,11 @@ export interface UserResponse {
   password: string;
   password2: string;
 }
+
+export const userUpdateSchema = z.object({
+  first_name: z.string().min(1, "First name must not be empty"),
+  last_name: z.string().min(1, "Last name must not be empty"),
+  email: z.string().min(1, "Required").email("Email must be a valid email"),
+})
+
+export type userUpdateType = z.infer<typeof userUpdateSchema>

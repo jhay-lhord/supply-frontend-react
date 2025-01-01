@@ -8,7 +8,8 @@ export const RESTRICTED_ACTION_STATUS = [
   "Rejected",
   "Cancelled",
   "Forwarded to Procurement",
-  "Recieved by the Procurement",
+  "Received by the Procurement",
   "Ready to Order",
-  "Order Placed"
+  "Order Placed",
+  "Items Delivered"
 ];

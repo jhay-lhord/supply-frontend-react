@@ -62,6 +62,7 @@ import {
 } from "@/components/ui/carousel";
 import { MessageDialog } from "../../shared/components/MessageDialog";
 import { AxiosError } from "axios";
+import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 
 interface AbstractFormProps {
   prNoFromProps: string;
@@ -112,18 +113,20 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
   const { data: rfqs } = useRequestForQoutation();
   const { data: items_, isLoading: item_loading } = useGetItemQuotation();
+  const { data: abstract } = useAbstractOfQuotation();
+  const purchaseItems = FilteredItemInPurchaseRequest(purchaseNumber!)
 
   const itemQuotation = useMemo(() => {
     const _items = Array.isArray(items_?.data) ? items_.data : [];
     return _items.filter((data) => data.rfq === rfqNo);
   }, [items_?.data, rfqNo]);
 
-  const { data: abstract } = useAbstractOfQuotation();
 
   const quotations_ = useMemo(() => {
     const data_ = Array.isArray(rfqs?.data) ? rfqs.data : [];
     return data_.filter((data) => data.purchase_request === purchaseNumber);
   }, [rfqs?.data, purchaseNumber]);
+
 
   const { mutate: addAOQMutation } = useAddAbstractOfQuotation();
   const { mutate: addSupplierItemMutation } = useAddSupplierItem();
@@ -196,16 +199,16 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
   const isItemSelected = (item_no: string) => {
     return quotations.some(
-      (q) =>
-        q.rfq_no !== selectedSupplier &&
-        q.items.some((item) => item.item_no === item_no)
+      (quotation) =>
+        quotation.rfq_no !== selectedSupplier &&
+      quotation.items.some((item) => item.item_no === item_no)
     );
   };
 
   const isItemSelectedForCurrentSupplier = (item_quote_no: string) => {
     return (
       quotations
-        .find((q) => q.rfq_no === selectedSupplier)
+        .find((quotation) => quotation.rfq_no === selectedSupplier)
         ?.items.some((item) => item.item_quote_no === item_quote_no) || false
     );
   };
@@ -219,12 +222,21 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     );
   };
 
+  const allItemQuotationCount = purchaseItems && purchaseItems?.length
+
+  const selectedItems = useMemo(() => {
+    return new Set(quotations.flatMap(data => data.items.map(item => item.item_quote_no)));
+  }, [quotations])
+
+  const restrictedSubmitAction = allItemQuotationCount! > selectedItems.size
+
   const onSubmit = async (
     data: abstractType | supplierType | supplierItemType
   ) => {
     setIsLoading(true);
     try {
       const result = abstractSchema.safeParse(data);
+      
       if (!result.success) {
         return;
       }
@@ -271,6 +283,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
               console.error("Error processing supplier:", error);
             }
           }
+
 
           await Promise.all(
             allItems.map(async (item) => {
@@ -462,13 +475,14 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <div className="fixed bottom-6 right-10">
+                  <div className="fixed bottom-6 right-10 flex gap-2 items-center">
+                    <p>({selectedItems.size} of {purchaseItems?.length} item selected)</p>
                     <Button
                       className={`text-slate-950 bg-orange-200 px-8 py-1 hover:bg-orange-300 ${
                         isLoading && "px-16"
                       }`}
                       type="submit"
-                      disabled={isLoading}
+                      disabled={restrictedSubmitAction}
                     >
                       {isLoading ? (
                         <Loader2 className="animate-spin" />

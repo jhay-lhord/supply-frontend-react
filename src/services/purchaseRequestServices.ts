@@ -47,6 +47,16 @@ export const AddPurchaseRequest = async (data: PurchaseRequestData) => {
   }
 };
 
+export const useAddPurchaseRequest = () => {
+  const queryClient = useQueryClient()
+  return useMutation<ApiResponse<PurchaseRequestData>,  Error, PurchaseRequestData>({
+    mutationFn: (data) => AddPurchaseRequest(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["purchase-request"]})
+    }
+  })
+}
+
 export const updatePurchaseRequest = async ({
   pr_no,
   data,

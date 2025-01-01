@@ -3,18 +3,18 @@ import { useMemo } from "react";
 import { TimeAgo } from "./GetTimeAgo";
 import { extractModelName } from "@/services/extractModelName";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useGetUserInformation } from "@/services/useProfile";
+import { useGetUserInformation } from "@/services/userProfile";
 import Loading from "./Loading";
 
 export const RecentActivities = () => {
   const { data, isLoading } = useGetAllRecentActivities();
-  const { trimmedUserRole } = useGetUserInformation()
+  const { trimmedUserRole } = useGetUserInformation();
   const recentActivites = useMemo(() => {
     const _data = Array.isArray(data?.data) ? data.data : [];
     return _data;
   }, [data]);
 
-  if(isLoading) return <Loading/>
+  if (isLoading) return <Loading />;
 
   return (
     <div>
