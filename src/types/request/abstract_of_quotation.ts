@@ -7,6 +7,7 @@ export const abstractSchema = z.object({
 
 export type supplierType = {
   supplier_no: string
+  extra_character: string
   aoq: string,
   rfq: string
 } 

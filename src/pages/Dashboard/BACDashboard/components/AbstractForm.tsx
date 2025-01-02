@@ -43,14 +43,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   addSupplier,
-  useAbstractOfQuotation,
   useAddAbstractOfQuotation,
   useAddSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { Empty } from "../../shared/components/Empty";
-import { generateAOQNo } from "@/services/generateAOQNo";
 import Loading from "../../shared/components/Loading";
 import { itemQuotationResponseType } from "@/types/response/request-for-qoutation";
 import {
@@ -63,6 +61,7 @@ import {
 import { MessageDialog } from "../../shared/components/MessageDialog";
 import { AxiosError } from "axios";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
+import { indexToLetter } from "@/utils/indexToLetter";
 
 interface AbstractFormProps {
   prNoFromProps: string;
@@ -102,7 +101,6 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [rfqNo, setRfqNo] = useState<string | null>(null);
-  const [aoqNo, setAoqNo] = useState<string>("");
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
   const [quotations, setQuotations] = useState<Quotation[]>([]);
 
@@ -113,7 +111,6 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
   const { data: rfqs } = useRequestForQoutation();
   const { data: items_, isLoading: item_loading } = useGetItemQuotation();
-  const { data: abstract } = useAbstractOfQuotation();
   const purchaseItems = FilteredItemInPurchaseRequest(purchaseNumber!)
 
   const itemQuotation = useMemo(() => {
@@ -134,28 +131,21 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const {
     handleSubmit,
     setValue,
-    formState: { errors },
   } = useForm({
     resolver: zodResolver(abstractSchema),
     defaultValues: {
-      aoq_no: aoqNo,
-      purchase_request: pr_no,
+      aoq_no: purchaseNumber ?? "",
+      purchase_request: purchaseNumber ?? "",
     },
   });
 
-  console.log(errors);
-
-  useEffect(() => {
-    const abstract_data = Array.isArray(abstract?.data) ? abstract.data : [];
-    setAoqNo(generateAOQNo(abstract_data, purchaseNumber!));
-  }, [purchaseNumber, abstract?.data, isDialogOpen]);
 
   useEffect(() => {
     if (isDialogOpen && itemQuotation.length > 0) {
-      setValue("aoq_no", aoqNo);
-      setValue("purchase_request", purchaseNumber);
+      setValue("aoq_no", purchaseNumber ?? "");
+      setValue("purchase_request", purchaseNumber ?? "");
     }
-  }, [isDialogOpen, setValue, itemQuotation, purchaseNumber, aoqNo]);
+  }, [isDialogOpen, setValue, itemQuotation, purchaseNumber]);
 
   const handleItemSelection = (item: itemQuotationResponseType) => {
     if (!selectedSupplier) return;
@@ -245,8 +235,9 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         onSuccess: async (AOQResponse) => {
           const aoqNo = AOQResponse?.data?.aoq_no;
 
-          const suppliersWithItems = quotations.map((quotation) => ({
+          const suppliersWithItems = quotations.map((quotation, index) => ({
             supplier_no: uuidv4(),
+            extra_character: indexToLetter(index + 1),
             aoq: aoqNo!,
             rfq: quotation.rfq_no,
             items: quotation.items,
@@ -258,6 +249,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
             try {
               const supplierResponse = await addSupplier({
                 supplier_no: supplier.supplier_no,
+                extra_character: supplier.extra_character ?? "",
                 aoq: supplier.aoq,
                 rfq: supplier.rfq,
               });

@@ -24,3 +24,17 @@ export const userUpdateSchema = z.object({
 })
 
 export type userUpdateType = z.infer<typeof userUpdateSchema>
+
+export const userUpdatePasswordSchema = z.object({
+  old_password: z.string().min(8, "The password should be at least 8 characters"),
+  new_password: z.string().min(8, "The password should be at least 8 characters"),
+  confirm_password: z.string().min(8, "The password should be at least 8 characters")
+}).refine((data) => data.new_password === data.confirm_password, {
+  message: "Password didn't match",
+  path: ["confirm_password"],
+});
+
+export type userUpdatePasswordType = z.infer<typeof userUpdatePasswordSchema>;
+
+
+

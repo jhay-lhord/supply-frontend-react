@@ -176,6 +176,27 @@ export const useGetAllSupplier = () => {
   });
 };
 
+export const updateSupplierIsAddedToTrue = async ({supplier_no}:{supplier_no:string}) => {
+  try {
+    const response = await api.patch(`api/supplier/${supplier_no}/update/`, {is_added: true})
+    console.log(response)
+    return handleSucess(response)
+  } catch (error) {
+    console.log(error)
+    return handleError(error)
+  }
+}
+
+export const useUpdateSupplierIsAddedToTrue = () => {
+  const queryClient = useQueryClient()
+  return useMutation<ApiResponse<unknown>, Error, {supplier_no: string}>({
+    mutationFn: ({supplier_no}) => updateSupplierIsAddedToTrue({supplier_no}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["suppliers"]})
+    }
+  })
+}
+
 
 export const deleteAbstractOfQuoutation = async (
   aoq_no: string

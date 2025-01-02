@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import api from "@/api";
 import { AxiosError } from "axios";
 import { deleteAuthStorage, deleteCookies } from "@/utils/deleteCookies";
+import { userUpdatePasswordType, userUpdateType } from "@/types/request/user";
 
 export interface User {
   id: number;
@@ -10,12 +11,6 @@ export interface User {
   first_name: string;
   last_name: string;
   role?: string;
-}
-
-export type UserUpdateFields = {
-  first_name: string
-  last_name: string
-  email: string
 }
 
 interface AuthState {
@@ -36,7 +31,12 @@ interface AuthState {
   ) => Promise<void>;
   updateUser: (
     id: number,
-    data: UserUpdateFields,
+    data: userUpdateType,
+    onSuccess?: (message: string) => void,
+    onError?: (error: string) => void
+  ) => Promise<void>;
+  updateUserPassword: (
+    data: userUpdatePasswordType,
     onSuccess?: (message: string) => void,
     onError?: (error: string) => void
   ) => Promise<void>;
@@ -117,7 +117,7 @@ const useAuthStore = create<AuthState>()(
       updateUser: async (id, data, onSuccess, onError) => {
         set({ isLoading: true, errorMessage: null, successMessage: null });
         try {
-          const response = await api.put(`/api/users/${id}/edit/`, data);
+          const response = await api.put(`/api/user/${id}/edit/`, data);
           set({
             user: response.data.user,
             successMessage: response.data.message,
@@ -127,7 +127,24 @@ const useAuthStore = create<AuthState>()(
           const axiosError = error as AxiosError;
           const errorMsg =
             (axiosError.response?.data as { error?: string })?.error ||
-            "hahahah pag sure";
+            "Something went wrong. Please try again.";
+          set({ otpSent: false, errorMessage: errorMsg });
+          onError?.(errorMsg);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      updateUserPassword: async (data, onSuccess, onError) => {
+        set({ isLoading: true, errorMessage: null, successMessage: null });
+        try {
+          const response = await api.post(`/api/user/change-password/`, data);
+          onSuccess?.(response.data.message);
+        } catch (error) {
+          const axiosError = error as AxiosError;
+          const errorMsg =
+            (axiosError.response?.data as { error?: string })?.error ||
+            "Something went wrong. Please try again.";
           set({ otpSent: false, errorMessage: errorMsg });
           onError?.(errorMsg);
         } finally {

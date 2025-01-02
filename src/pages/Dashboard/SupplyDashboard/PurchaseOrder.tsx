@@ -4,12 +4,7 @@ import SupplyAOQ from "./components/AbstractOfQuotation";
 import Layout from "./components/Layout/SupplyDashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  XCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, XCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,6 +16,7 @@ import PurchaseOrderCompleted from "./components/PurchaseOrderCompleted";
 import PurchaseOrderCancelled from "./components/PurchaseOrderCancelled";
 import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const PurchaseOrder: React.FC = () => {
   const { data: purchaseOrdersResponse } = useGetAllPurchaseOrder();
@@ -115,7 +111,9 @@ const PurchaseOrder: React.FC = () => {
                   These items are ready to placed.
                 </AlertDescription>
               </Alert>
-              <SupplyAOQ />
+              <ScrollArea className="h-[600px] rounded-md">
+                <SupplyAOQ />
+              </ScrollArea>
             </TabsContent>
             <TabsContent value="to-receive">
               <Alert className="my-5">

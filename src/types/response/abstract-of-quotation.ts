@@ -17,7 +17,8 @@ export type supplierType_ = {
       }
     }
   }
-
+  is_added: boolean
+  extra_character: string
   created_at: Date
 }
 
