@@ -25,16 +25,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { OrderReceivedDialog } from "./orderReceived";
 import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
-import { useEffect, useMemo, useState } from "react";
-import {
-  useGetAllPurchaseOrder,
-  useGetItemsDelivered,
-  useUpdatePurchaseOrderStatus,
-} from "@/services/puchaseOrderServices";
+import { useState } from "react";
+import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
 import CancelOrderDialog from "./cancelOrder";
 import { useNavigate } from "react-router-dom";
-import { useUpdatePurchaseRequestStatus } from "@/services/purchaseRequestServices";
 
 export default function PurchaseOrderInProgess() {
   const [poNo, setPoNo] = useState<string>("");
@@ -47,14 +42,7 @@ export default function PurchaseOrderInProgess() {
 
   const { data, isLoading } = useGetAllPurchaseOrder();
   const { data: supplier_item } = useGetAllSupplierItem();
-  const { data: items_delivered } = useGetItemsDelivered();
-  const { mutate: updatePOMutation } = useUpdatePurchaseOrderStatus();
-  const { mutate: updatePRMutation } = useUpdatePurchaseRequestStatus();
   const navigate = useNavigate();
-
-  const itemsDeliveredData = useMemo(() => {
-    return Array.isArray(items_delivered?.data) ? items_delivered?.data : [];
-  }, [items_delivered?.data]);
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
   const inProgressOrders = purchaseOrderData.filter(
@@ -63,65 +51,6 @@ export default function PurchaseOrderInProgess() {
   const supplierItemData = Array.isArray(supplier_item?.data)
     ? supplier_item.data
     : [];
-
-  const getIncompleteItems = (supplier_no: string) => {
-    return supplierItemData.filter((item) => {
-      if (item.supplier_details.supplier_no !== supplier_no) {
-        return false;
-      }
-
-      const deliveredItem = itemsDeliveredData.find(
-        (delivered) =>
-          delivered.item_details.supplier_item_no === item.supplier_item_no
-      );
-
-      if (!deliveredItem) {
-        // If the item is not found in itemsDeliveredData, it's completely undelivered
-        item.remaining_quantity = parseInt(
-          item.item_quotation_details.item_details.quantity,
-          10
-        );
-        return true;
-      }
-
-      const orderedQuantity = parseInt(
-        item.item_quotation_details.item_details.quantity,
-        10
-      );
-      const deliveredQuantity = Number(deliveredItem.quantity_delivered || 0);
-      const remainingQuantity = orderedQuantity - deliveredQuantity;
-      item.old_delivered_quantity = deliveredQuantity;
-
-      if (remainingQuantity > 0) {
-        item.remaining_quantity = remainingQuantity;
-        return true;
-      }
-
-      return false;
-    });
-  };
-
-  const allOrdersCompleted = useMemo(() => {
-    return inProgressOrders.every(order => {
-      const incompleteItems = getIncompleteItems(order.supplier_details.supplier_no);
-      return incompleteItems.length === 0;
-    });
-  }, [inProgressOrders]);
-  
-  useEffect(() => {
-    if (allOrdersCompleted) {
-      inProgressOrders.forEach(order => {
-        updatePOMutation({ po_no: order.po_no, status: "Completed" });
-        updatePRMutation({
-          pr_no: order.pr_details.pr_no,
-          status: "Items Delivered",
-        });
-      });
-      console.log('All orders updated successfully');
-    }
-  }, [allOrdersCompleted, inProgressOrders, updatePOMutation, updatePRMutation]);
-  
-  console.log('Are all orders completed?', allOrdersCompleted);
 
   const itemsInSupplierCount = (supplier_no: string) =>
     supplierItemData.filter(
@@ -160,7 +89,6 @@ export default function PurchaseOrderInProgess() {
               <TableHead>Total Amount</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created At</TableHead>
-              {/* <TableHead>Action</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -248,7 +176,7 @@ export default function PurchaseOrderInProgess() {
       <OrderReceivedDialog
         po_no={poNo}
         supplier_no={supplierNo}
-        items_={getIncompleteItems(supplierNo)}
+        items_={supplierItemData}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
       />

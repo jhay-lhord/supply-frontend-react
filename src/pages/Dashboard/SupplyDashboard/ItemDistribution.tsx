@@ -4,6 +4,7 @@ import { ItemDistributionDataTable } from "./components/ItemDistributionDataTabl
 import { Package } from "lucide-react";
 
 const ItemDistribution: React.FC = () => {
+  
   return (
     <Layout>
       <Card className="bg-slate-100 w-full">

@@ -1,7 +1,10 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { ItemDistributionActions } from "./item-distribution-action";
+import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
+import { useMemo } from "react";
 
 export const itemDistributionColumns: ColumnDef<purchaseRequestType>[] = [
   {
@@ -27,8 +30,21 @@ export const itemDistributionColumns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="ITEMS" />
     ),
     cell: ({ row }) => {
+      const { data: supplier_item } = useGetAllSupplierItem();
+
+      const supplierItemData = useMemo(() => {
+        return Array.isArray(supplier_item?.data) ? supplier_item.data : [];
+      }, [supplier_item?.data]);
+
+      const itemsInPurchaseRequest = (pr_no: string) => {
+        return supplierItemData.filter(
+          (data) => data.rfq_details.purchase_request === pr_no
+        ).length;
+      };
+
+      const itemsCount = itemsInPurchaseRequest(row.getValue("pr_no"));
       return (
-        <div className="w-[200px]">{row.getValue("item_description")}</div>
+        <div className="w-[200px]">{itemsCount}</div>
       );
     },
     enableSorting: false,
@@ -55,7 +71,10 @@ export const itemDistributionColumns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="ACTIONS" />
     ),
     cell: ({ row }) => (
-      <ItemDistributionActions pr_no={row.getValue("pr_no")} _data={row.original} />
+      <ItemDistributionActions
+        pr_no={row.getValue("pr_no")}
+        _data={row.original}
+      />
     ),
   },
 ];

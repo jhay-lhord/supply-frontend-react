@@ -40,11 +40,10 @@ export default function PurchaseOrderCompleted() {
       <TableHeader>
         <TableRow>
           <TableHead>PO Number</TableHead>
-          <TableHead>AOQ No</TableHead>
           <TableHead>Items</TableHead>
           <TableHead>Total Amount</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Updated At</TableHead>
+          <TableHead>Date Completed</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -52,7 +51,6 @@ export default function PurchaseOrderCompleted() {
           completedOrders.map((order) => (
             <TableRow key={order.po_no}>
               <TableCell className="font-medium">{order.po_no}</TableCell>
-              <TableCell>{order.aoq_details.aoq_no}</TableCell>
               <TableCell>{itemsInSupplierCount(order.supplier_details.supplier_no)}</TableCell>
               <TableCell>₱{Number(order.total_amount).toFixed(2)}</TableCell>
               <TableCell>

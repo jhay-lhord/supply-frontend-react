@@ -245,6 +245,7 @@ type PurchaseRequestStatus =
   | "Items Delivered"
   | "Ready to Order"
   | "Order Placed"
+  | "Completed"
 
 export const usePurchaseRequestActions = () => {
   const mutation = useUpdatePurchaseRequestStatus();

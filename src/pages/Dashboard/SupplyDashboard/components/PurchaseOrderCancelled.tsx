@@ -41,11 +41,10 @@ export default function PurchaseOrderCancelled() {
           <TableHeader>
             <TableRow>
               <TableHead>PO Number</TableHead>
-              <TableHead>AOQ No</TableHead>
               <TableHead>Items</TableHead>
               <TableHead>Total Amount</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created At</TableHead>
+              <TableHead>Date Cancelled</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -53,7 +52,6 @@ export default function PurchaseOrderCancelled() {
               canceledOrders.map((order) => (
                 <TableRow key={order.po_no}>
                   <TableCell className="font-medium">{order.po_no}</TableCell>
-                  <TableCell>{order.aoq_details.aoq_no}</TableCell>
                   <TableCell>{itemsInSupplierCount(order.supplier_details.supplier_no)}</TableCell>
                   <TableCell>
                     php {Number(order.total_amount).toFixed(2)}
@@ -64,7 +62,7 @@ export default function PurchaseOrderCancelled() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatDate(order.created_at)}
+                    {formatDate(order.updated_at)}
                   </TableCell>
                 </TableRow>
               ))

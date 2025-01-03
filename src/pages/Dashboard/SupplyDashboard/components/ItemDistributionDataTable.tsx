@@ -8,6 +8,7 @@ import { itemDistributionColumns } from "./item-distribution-column";
 export const ItemDistributionDataTable = () => {
   const { isLoading, error, data } = usePurchaseRequest();
 
+
   if (isLoading) return <Loading />;
 
   if (error) return <div>{error.message}</div>;
