@@ -118,11 +118,27 @@ export type _itemsDeliveredType = {
       po_no: string
       status: string
       total_amount: string
+      po_details:{
+        po_no:string
+      }
+      pr_details: {
+        pr_no: string
+        res_center_code: string
+        office: string
+        purpose: string
+        requisitioner_details: {
+          name: string
+          department: string
+          designation: string
+        }
+        created_at: Date
+      }
     }
   }
   item_details: {
     item_quotation_details: {
       item_details: {
+        stock_property_no: string
         item_description: string
         quantity: string
         unit: string

@@ -245,6 +245,7 @@ type PurchaseRequestStatus =
   | "Items Delivered"
   | "Ready to Order"
   | "Order Placed"
+  | "Ready for Distribution"
   | "Completed"
 
 export const usePurchaseRequestActions = () => {

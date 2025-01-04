@@ -108,7 +108,7 @@ export function OrderReceivedDialog({
       });
       await updatePRStatusMutation({
         pr_no: pr_no ?? "",
-        status: "Completed",
+        status: "Ready for Distribution",
       });
       setIsLoading(false);
       setIsDialogOpen(false);
