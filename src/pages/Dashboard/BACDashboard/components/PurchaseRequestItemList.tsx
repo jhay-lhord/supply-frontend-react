@@ -42,9 +42,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatDate } from "@/services/formatDate";
+import SendFileDialog from "./SendFileDialog";
 
 export default function PurchaseRequestItemList() {
   const [pdfUrl, setPdfUrl] = useState<string | undefined>();
+  const [openSendFileDialog, setOpenSendFileDialog] = useState(false);
 
   const { pr_no } = useParams();
   const items = FilteredItemInPurchaseRequest(pr_no!);
@@ -98,6 +100,10 @@ export default function PurchaseRequestItemList() {
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
+
+  const handleOpenFileDialog = () => {
+    setOpenSendFileDialog(true);
+  }
 
   const handlePrintCLick = async () => {
     return window.open(pdfUrl, "_blank");
@@ -184,7 +190,7 @@ export default function PurchaseRequestItemList() {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950">
+                      <Button className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950" onClick={handleOpenFileDialog}>
                         <SendIcon strokeWidth={1.3} />
                       </Button>
                     </TooltipTrigger>
@@ -201,6 +207,7 @@ export default function PurchaseRequestItemList() {
         </CardContent>
         <CardFooter className="flex justify-between"></CardFooter>
       </Card>
+      <SendFileDialog open={openSendFileDialog} setOpen={setOpenSendFileDialog} />
     </div>
   );
 }

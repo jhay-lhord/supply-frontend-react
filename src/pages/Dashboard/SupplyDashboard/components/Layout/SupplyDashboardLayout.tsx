@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import FloatingPDFGenerator from "../pdf-generator";
+import { FloatingButton } from "../pdf-generator";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -40,8 +40,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="flex p-10">
-          <FloatingPDFGenerator />
-          {children}</main>
+          <FloatingButton />
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
