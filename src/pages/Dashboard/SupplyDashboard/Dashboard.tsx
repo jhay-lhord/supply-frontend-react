@@ -2,18 +2,21 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RecentActivities } from "../shared/components/RecentActivities";
+
 import {
-  usePurchaseRequestCount,
-  usePurchaseRequestInProgressCount,
-} from "@/services/purchaseRequestServices";
-import { usePurchaseOrderCount } from "@/services/puchaseOrderServices";
-import { Activity, ClockArrowUp, Loader2 } from "lucide-react";
+  useItemsDeliveredCount,
+  usePurchaseOrderCancelledCount,
+  usePurchaseOrderCompletedCount,
+  usePurchaseOrderPendingCount,
+} from "@/services/puchaseOrderServices";
+import { FileText, Package, ShoppingBag } from "lucide-react";
 import Layout from "./components/Layout/SupplyDashboardLayout";
 import {
   ChartConfig,
@@ -23,6 +26,12 @@ import {
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useGetSupplyDailyReport } from "@/services/DailyReport";
+import { Button } from "@/components/ui/button";
+import {
+  usePurchaseRequestCompletedCount,
+  usePurchaseRequestInProgressCount,
+  usePurchaseRequestPendingCount,
+} from "@/services/purchaseRequestServices";
 
 const chartConfig = {
   total_active_pr: {
@@ -40,21 +49,25 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const SupplyDashboard: React.FC = () => {
-  const { purchase_order_count, isLoading: isPurchaseOrderLoading } =
-    usePurchaseOrderCount();
 
-  const { purchaseRequestCount, isLoading: isPurchaseRequestLoading } =
-    usePurchaseRequestCount();
+  const { requestPendingCount } = usePurchaseRequestPendingCount();
+  const { requestInProgressCount } = usePurchaseRequestInProgressCount();
+  const { requestCompletedCount } = usePurchaseRequestCompletedCount();
 
-  const { inProgressCount, isLoading: isInProgressLoading } =
-    usePurchaseRequestInProgressCount();
+  const { pendingCount } = usePurchaseOrderPendingCount();
+  const { completedCount } = usePurchaseOrderCompletedCount();
+  const { cancelledCount } = usePurchaseOrderCancelledCount();
+
+  const { itemDeliveredCount } = useItemsDeliveredCount();
 
   const navigate = useNavigate();
 
   const { data } = useGetSupplyDailyReport();
 
-  const chartData = data?.data
-  const reversedChartData = Array.isArray(data?.data) ?  [...chartData]?.reverse() : [];
+  const chartData = data?.data;
+  const reversedChartData = Array.isArray(data?.data)
+    ? [...chartData]?.reverse()
+    : [];
 
   return (
     <Layout>
@@ -67,87 +80,122 @@ const SupplyDashboard: React.FC = () => {
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-
-                 <Card
-                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
-                  onClick={() => {
-                    navigate("/supply/purchase-request");
-                  }}
+                <Card
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg overflow-hidden relative`}
                 >
-                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
-                    <Activity className="w-32 h-32" />
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <FileText className="w-32 h-32" />
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium text-white/90">
-                      Active Request
+                  <CardHeader className="">
+                    <CardTitle className="text-2xl font-medium text-black/90">
+                      Purchase Request
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
-                      <span className="text-4xl font-bold">
-                      {isPurchaseRequestLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        purchaseRequestCount
-                      )}
-                      </span>
-                      <Activity className="h-6 w-6 text-white/80" />
+                    <div className="">
+                      <div className="flex justify-between w-full">
+                        <div className="flex flex-col items-center ">
+                          <p className="text-sm text-black/90">Pending</p>
+                          <p className="text-2xl ">{requestPendingCount}</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-sm text-black/90">On going</p>
+                          <p className="text-2xl">{requestInProgressCount}</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-sm text-black/90">Completed</p>
+                          <p className="text-2xl">{requestCompletedCount}</p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        navigate("/supply/purchase-request");
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </CardFooter>
                 </Card>
-                   <Card
-                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
-                  onClick={() => {
-                    navigate("/supply/in-progress");
-                  }}
+                <Card
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg overflow-hidden relative`}
                 >
-                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
-                    <ClockArrowUp className="w-32 h-32" />
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <ShoppingBag className="w-32 h-32" />
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium text-white/90">
-                    Pending Request
+                  <CardHeader className="">
+                    <CardTitle className="text-2xl font-medium text-black/90">
+                      Purchase Order
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
-                      <span className="text-4xl font-bold">
-                      {isInProgressLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        inProgressCount
-                      )}
-                      </span>
-                      <ClockArrowUp className="h-6 w-6 text-white/80" />
+                      <div className="flex justify-between w-full">
+                        <div className="flex flex-col items-center">
+                          <p className="text-sm text-black/90">Pending</p>
+                          <p className="text-2xl">{pendingCount}</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-sm text-black/90">Completed</p>
+                          <p className="text-2xl">{completedCount}</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-sm text-black/90">Cancelled</p>
+                          <p className="text-2xl">{cancelledCount}</p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        navigate("/supply/purchase-order");
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </CardFooter>
                 </Card>
-                 <Card
-                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
-                  onClick={() => {
-                    navigate("/supply/purchase-order");
-                  }}
+                <Card
+                  className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg overflow-hidden relative`}
                 >
-                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
-                    <ClockArrowUp className="w-32 h-32" />
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                    <Package className="w-32 h-32" />
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium text-white/90">
-                    Pending Orders
+                  <CardHeader className="">
+                    <CardTitle className="text-2xl font-medium text-black/90">
+                      Inventory
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
-                      <span className="text-4xl font-bold">
-                      {isPurchaseOrderLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        purchase_order_count
-                      )}
-                      </span>
-                      <ClockArrowUp className="h-6 w-6 text-white/80" />
+                      <div className="flex w-full">
+                        <div className=" flex justify-between items-center w-full">
+                          <p className="flex flex-col items-center text-sm text-black/90">
+                            Items Delivered
+                            <p className="text-2xl text-white/90">{itemDeliveredCount}</p>
+                          </p>
+                          <div className="">
+                            <Package className="h-6 w-6 text-white/80" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        navigate("/supply/item-distribution");
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </CardFooter>
                 </Card>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-5">

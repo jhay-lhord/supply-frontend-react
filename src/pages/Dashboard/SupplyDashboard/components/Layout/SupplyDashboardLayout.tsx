@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { FloatingButton } from "../pdf-generator";
+import { FloatingButton } from "../QuickAccess";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

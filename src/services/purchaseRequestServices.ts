@@ -9,7 +9,7 @@ import {
   EditPRFormType,
   PurchaseRequestData,
 } from "@/types/request/purchase-request";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const GetPurchaseRequest = async (): Promise<
   ApiResponse<purchaseRequestType[]>
@@ -48,14 +48,18 @@ export const AddPurchaseRequest = async (data: PurchaseRequestData) => {
 };
 
 export const useAddPurchaseRequest = () => {
-  const queryClient = useQueryClient()
-  return useMutation<ApiResponse<PurchaseRequestData>,  Error, PurchaseRequestData>({
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiResponse<PurchaseRequestData>,
+    Error,
+    PurchaseRequestData
+  >({
     mutationFn: (data) => AddPurchaseRequest(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["purchase-request"]})
-    }
-  })
-}
+      queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
+    },
+  });
+};
 
 export const updatePurchaseRequest = async ({
   pr_no,
@@ -106,33 +110,60 @@ export const usePurchaseRequestCount = () => {
   return { purchaseRequestCount, isLoading };
 };
 
-export const usePurchaseRequestInProgressCount = () => {
+export const usePurchaseRequestPendingCount = () => {
   const { data, isLoading } = usePurchaseRequest();
-  const purchase_request_in_progress = data?.data
-    ?.map((data) => {
-      return data;
-    })
-    .filter((data) => {
-      return data.status === "Received by the Procurement";
-    });
-  const inProgressCount = purchase_request_in_progress?.length ?? 0;
-  return { inProgressCount, isLoading };
+  const purchaseRequestData = Array.isArray(data?.data) ? data.data : [];
+  const pending = purchaseRequestData.filter(
+    (data) => data.status === "Pending for Approval"
+  );
+  const requestPendingCount = pending.length ?? 0;
+
+  return { requestPendingCount, isLoading };
 };
 
 export const usePurchaseRequestInProgress = () => {
   const { data, isLoading } = usePurchaseRequest();
 
-  const inProgress = Array.isArray(data?.data) ? data.data : [];
+  const purchaseRequestData = Array.isArray(data?.data) ? data.data : [];
 
-  const purchaseRequestInProgress = inProgress
-    ?.map((data) => {
-      return data;
-    })
-    .filter((data) => {
-      return data.status === "Received by the Procurement";
-    });
+  const purchaseRequestInProgress = purchaseRequestData.filter((data) => {
+    return data.status === "Received by the Procurement";
+  });
 
   return { purchaseRequestInProgress, isLoading };
+};
+
+export const usePurchaseRequestInProgressCount = () => {
+  const inProgressStatus = [
+    "Forwarded to Procurement",
+    "Received by the Procurement",
+    "Items Delivered",
+    "Ready to Order",
+    "Order Placed",
+    "Ready for Distribution",
+  ];
+
+  const { data, isLoading } = usePurchaseRequest();
+  const purchaseRequestData = Array.isArray(data?.data) ? data.data : [];
+  const inProgress = purchaseRequestData
+    .filter((data) => inProgressStatus.includes(data.status))
+    .map((data) => data);
+  const requestInProgressCount = inProgress.length ?? 0;
+
+  return { requestInProgressCount, isLoading };
+};
+
+export const usePurchaseRequestCompletedCount = () => {
+  const { data, isLoading } = usePurchaseRequest();
+  const purchaseRequestData = useMemo(() => {
+    return Array.isArray(data?.data) ? data.data : [];
+  }, [data?.data]);
+  const completed = useMemo(() => {
+    return purchaseRequestData.filter((data) => data.status === "Completed");
+  }, [purchaseRequestData]);
+  const requestCompletedCount = completed.length ?? 0;
+
+  return { requestCompletedCount, isLoading };
 };
 
 export const usePurchaseRequestIncoming = () => {
@@ -246,7 +277,7 @@ type PurchaseRequestStatus =
   | "Ready to Order"
   | "Order Placed"
   | "Ready for Distribution"
-  | "Completed"
+  | "Completed";
 
 export const usePurchaseRequestActions = () => {
   const mutation = useUpdatePurchaseRequestStatus();
@@ -317,8 +348,7 @@ export const usePurchaseRequestActions = () => {
       handleAction("Forwarded to Procurement", pr_no),
     handleReadyToOrder: (pr_no: string) =>
       handleAction("Ready to Order", pr_no),
-    handleOrderPlaced: (pr_no: string) =>
-      handleAction("Order Placed", pr_no),
+    handleOrderPlaced: (pr_no: string) => handleAction("Order Placed", pr_no),
     isPendingApprove,
     isPendingReject,
     isPendingCancel,
