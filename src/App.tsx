@@ -34,6 +34,7 @@ import Stocks from "./pages/Dashboard/SupplyDashboard/Stocks";
 import PurchaseOrderItemList from "./pages/Dashboard/SupplyDashboard/components/PurchaseOrderItemList";
 import BACPurchaseRequestIncoming from "./pages/Dashboard/BACDashboard/BACPurchaseRequestIncoming";
 import ItemDistribution from "./pages/Dashboard/SupplyDashboard/ItemDistribution";
+import { ItemDistributionList } from "./pages/Dashboard/SupplyDashboard/components/ItemDistributionList";
 
 const App = () => {
   return (
@@ -64,6 +65,7 @@ const App = () => {
 
             <Route path="stocks" element={<Stocks />} />
             <Route path="item-distribution" element={<ItemDistribution />} />
+            <Route path="item-distribution/:pr_no" element={<ItemDistributionList />} />
             <Route path="not-found" element={<ItemNotFound />} />
           </Route>
 

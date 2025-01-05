@@ -18,7 +18,6 @@ export type purchaseOrderItemType = {
 
 export type purchaseOrderType = z.infer<typeof purchaseOrderSchema>;
 
-
 export const supplierSchema = z.object({
   supplier_no: z.string(),
   rfq_details: z.object({
@@ -39,7 +38,7 @@ export const supplierSchema = z.object({
     }),
   }),
   created_at: z.date(),
-})
+});
 
 export const supplierItemSchema = z.object({
   supplier_item_no: z.string(),
@@ -79,14 +78,14 @@ export const supplierItemSchema = z.object({
     supplier_no: z.string(),
   }),
   quantity_delivered: z.number().min(0).optional(),
-})
+});
 
-export type SupplierType = z.infer<typeof supplierSchema>
-export type SupplierItemType = z.infer<typeof supplierItemSchema>
+export type SupplierType = z.infer<typeof supplierSchema>;
+export type SupplierItemType = z.infer<typeof supplierItemSchema>;
 
 export const formSchema = z.object({
   items: z.array(supplierItemSchema),
-})
+});
 
 export const deliveredFormSchema = z.object({
   items: z.array(supplierItemSchema),
@@ -97,66 +96,78 @@ export type DeliveredFormType = z.infer<typeof deliveredFormSchema>;
 export const inspectionSchema = z.object({
   inspection_no: z.string(),
   purchase_request: z.string(),
-  purchase_order: z.string()
-})
+  purchase_order: z.string(),
+});
 
-export type inspectionType = z.infer<typeof inspectionSchema>
+export type inspectionType = z.infer<typeof inspectionSchema>;
 
 export const itemsDeliveredSchema = z.object({
+  purchase_request: z.string(),
   inspection: z.string(),
   supplier_item: z.string(),
   quantity_delivered: z.number().min(0).optional(),
-  is_complete: z.boolean()
-})
+  is_complete: z.boolean(),
+});
 
-export type itemsDeliveredType = z.infer<typeof itemsDeliveredSchema>
+export type itemsDeliveredType = z.infer<typeof itemsDeliveredSchema>;
 
 export type _itemsDeliveredType = {
-  id:number
+  id: number;
+  pr_details: {
+    pr_no: string;
+    res_center_code: string;
+    office: string;
+    purpose: string;
+    status: string;
+    requisitioner_details: {
+      name: string;
+      department: string;
+      designation: string;
+    };
+    created_at: Date;
+  };
   inspection_details: {
     po_details: {
-      po_no: string
-      status: string
-      total_amount: string
-      po_details:{
-        po_no:string
-      }
+      po_no: string;
+      status: string;
+      total_amount: string;
+      po_details: {
+        po_no: string;
+      };
       pr_details: {
-        pr_no: string
-        res_center_code: string
-        office: string
-        purpose: string
+        pr_no: string;
+        res_center_code: string;
+        office: string;
+        purpose: string;
         requisitioner_details: {
-          name: string
-          department: string
-          designation: string
-        }
-        created_at: Date
-      }
-    }
-  }
+          name: string;
+          department: string;
+          designation: string;
+        };
+        created_at: Date;
+      };
+    };
+  };
   item_details: {
     item_quotation_details: {
       item_details: {
-        stock_property_no: string
-        item_description: string
-        quantity: string
-        unit: string
-        unit_cost:string
-      }
-      unit_price: string
-    }
-    supplier_item_no:string
-  }
-  quantity_delivered: number
-  supplier_item: string
-  created_at: Date
-  date_received: Date
-  is_complete: boolean
-  is_partial: boolean
-}
+        stock_property_no: string;
+        item_description: string;
+        quantity: string;
+        unit: string;
+        unit_cost: string;
+      };
+      unit_price: string;
+      brand_model: string;
+    };
+    supplier_item_no: string;
+  };
+  quantity_delivered: number;
+  supplier_item: string;
+  created_at: Date;
+  date_received: Date;
+  is_complete: boolean;
+  is_partial: boolean;
+};
 
-export type StockItemType = Omit<itemsDeliveredType, 'id'>;
-
-
-
+export type StockItemType = Omit<itemsDeliveredType, "id">;

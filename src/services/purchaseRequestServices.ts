@@ -287,6 +287,7 @@ export const usePurchaseRequestActions = () => {
   const [isPendingForward, setIsPendingForward] = useState(false);
   const [isPendingReadyToOrder, setIsPendingReadyToOrder] = useState(false);
   const [isPendingOrderPlaced, setIsPendingOrderPlaced] = useState(false);
+  const [isPendingDistribute, setIsPendingDistribute] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -311,6 +312,9 @@ export const usePurchaseRequestActions = () => {
         break;
       case "Order Placed":
         setPendingState = setIsPendingOrderPlaced;
+        break;
+      case "Completed":
+        setPendingState = setIsPendingDistribute;
         break;
     }
 
@@ -349,12 +353,14 @@ export const usePurchaseRequestActions = () => {
     handleReadyToOrder: (pr_no: string) =>
       handleAction("Ready to Order", pr_no),
     handleOrderPlaced: (pr_no: string) => handleAction("Order Placed", pr_no),
+    handleDistribute: (pr_no: string) => handleAction("Completed", pr_no),
     isPendingApprove,
     isPendingReject,
     isPendingCancel,
     isPendingForward,
     isPendingReadyToOrder,
     isPendingOrderPlaced,
+    isPendingDistribute,
     isError,
     isSuccess,
   };

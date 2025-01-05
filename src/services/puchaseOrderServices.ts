@@ -284,6 +284,27 @@ export const useGetItemsDelivered = () => {
   });
 };
 
+export const GetItemsDeliveredInPurchaseRequest = async (filters: { pr_no?: string; }):Promise<ApiResponse<_itemsDeliveredType[]>> => {
+  try {
+    const params = new URLSearchParams();
+
+    if (filters.pr_no) params.append('pr_no', filters.pr_no);
+    console.log(params)
+    const response = await api.get("api/items-delivered/purchase-request/filter/", {params})
+    return handleSucess(response)
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const useGetItemsDeliveredInPurchaseRequest = (filters: { pr_no?: string; }) => {
+  return useQuery({
+    queryKey: ["items-delivered", filters],
+    queryFn: () => GetItemsDeliveredInPurchaseRequest(filters),
+    enabled: !!filters.pr_no, 
+  })
+} 
+
 export const useItemsDeliveredCount = () => {
   const { data } = useGetItemsDelivered();
   const itemsDeliveredData = useMemo(() => {

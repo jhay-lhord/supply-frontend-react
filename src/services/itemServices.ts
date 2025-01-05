@@ -4,14 +4,24 @@ import { ItemType } from "@/types/request/item";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { itemType } from "@/types/response/item";
 
-export const GetItems = async (): Promise<ApiResponse<ItemType[]>> => {
+export const GetItems = async (): Promise<ApiResponse<itemType[]>> => {
   try {
-    const response = await api.get<ItemType[]>("api/item/");
+    const response = await api.get<itemType[]>("api/item/");
     return handleSucess(response);
   } catch (error) {
+    console.log(error)
     return handleError(error);
   }
+};
+
+export const useItem = () => {
+  return useQuery<ApiResponse<itemType[]>, Error>({
+    queryKey: ["items"],
+    queryFn: GetItems,
+    refetchInterval: 5000,
+  });
 };
 
 export const AddItem = async (data: ItemType) => {
@@ -42,9 +52,15 @@ export const useAddItem = () => {
   });
 };
 
-export const GetItemInPurchaseRequest = async (pr_no:string):Promise<ApiResponse<ItemType>> => {
+export const GetItemInPurchaseRequest = async (filters: { pr_no?: string; }):Promise<ApiResponse<itemType>> => {
+  console.log("called in function")
   try {
-    const response = await api.get(`api/item/purchase_request/${pr_no}`)
+    const params = new URLSearchParams();
+
+    if (filters.pr_no) params.append('pr_no', filters.pr_no);
+    console.log(params)
+    
+    const response = await api.get("api/purchase-request/item/filter/", {params})
     console.log(response)
     return handleSucess(response)
   } catch (error) {
@@ -53,10 +69,12 @@ export const GetItemInPurchaseRequest = async (pr_no:string):Promise<ApiResponse
 }
 
 // Use this if rendering the latet items in the Purchase request or need to access the loading state
-export const useGetItemInPurchaseRequest = (pr_no:string) => {
+export const useGetItemInPurchaseRequest = (filters: { pr_no?: string; }) => {
+  console.log("called in hooks")
   return useQuery({
-    queryKey: ["items"],
-    queryFn: () => GetItemInPurchaseRequest(pr_no)
+    queryKey: ["items", filters],
+    queryFn: () => GetItemInPurchaseRequest(filters),
+    enabled: !!filters.pr_no, 
   })
 } 
 
@@ -66,17 +84,10 @@ export const FilteredItemInPurchaseRequest = (pr_no: string) => {
 
   return (
     data &&
-    data.data?.filter((item: ItemType) => item.purchase_request === pr_no)
+    data.data?.filter((item: itemType) => item.pr_details.pr_no === pr_no)
   );
 };
 
-export const useItem = () => {
-  return useQuery<ApiResponse<ItemType[]>, Error>({
-    queryKey: ["items"],
-    queryFn: GetItems,
-    refetchInterval: 5000,
-  });
-};
 
 export const GetItem = async (id: string): Promise<ApiResponse<ItemType>> => {
   try {

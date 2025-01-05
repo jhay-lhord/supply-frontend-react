@@ -2,11 +2,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { purchaseRequestType } from "@/types/response/puchase-request";
-import { ItemDistributionActions } from "./item-distribution-action";
 import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
 import { useMemo } from "react";
+import { ItemDistributedActions } from "./item-distributed-action";
 
-export const itemDistributionColumns: ColumnDef<purchaseRequestType>[] = [
+export const itemDistributedColumns: ColumnDef<purchaseRequestType>[] = [
   {
     accessorKey: "pr_no",
     header: ({ column }) => (
@@ -71,7 +71,7 @@ export const itemDistributionColumns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="ACTIONS" />
     ),
     cell: ({ row }) => (
-      <ItemDistributionActions
+      <ItemDistributedActions
         pr_no={row.getValue("pr_no")}
         _data={row.original}
       />

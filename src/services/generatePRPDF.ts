@@ -6,7 +6,6 @@ import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "pdf-lib";
 import { formatPrDate } from "./formatDate";
 
 export const generatePRPDF = async (
-  data: purchaseRequestType,
   item: itemType[]
 ) => {
   const pdfDoc = await PDFDocument.create();
@@ -53,7 +52,7 @@ export const generatePRPDF = async (
 
     const wrappedDescription = wrapText(item_description, maxWidth, 9);
     const descriptionHeight = wrappedDescription.length * lineHeight;
-    const purposesplit = wrapText(data.purpose, purposewidth, 12);
+    const purposesplit = wrapText(item[0].pr_details.purpose, purposewidth, 12);
 
     purposesplit.forEach((line, lineIndex) => {
       page.drawText(line, {
@@ -63,7 +62,7 @@ export const generatePRPDF = async (
         font: timesRomanFont,
       });
     });
-    const requestby1 = (data.requisitioner_details.name ?? "").toUpperCase();
+    const requestby1 = (item[0].pr_details.requisitioner_details.name ?? "").toUpperCase();
     const requestbywidth = Helveticabold.widthOfTextAtSize(requestby1, 10);
     const requestbyplace = (119 + 365) / 2;
     page.drawText(requestby1, {
@@ -82,7 +81,7 @@ export const generatePRPDF = async (
       thickness: 1, // Adjust line thickness as needed
       color: rgb(0, 0, 0), // Black color
     });
-    const approvedby1 = (data.campus_director_details.name || "").toUpperCase();
+    const approvedby1 = (item[0].pr_details.campus_director_details.name || "").toUpperCase();
     const approvedbywidth = Helveticabold.widthOfTextAtSize(approvedby1, 10);
     const approvedbyplace = (365 + 564) / 2;
     page.drawText(approvedby1, {
@@ -101,7 +100,7 @@ export const generatePRPDF = async (
       color: rgb(0, 0, 0), // Black color
     });
 
-    const designation1 = data.requisitioner_details.designation ?? "";
+    const designation1 = item[0].pr_details.requisitioner_details.designation ?? "";
     const designationwidth = Helveticafont.widthOfTextAtSize(designation1, 11);
     const designationplace = (119 + 365) / 2;
     page.drawText(designation1, {
@@ -111,7 +110,7 @@ export const generatePRPDF = async (
       font: Helveticafont,
     });
 
-    const designation2 = data.campus_director_details.designation || "";
+    const designation2 = item[0].pr_details.campus_director_details.designation || "";
     const designationwidth2 = Helveticafont.widthOfTextAtSize(designation2, 11);
     const designationplace2 = (385 + 564) / 2;
     page.drawText(designation2, {
@@ -299,7 +298,7 @@ export const generatePRPDF = async (
       timesRomanFont,
       timesRomanItalicFont,
       Helveticafont,
-      data
+      item[0]
     );
   }
   // Serialize the PDF to bytes
@@ -315,7 +314,7 @@ const textandlines = async (
   timesRomanFont: PDFFont,
   timesRomanItalicFont: PDFFont,
   Helveticafont: PDFFont,
-  data: purchaseRequestType
+  item: itemType
 ) => {
   page.drawText("PURCHASE REQUEST", {
     x: 201,
@@ -438,14 +437,14 @@ const textandlines = async (
     size: 11,
     font: timesBoldFont,
   });
-  page.drawText(data.office, {
+  page.drawText(item.pr_details.office, {
     x: 30,
     y: 650,
     size: 11,
     font: timesBoldFont,
   });
   page.drawText("PR No.:", { x: 125, y: 663, size: 11, font: timesBoldFont });
-  page.drawText(data.pr_no, {
+  page.drawText(item.pr_details.pr_no, {
     x: 170,
     y: 663,
     size: 11,
@@ -466,7 +465,7 @@ const textandlines = async (
     font: timesBoldFont,
   });
   page.drawText("Date :", { x: 418, y: 663, size: 11, font: timesBoldFont });
-  page.drawText(formatPrDate(data.created_at), {
+  page.drawText(formatPrDate(item.pr_details.created_at), {
     x: 450,
     y: 663,
     size: 11,

@@ -3,6 +3,7 @@ import {
   deleteItem,
   FilteredItemInPurchaseRequest,
   arraySort,
+  useGetItemInPurchaseRequest,
 } from "@/services/itemServices";
 import {
   usePurchaseRequestActions,
@@ -11,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -73,6 +74,7 @@ interface messageDialogProps {
 export default function PurchaseRequestItemList() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [messageDialog, setMessageDialog] = useState<messageDialogProps>({
     open: false,
     type: "success" as const,
@@ -84,12 +86,21 @@ export default function PurchaseRequestItemList() {
   const { setStatus, status } = useStatusStore();
 
   const items = FilteredItemInPurchaseRequest(pr_no!);
+
+  const { data } = useGetItemInPurchaseRequest({
+    pr_no: pr_no,
+  });
+
+  const itemInPurchaseRequest = useMemo(() => {
+    return Array.isArray(data?.data) ? data.data : [];
+  }, [data?.data]);
+
   const {
     isLoading,
     data: purchase_request,
     error,
   } = usePurchaseRequestList(pr_no!);
-  const isItemEmpty = items && items.length === 0
+  const isItemEmpty = items && items.length === 0;
 
   const {
     handleApprove,
@@ -191,15 +202,13 @@ export default function PurchaseRequestItemList() {
       });
     }
   };
+  console.log(items);
 
   const handleGeneratePDF = async () => {
-    const purchaseRequestData = purchase_request?.data;
-    const itemsData = items ? items : [];
-
-    const pdfURL = await generatePRPDF(purchaseRequestData!, itemsData);
-    return itemsData.length != 0
-      ? window.open(pdfURL!, "_blank")
-      : navigate("/supply/not-found");
+    setIsGenerating(true)
+    const pdfURL = await generatePRPDF(itemInPurchaseRequest);
+    setIsGenerating(false)
+    return await window.open(pdfURL!, "_blank");
   };
 
   if (isLoading) return <Loading />;
@@ -278,7 +287,7 @@ export default function PurchaseRequestItemList() {
                       onClick={handleGeneratePDF}
                       className="flex bg-green-300 hover:rounded-full hover:bg-green-300 hover:border-none text-gray-950"
                     >
-                      <p className="mx-1 text-sm font-thin">Generate PDF</p>
+                      <p className="mx-1 text-sm font-thin">{ isGenerating ? "Generating": "Generate PDF"}</p>
                       <FileTextIcon className="w-4 h-4 mr-2" />
                       <span className="sr-only">Generate PDF</span>
                     </Button>
@@ -317,7 +326,11 @@ export default function PurchaseRequestItemList() {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>{isItemEmpty ? "Please add some items to proceed" : "Click to Approved The Purchase Request"}</p>
+                                <p>
+                                  {isItemEmpty
+                                    ? "Please add some items to proceed"
+                                    : "Click to Approved The Purchase Request"}
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>

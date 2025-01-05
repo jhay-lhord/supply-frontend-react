@@ -1,12 +1,4 @@
 import SupplySidebar from "../SupplySidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -14,8 +6,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { FloatingButton } from "../QuickAccess";
+import useAuthStore from "@/components/Auth/AuthStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthStore()
   return (
     <SidebarProvider>
       <SupplySidebar />
@@ -24,7 +18,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
+            <p className="text-xl font-bold">Hello, {user?.first_name}</p>
+            {/* <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
@@ -36,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
+            </Breadcrumb> */}
           </div>
         </header>
         <main className="flex p-10">

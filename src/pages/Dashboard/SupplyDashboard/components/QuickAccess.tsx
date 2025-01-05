@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PDFGeneratorDialog from "../../shared/components/PDFGenerator";
 
 const buttonVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -18,11 +19,12 @@ const buttonVariants = {
 
 export const FloatingButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPDFGeneratorOpen, setIsPDFGeneratorOpen] = useState<boolean>(false);
 
-  const toggleOpen = () => setIsOpen(!isOpen);
+  const toggleOpen = () => setIsOpen(!isOpen)
 
   const pdfButtons = [
-    { label: "Generate PDF", onClick: () => console.log("PR PDF clicked") },
+    { label: "PDF Generator", onClick: () => setIsPDFGeneratorOpen(true) },
     {
       label: "Track Purchase Request",
       onClick: () => console.log("PR PDF clicked"),
@@ -79,6 +81,7 @@ export const FloatingButton = () => {
           </Button>
         </motion.div>
       </div>
+      <PDFGeneratorDialog isOpen={isPDFGeneratorOpen} setIsOpen={setIsPDFGeneratorOpen}/>
     </>
   );
 };

@@ -91,6 +91,7 @@ export function OrderReceivedDialog({
 
       filteredItems?.map(async (data) => {
         const deliverData = {
+          purchase_request: pr_no ?? "",
           supplier_item: data.supplier_item_no,
           quantity_delivered: Number(
             data.item_quotation_details.item_details.quantity
