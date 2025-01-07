@@ -305,7 +305,10 @@ export default function PurchaseRequestItemList() {
                 {purchaseData?.status !== "Cancelled" &&
                   purchaseData?.status !== "Forwarded to Procurement" &&
                   purchaseData?.status !== "Received by the Procurement" &&
-                  purchaseData?.status !== "Ready to Order" && (
+                  purchaseData?.status !== "Ready to Order" &&
+                  purchaseData?.status !== "Completed" &&
+                  purchaseData?.status !== "Items Delivered" &&
+                  purchaseData?.status !== "Ready to Distribute" && (
                     <>
                       {purchaseData?.status !== "Approved" &&
                         purchaseData?.status !== "Rejected" && (

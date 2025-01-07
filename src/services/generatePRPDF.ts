@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { itemType } from "@/types/response/item";
-import { purchaseRequestType } from "@/types/response/puchase-request";
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "pdf-lib";
 import { formatPrDate } from "./formatDate";
 

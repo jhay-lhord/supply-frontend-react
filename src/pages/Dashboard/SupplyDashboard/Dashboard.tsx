@@ -69,6 +69,7 @@ const SupplyDashboard: React.FC = () => {
     ? [...chartData]?.reverse()
     : [];
 
+  console.log(chartData)
   return (
     <Layout>
       <ScrollArea className="w-full">

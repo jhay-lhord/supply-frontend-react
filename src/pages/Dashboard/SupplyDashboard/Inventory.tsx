@@ -1,31 +1,28 @@
-import {
-  Package,
-} from "lucide-react";
+import { Loader2, Package } from "lucide-react";
 import Layout from "./components/Layout/SupplyDashboardLayout";
-import { useGetAllPurchaseOrder, useGetItemsDelivered } from "@/services/puchaseOrderServices";
+import { useGetItemsDelivered } from "@/services/puchaseOrderServices";
 import { DataTable } from "./components/data-table";
 import { inventoryColumns } from "./components/inventory-column";
 
-
 export default function ModernInventory() {
+  const { data: items_delivered, isLoading: itemsLoading } =
+    useGetItemsDelivered();
 
-  const { data } = useGetAllPurchaseOrder()
-  const { data:items_delivered} = useGetItemsDelivered()
+  const itemDeliveredData = Array.isArray(items_delivered?.data)
+    ? items_delivered.data
+    : [];
 
-  console.log(data?.data)
-  const itemDeliveredData = Array.isArray(items_delivered?.data) ? items_delivered.data : []
-
-  const flattenedItemDeliveredData = itemDeliveredData.map(item => ({
+  const flattenedItemDeliveredData = itemDeliveredData.map((item) => ({
     ...item,
     po_no: item.inspection_details.po_details.po_no,
-    item_description: item.item_details.item_quotation_details.item_details.item_description,
+    item_description:
+      item.item_details.item_quotation_details.item_details.item_description,
     unit: item.item_details.item_quotation_details.item_details.unit,
     quantity: item.item_details.item_quotation_details.item_details.quantity,
     unit_cost: item.item_details.item_quotation_details.item_details.unit_cost,
   }));
-  
-  console.log(itemDeliveredData)
 
+  console.log(itemDeliveredData);
 
   return (
     <Layout>
@@ -36,7 +33,14 @@ export default function ModernInventory() {
         </h1>
 
         <div className="rounded-md">
-          <DataTable data={flattenedItemDeliveredData} columns={inventoryColumns}/>
+          {itemsLoading ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <DataTable
+              data={flattenedItemDeliveredData}
+              columns={inventoryColumns}
+            />
+          )}
         </div>
       </div>
     </Layout>

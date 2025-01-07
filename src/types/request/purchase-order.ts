@@ -127,6 +127,7 @@ export type _itemsDeliveredType = {
     created_at: Date;
   };
   inspection_details: {
+    created_at: Date
     po_details: {
       po_no: string;
       status: string;
@@ -146,6 +147,12 @@ export type _itemsDeliveredType = {
         };
         created_at: Date;
       };
+      rfq_details: {
+        supplier_name: string
+        address: string
+        tin: string
+        is_VAT: boolean
+      }
     };
   };
   item_details: {

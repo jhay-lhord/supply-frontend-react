@@ -20,7 +20,8 @@ export type itemQuotationResponseType = {
     quantity: string;
     unit_cost: string;
   };
-  unit_price: number;   
+  unit_price: number;
+  unit_quantity: number;   
   brand_model: string;
   is_low_price: boolean;
 };

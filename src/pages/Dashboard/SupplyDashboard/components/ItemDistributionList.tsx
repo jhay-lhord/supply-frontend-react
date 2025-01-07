@@ -30,9 +30,10 @@ import {
 import { useGetItemsDeliveredInPurchaseRequest } from "@/services/puchaseOrderServices";
 import GenerateICSPDFDialog from "./ItemDistributeDialog";
 import Layout from "./Layout/SupplyDashboardLayout";
-import { generateRISPDF } from "@/utils/generateRISPDF";
+// import { generateRISPDF } from "@/utils/generateRISPDF";
 import { usePurchaseRequestActions } from "@/services/purchaseRequestServices";
 import { MessageDialog } from "../../shared/components/MessageDialog";
+import { generateIARPDF } from "@/utils/generateIARPDF";
 
 interface messageDialogProps {
   open: boolean;
@@ -69,12 +70,14 @@ export const ItemDistributionList = () => {
     );
   }, [itemsDeliveredData]);
 
+  console.log(filteredItemsDeliveredData)
+
   if (isItemsDeliveredLoading) return <Loading />;
 
-  const handleGenerateRISPDF = async () => {
-    const url = await generateRISPDF(filteredItemsDeliveredData);
+  const handleGenerateIARPDF = async () => {
+    const url = await generateIARPDF(filteredItemsDeliveredData)
     window.open(url, "_blank");
-  };
+  }
 
   const handleDistributeClick = async () => {
     await handleDistribute(pr_no!);
@@ -174,7 +177,7 @@ export const ItemDistributionList = () => {
                 </div>
                 <div className="flex gap-4 mt-2">
                   <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-                    <Tooltip>
+                    {/* <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           className="bg-green-200 hover:bg-green-300"
@@ -187,19 +190,19 @@ export const ItemDistributionList = () => {
                       <TooltipContent side="top">
                         Click to Generate ICS PDF
                       </TooltipContent>
-                    </Tooltip>
+                    </Tooltip> */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           className="bg-green-200 hover:bg-green-300"
-                          onClick={handleGenerateRISPDF}
+                          onClick={handleGenerateIARPDF}
                         >
                           <FileText width={20} height={20} className="mx-2" />{" "}
-                          Generate RIS PDF
+                          Generate IAR PDF
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="top">
-                        Click to Generate RIS PDF
+                        Click to Generate IAR PDF
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

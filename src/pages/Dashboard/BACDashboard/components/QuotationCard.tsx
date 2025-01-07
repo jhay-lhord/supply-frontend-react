@@ -79,9 +79,7 @@ export const QuotationCard: React.FC<QuotationCardProps> = ({
     null
   );
 
-  const { data: items, isLoading: item_loading } = useGetItemInPurchaseRequest(
-    pr_no!
-  );
+  const { data: items, isLoading: item_loading } = useGetItemInPurchaseRequest({pr_no:pr_no});
   const { data } = useRequestForQoutation();
   const { data: item, isLoading } = useGetItemQuotation();
   const { mutate } = useDeleteRequestForQuotation();

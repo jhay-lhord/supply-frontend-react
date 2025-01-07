@@ -11,5 +11,8 @@ export const RESTRICTED_ACTION_STATUS = [
   "Received by the Procurement",
   "Ready to Order",
   "Order Placed",
-  "Items Delivered"
+  "Items Delivered",
+  "Ready to Distribute",
+  "Completed",
+
 ];

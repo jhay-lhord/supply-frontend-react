@@ -40,7 +40,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const BACDashboard: React.FC = () => {
-  const { inProgressCount, isLoading } = usePurchaseRequestInProgressCount();
+  const { requestInProgressCount, isLoading } = usePurchaseRequestInProgressCount();
 
   const { requestForQuotationCount, isLoading: quotation_loading } =
     useRequestForQuotationCount();
@@ -85,7 +85,7 @@ const BACDashboard: React.FC = () => {
                         {isLoading ? (
                           <Loader2 className="animate-spin" />
                         ) : (
-                          inProgressCount
+                          requestInProgressCount
                         )}
                       </span>
                       <Activity className="h-6 w-6 text-white/80" />

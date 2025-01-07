@@ -41,7 +41,10 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
   });
 
   const items = FilteredItemInPurchaseRequest(pr_no);
-  const sortedItems = arraySort(items!, "stock_property_no");
+  const sortedItems = arraySort(items!.map(item => ({
+    ...item,
+    purchase_request: pr_no
+  })), "stock_property_no");
   const nextStockNo = generateStockPropertyNo(sortedItems).toString();
   const item_no = uuidv4();
   const {

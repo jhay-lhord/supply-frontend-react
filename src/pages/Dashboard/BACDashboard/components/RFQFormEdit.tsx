@@ -93,6 +93,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
         rfq: item.rfq,
         item: item.item_details.item_no,
         unit_price: item.unit_price,
+        unit_quantity: item.unit_quantity,
         brand_model: item.brand_model,
         is_low_price: false,
       })),
@@ -115,6 +116,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
           rfq: item.rfq,
           item: item.item_details.item_no,
           unit_price: item.unit_price,
+          unit_quantity: item.unit_quantity,
           brand_model: item.brand_model,
           is_low_price: false,
         })),
@@ -181,6 +183,7 @@ export const RFQFormEdit: React.FC<RFQFormEditProps> = ({
               rfq: item.rfq,
               item: item.item,
               unit_price: item.unit_price,
+              unit_quantity: item.unit_quantity,
               brand_model: item.brand_model,
               is_low_price: sortedItem
                 ? Number(item.unit_price) <

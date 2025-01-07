@@ -6,7 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 
 export const getAllRecentActivities = async ():Promise<ApiResponse<ActivityType[]>> => {
   try {
+    console.log("called")
     const response = await api.get<ActivityType[]>("api/recent-activities/");
+    console.log(response)
     return handleSucess(response)
   } catch (error) {
     return handleError(error)

@@ -38,10 +38,9 @@ export const itemDistributedColumns: ColumnDef<purchaseRequestType>[] = [
 
       const itemsInPurchaseRequest = (pr_no: string) => {
         return supplierItemData.filter(
-          (data) => data.rfq_details.purchase_request === pr_no
+          (data) => data.rfq_details.purchase_request === pr_no && data.supplier_details.aoq_details.pr_details.status === "Completed"
         ).length;
       };
-
       const itemsCount = itemsInPurchaseRequest(row.getValue("pr_no"));
       return (
         <div className="w-[200px]">{itemsCount}</div>

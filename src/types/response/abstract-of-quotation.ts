@@ -57,6 +57,7 @@ export type supplierItemType_ = {
         pr_no: string;
         purpose: string;
         office: string;
+        status: string;
         res_center_code: string;
         requisitioner_details: {
           name: string;

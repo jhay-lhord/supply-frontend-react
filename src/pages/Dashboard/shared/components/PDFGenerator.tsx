@@ -1,6 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-"use client";
-
 import { useState } from "react";
 import {
   Search,
@@ -32,13 +29,13 @@ import { generatePRPDF } from "@/services/generatePRPDF";
 import { itemType } from "@/types/response/item";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-type PDFType = "PR" | "RIS" | "ICS" | "PO";
+type PDFType = "PR" 
 
 const pdfTypes: { value: PDFType; label: string }[] = [
   { value: "PR", label: "PR PDF" },
-  { value: "RIS", label: "RIS PDF" },
-  { value: "ICS", label: "ICS PDF" },
-  { value: "PO", label: "PO PDF" },
+  // { value: "RIS", label: "RIS PDF" },
+  // { value: "ICS", label: "ICS PDF" },
+  // { value: "PO", label: "PO PDF" },
 ];
 
 interface PDFGeneratorDialogProps {
@@ -48,7 +45,7 @@ interface PDFGeneratorDialogProps {
 
 const pdfConfig: Record<
   PDFType,
-  { searchFn: (documentNo: string) => Promise<any> }
+  { searchFn: (documentNo: string) => Promise<unknown> }
 > = {
   PR: {
     searchFn: async (documentNo) => {
@@ -57,21 +54,21 @@ const pdfConfig: Record<
       return (response.status === "success") && (response.data) ? response?.data as itemType : []
     },
   },
-  RIS: {
-    searchFn: async (documentNo) => {
-      return { exampleKey: "RIS data" };
-    },
-  },
-  ICS: {
-    searchFn: async (documentNo) => {
-      return { exampleKey: "ICS data" };
-    },
-  },
-  PO: {
-    searchFn: async (documentNo) => {
-      return { exampleKey: "PO data" };
-    },
-  },
+  // RIS: {
+  //   searchFn: async (documentNo) => {
+  //     return { exampleKey: "RIS data" };
+  //   },
+  // },
+  // ICS: {
+  //   searchFn: async (documentNo) => {
+  //     return { exampleKey: "ICS data" };
+  //   },
+  // },
+  // PO: {
+  //   searchFn: async (documentNo) => {
+  //     return { exampleKey: "PO data" };
+  //   },
+  // },
 };
 
 export default function PDFGeneratorDialog({
@@ -95,14 +92,18 @@ export default function PDFGeneratorDialog({
     try {
       const data = await pdfConfig[selectedType].searchFn(documentNo);
       console.log(data)
-      if (data.length !== 0 ) {
+      if (Array.isArray(data) && data.length !== 0) {
         setPdfData(data);
         setIsFound(true);
       } else {
-        throw new Error(`${documentNo} not found`);
+        throw new Error(`No items found for PR No. ${documentNo}. Please check the items or add new ones to continue.`);
       }
-    } catch (err: any) {
-      setError(err.message || "An error occurred while searching");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An error occurred while searching");
+      }
     } finally {
       setIsSearching(false);
     }
