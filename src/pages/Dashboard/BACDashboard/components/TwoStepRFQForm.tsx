@@ -257,7 +257,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
         <DialogContent className="max-w-full w-[70rem]">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              Create Request for Qoutation
+              Create Request for Quotation [{pr_no}]
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[30rem] mb-9">

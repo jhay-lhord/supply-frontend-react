@@ -86,6 +86,7 @@ export default function SupplyAOQ() {
   const memoizedHandleOrderPlaced = useCallback(
     (pr_no: string) => {
       handleOrderPlaced(pr_no);
+      console.log("updated to order placed")
     },
     [handleOrderPlaced]
   );
@@ -161,6 +162,7 @@ export default function SupplyAOQ() {
       if (allOrdered && !processedPRs.current.has(pr_no)) {
         processedPRs.current.add(pr_no);
         memoizedHandleOrderPlaced(pr_no);
+        console.log("updated the pr")
       }
     });
   }, [

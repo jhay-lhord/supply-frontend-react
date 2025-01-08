@@ -1,3 +1,5 @@
+import { SupplierType } from "@/types/request/purchase-order";
+
 export function generatePONo(prNo: string, supplierIndex: number, hasMultipleSuppliers: boolean): string {
   if (!hasMultipleSuppliers) {
     return prNo;
@@ -7,7 +9,7 @@ export function generatePONo(prNo: string, supplierIndex: number, hasMultipleSup
   return `${prNo}${letterCode}`;
 }
 
-export function hasMultipleSuppliers(suppliers: any[]): boolean {
+export function hasMultipleSuppliers(suppliers: SupplierType[]): boolean {
   return suppliers.length > 1;
 }
 

@@ -44,7 +44,7 @@ const purchaseRequest = [
   },
 ];
 
-const sidebarItems = [
+const quotations = [
   {
     title: "Request for Quotation",
     url: "",
@@ -108,7 +108,7 @@ export function SideBarItem() {
       </SidebarMenu>
       <SidebarGroupLabel>Quotation</SidebarGroupLabel>
       <SidebarMenu>
-        {sidebarItems.map((item) => (
+        {quotations.map((item) => (
           <Collapsible key={item.title} asChild className="group/collapsible" defaultOpen={true}>
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
@@ -122,7 +122,7 @@ export function SideBarItem() {
                 <SidebarMenuSub>
                   {item.items.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton className="px-3 py-5" asChild>
+                      <SidebarMenuSubButton className="px-3 py-5" isActive={location.pathname === subItem.url}>
                         <Link to={subItem.url}>
                           <span>{subItem.title}</span>
                         </Link>

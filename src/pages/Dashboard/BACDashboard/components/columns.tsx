@@ -12,7 +12,7 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
   {
     accessorKey: "pr_no",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="PO No." />
+      <DataTableColumnHeader column={column} title="PR No." />
     ),
     cell: ({ row }) => {
       const rfqCount = useRequestForQoutationCount(row.getValue("pr_no"));

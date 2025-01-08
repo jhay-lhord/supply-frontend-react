@@ -62,6 +62,7 @@ import { MessageDialog } from "../../shared/components/MessageDialog";
 import { AxiosError } from "axios";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import { indexToLetter } from "@/utils/indexToLetter";
+import { Input } from "@/components/ui/input";
 
 interface AbstractFormProps {
   prNoFromProps: string;
@@ -73,6 +74,8 @@ interface SelectedItems {
   rfq_no: string;
   item_quote_no: string;
   item_no: string;
+  item_quantity: number;
+  item_cost: number;
   total_amount: number;
 }
 
@@ -103,6 +106,9 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
   const [rfqNo, setRfqNo] = useState<string | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
   const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const [editableQuotation, setEditableQuotation] = useState<
+    itemQuotationResponseType[]
+  >([]);
 
   const { pr_no } = useParams();
 
@@ -111,27 +117,25 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
 
   const { data: rfqs } = useRequestForQoutation();
   const { data: items_, isLoading: item_loading } = useGetItemQuotation();
-  const purchaseItems = FilteredItemInPurchaseRequest(purchaseNumber!)
+  const purchaseItems = FilteredItemInPurchaseRequest(purchaseNumber!);
+  const _items = useMemo(() => {
+    return Array.isArray(items_?.data) ? items_.data : [];
+  }, [items_?.data])
+
 
   const itemQuotation = useMemo(() => {
-    const _items = Array.isArray(items_?.data) ? items_.data : [];
     return _items.filter((data) => data.rfq === rfqNo);
-  }, [items_?.data, rfqNo]);
-
+  }, [_items, rfqNo]);
 
   const quotations_ = useMemo(() => {
     const data_ = Array.isArray(rfqs?.data) ? rfqs.data : [];
     return data_.filter((data) => data.purchase_request === purchaseNumber);
   }, [rfqs?.data, purchaseNumber]);
 
-
   const { mutate: addAOQMutation } = useAddAbstractOfQuotation();
   const { mutate: addSupplierItemMutation } = useAddSupplierItem();
 
-  const {
-    handleSubmit,
-    setValue,
-  } = useForm({
+  const { handleSubmit, setValue } = useForm({
     resolver: zodResolver(abstractSchema),
     defaultValues: {
       aoq_no: purchaseNumber ?? "",
@@ -139,13 +143,21 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     },
   });
 
-
   useEffect(() => {
     if (isDialogOpen && itemQuotation.length > 0) {
       setValue("aoq_no", purchaseNumber ?? "");
       setValue("purchase_request", purchaseNumber ?? "");
+      setEditableQuotation(itemQuotation);
     }
   }, [isDialogOpen, setValue, itemQuotation, purchaseNumber]);
+
+  useEffect(() => {
+    
+    if (isDialogOpen && itemQuotation && itemQuotation.length > 0) {
+      setEditableQuotation(itemQuotation);
+    } 
+  }, [itemQuotation, isDialogOpen, selectedSupplier]);
+
 
   const handleItemSelection = (item: itemQuotationResponseType) => {
     if (!selectedSupplier) return;
@@ -157,6 +169,8 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         rfq_no: item.rfq,
         item_quote_no: item.item_quotation_no,
         item_no: item.item_details.item_no,
+        item_quantity: Number(item.item_details.quantity),
+        item_cost: Number(item.item_details.unit_cost),
         total_amount:
           Number(item.item_details.quantity) * Number(item.unit_price),
       };
@@ -191,7 +205,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     return quotations.some(
       (quotation) =>
         quotation.rfq_no !== selectedSupplier &&
-      quotation.items.some((item) => item.item_no === item_no)
+        quotation.items.some((item) => item.item_no === item_no)
     );
   };
 
@@ -212,13 +226,22 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     );
   };
 
-  const allItemQuotationCount = purchaseItems && purchaseItems?.length
+  const allItemQuotationCount = purchaseItems && purchaseItems?.length;
 
   const selectedItems = useMemo(() => {
-    return new Set(quotations.flatMap(data => data.items.map(item => item.item_quote_no)));
-  }, [quotations])
+    return new Set(
+      quotations.flatMap((data) => data.items.map((item) => item.item_quote_no))
+    );
+  }, [quotations]);
 
-  const restrictedSubmitAction = allItemQuotationCount! > selectedItems.size
+  const restrictedSubmitAction = allItemQuotationCount! > selectedItems.size;
+
+  const handleInputChange = (index: number, field: 'quantity' | 'unit_cost', value: string) => {
+    const updatedQuotation = [...editableQuotation];
+    updatedQuotation[index].item_details[field] = value ?? 0;
+    setEditableQuotation(updatedQuotation);
+  };
+
 
   const onSubmit = async (
     data: abstractType | supplierType | supplierItemType
@@ -226,7 +249,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
     setIsLoading(true);
     try {
       const result = abstractSchema.safeParse(data);
-      
+
       if (!result.success) {
         return;
       }
@@ -267,15 +290,17 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                 supplier: supplier_no,
                 rfq: item.rfq_no,
                 item_quotation: item.item_quote_no,
+                item_quantity: item.item_quantity,
+                item_cost: item.item_cost,
                 total_amount: item.total_amount.toString(),
               }));
+
 
               allItems = [...allItems, ...supplierItems];
             } catch (error) {
               console.error("Error processing supplier:", error);
             }
           }
-
 
           await Promise.all(
             allItems.map(async (item) => {
@@ -323,7 +348,7 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
         <DialogContent className="max-w-full w-[70rem] ">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              Create Abstract of Quotation
+              Create Abstract of Quotation [{purchaseNumber}]
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[30rem] mb-9">
@@ -401,27 +426,51 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                     </div>
                     {item_loading ? (
                       <Loading />
-                    ) : itemQuotation && itemQuotation?.length > 0 ? (
-                      itemQuotation.map((item, index) => (
+                    ) : editableQuotation && editableQuotation?.length > 0 ? (
+                      editableQuotation.map((item, index) => (
                         <div
                           key={item.item_quotation_no}
                           className="grid grid-cols-9 gap-2 items-center py-6 border-b-2"
                         >
                           <p className="text-gray-500">
-                            {itemQuotation[index].item_details.unit}
+                            {editableQuotation[index].item_details.unit}
                           </p>
                           <p className="text-gray-500 col-span-2">
-                            {itemQuotation[index].item_details.item_description}
+                            {editableQuotation[index].item_details.item_description}
                           </p>
-                          <p className="text-gray-500">
-                            {itemQuotation[index].item_details.quantity}
-                          </p>
-                          <p className="text-gray-500">
-                            {itemQuotation[index].item_details.unit_cost}
-                          </p>
+                          <Input
+                            defaultValue={
+                              editableQuotation[index].item_details.quantity
+                            }
+                            value={
+                              editableQuotation[index].item_details.quantity
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                "quantity",
+                                e.target.value
+                              )
+                            }
+                          />
+                          <Input
+                            defaultValue={
+                              editableQuotation[index].item_details.unit_cost
+                            }
+                            value={
+                              editableQuotation[index].item_details.unit_cost
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                "unit_cost",
+                                e.target.value
+                              )
+                            }
+                          />
                           <div className="flex flex-col col-span-2">
                             <p className="text-gray-500">
-                              {itemQuotation[index].brand_model}
+                              {editableQuotation[index].brand_model}
                             </p>
                           </div>
                           <div className="flex flex-col">
@@ -468,7 +517,10 @@ export const AbstractForm: React.FC<AbstractFormProps> = ({
                 </CardContent>
                 <CardFooter>
                   <div className="fixed bottom-6 right-10 flex gap-2 items-center">
-                    <p>({selectedItems.size} of {purchaseItems?.length} item selected)</p>
+                    <p>
+                      ({selectedItems.size} of {purchaseItems?.length} item
+                      selected)
+                    </p>
                     <Button
                       className={`text-slate-950 bg-orange-200 px-8 py-1 hover:bg-orange-300 ${
                         isLoading && "px-16"

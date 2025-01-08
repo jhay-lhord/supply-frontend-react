@@ -10,7 +10,7 @@ export const incoming_columns: ColumnDef<purchaseRequestType>[] = [
   {
     accessorKey: "pr_no",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="PO No." />
+      <DataTableColumnHeader column={column} title="PR No." />
     ),
     cell: ({ row }) => {
       const navigate = useNavigate();
