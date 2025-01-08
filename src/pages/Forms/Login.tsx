@@ -4,13 +4,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import ErrorCard from "@/components/ErrorCard";
 import { InputOTPForm } from "@/pages/Forms/InputOTPForm";
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userLoginSchema, userLoginType } from "@/types/request/user";
 import { useToast } from "@/hooks/use-toast";
 import useAuthStore from "@/components/Auth/AuthStore";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -124,7 +124,13 @@ const Login = () => {
                   Sign in to Supply Office
                 </p>
 
-                {errorMessage && <ErrorCard description={errorMessage} />}
+                {errorMessage && (
+                  <Alert variant={"destructive"}>
+                    <AlertDescription>
+                      <p className="text-red-500">{errorMessage}</p>
+                    </AlertDescription>
+                  </Alert>
+                )}
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                   {renderField({ label: "Email", field_name: "email", errors })}

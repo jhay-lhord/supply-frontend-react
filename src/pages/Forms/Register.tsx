@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { ApiResponse } from "@/types/response/api-response";
 import { UserResponse } from "@/types/request/user";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Register = () => {
   const [isloading, setIsloading] = useState<boolean>(false);
@@ -60,25 +61,18 @@ const Register = () => {
               description:
                 "Your account is pending activation by an administrator. You'll be notified once it's activated.",
             });
-          } else if (response.status === "error") {
-            setErrorMessage(
-              response.error?.message || "An unexpected error occurred"
-            );
           } else {
-            setErrorMessage("An unexpected error occurred");
+            setErrorMessage(
+              (response.error?.response?.data as { email?: string })?.email ??
+                ""
+            );
           }
         },
         onError: (error) => {
           setIsloading(false);
           console.log(error);
           if (error instanceof AxiosError) {
-            setErrorMessage(
-              error.response?.data?.email ||
-                error.response?.data?.message ||
-                error.message
-            );
-          } else if (error instanceof Error) {
-            setErrorMessage(error.message);
+            setErrorMessage(error.response?.data?.email);
           } else {
             setErrorMessage("An unexpected error occurred 2");
           }
@@ -123,8 +117,13 @@ const Register = () => {
             className="w-full flex flex-col justify-between space-y-4"
             onSubmit={handleSubmit(onSubmit)}
           >
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-
+            {errorMessage && (
+              <Alert variant={"destructive"}>
+                <AlertDescription>
+                  <p className="text-red-500">{errorMessage}</p>
+                </AlertDescription>
+              </Alert>
+            )}
             <p className="font-normal text-3xl mt-0 mb-6 text-gray-900 text-center">
               Create an Account
             </p>
