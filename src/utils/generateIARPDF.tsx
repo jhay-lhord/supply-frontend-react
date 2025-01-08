@@ -48,9 +48,8 @@ export const generateIARPDF = async (itemData: _itemsDeliveredType[]) => {
     const no = data.item_details.item_quotation_details.item_details.stock_property_no
     const unit = data.item_details.item_quotation_details.item_details.unit
     const description = data.item_details.item_quotation_details.item_details.item_description
-    const quantity = data.item_details.item_quotation_details.item_details.quantity
-    const unitcost = data.item_details.item_quotation_details.unit_price
-    // const { no, unit, description, quantity, unitcost } = entry;
+    const quantity = data.item_details.item_quantity
+    const unitcost = data.item_details.item_cost
 
     // Calculate height needed for wrapped description
     const wrappedDescription = wrapText(

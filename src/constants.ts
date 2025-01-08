@@ -12,7 +12,7 @@ export const RESTRICTED_ACTION_STATUS = [
   "Ready to Order",
   "Order Placed",
   "Items Delivered",
-  "Ready to Distribute",
+  "Ready for Distribution",
   "Completed",
 
 ];

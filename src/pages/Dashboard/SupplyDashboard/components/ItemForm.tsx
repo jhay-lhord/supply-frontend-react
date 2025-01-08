@@ -40,7 +40,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ pr_no }) => {
     message: "",
   });
 
-  const items = FilteredItemInPurchaseRequest(pr_no);
+  const items = FilteredItemInPurchaseRequest(pr_no) ?? [];
   const sortedItems = arraySort(items!.map(item => ({
     ...item,
     purchase_request: pr_no

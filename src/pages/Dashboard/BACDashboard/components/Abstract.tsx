@@ -1,20 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { usePurchaseRequestList } from "@/services/purchaseRequestServices";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  PurchaseRequestData,
-  purchaseRequestFormSchema,
-} from "@/types/request/purchase-request";
+import { useMemo, useState } from "react";
 import { useEffect } from "react";
 import Loading from "../../shared/components/Loading";
 
 import {
   CalendarIcon,
   DownloadIcon,
-  Printer,
+  FileText,
   SquareArrowOutUpRightIcon,
   TargetIcon,
   UserIcon,
@@ -51,7 +45,13 @@ export default function Abstract() {
     useAbstractOfQuotation();
   const { data: items } = useGetAllSupplierItem();
 
-  const supplierItemData = Array.isArray(items?.data) ? items.data : []
+  const supplierItemData = useMemo(() => {
+    return Array.isArray(items?.data) ? items.data : []
+  }, [items?.data])
+
+  const filteredSupplierItem = useMemo(() => {
+    return supplierItemData.filter(data => data.rfq_details.purchase_request === pr_no)
+  }, [supplierItemData, pr_no])
 
   const {
     isLoading,
@@ -63,17 +63,17 @@ export default function Abstract() {
 
   const navigate = useNavigate();
 
-  const { setValue } = useForm<PurchaseRequestData>({
-    resolver: zodResolver(purchaseRequestFormSchema),
-    defaultValues: {
-      pr_no: pr_no,
-      purpose: purchaseRequestData?.purpose,
-      status: purchaseRequestData?.status,
-      office: purchaseRequestData?.office,
-      requisitioner: purchaseRequestData?.requisitioner_details.name,
-      campus_director: purchaseRequestData?.campus_director_details.name,
-    },
-  });
+  // const { setValue } = useForm<PurchaseRequestData>({
+  //   resolver: zodResolver(purchaseRequestFormSchema),
+  //   defaultValues: {
+  //     pr_no: pr_no,
+  //     purpose: purchaseRequestData?.purpose,
+  //     status: purchaseRequestData?.status,
+  //     office: purchaseRequestData?.office,
+  //     requisitioner: purchaseRequestData?.requisitioner_details.name,
+  //     campus_director: purchaseRequestData?.campus_director_details.name,
+  //   },
+  // });
 
   useEffect(() => {
     const fetchPdfUrl = async () => {
@@ -83,28 +83,28 @@ export default function Abstract() {
     fetchPdfUrl();
   }, []);
 
-  useEffect(() => {
-    if (purchaseRequestData) {
-      setValue("purpose", purchaseRequestData?.purpose ?? "");
-      setValue("office", purchaseRequestData?.office ?? "");
-      setValue(
-        "requisitioner",
-        purchaseRequestData?.requisitioner_details.name ?? ""
-      );
-      setValue(
-        "campus_director",
-        purchaseRequestData?.campus_director_details.name ?? ""
-      );
-      setValue("status", purchaseRequestData?.status);
-    }
-  }, [purchaseRequestData, setValue]);
+  // useEffect(() => {
+  //   if (purchaseRequestData) {
+  //     setValue("purpose", purchaseRequestData?.purpose ?? "");
+  //     setValue("office", purchaseRequestData?.office ?? "");
+  //     setValue(
+  //       "requisitioner",
+  //       purchaseRequestData?.requisitioner_details.name ?? ""
+  //     );
+  //     setValue(
+  //       "campus_director",
+  //       purchaseRequestData?.campus_director_details.name ?? ""
+  //     );
+  //     setValue("status", purchaseRequestData?.status);
+  //   }
+  // }, [purchaseRequestData, setValue]);
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
 
   const handlePrintClick = async () => {
-    const url = await generateAOQPDF(supplierItemData!);
+    const url = await generateAOQPDF(filteredSupplierItem!);
     window.open(url!, "_blank");
   };
 
@@ -149,7 +149,16 @@ export default function Abstract() {
           </CardTitle>
           <div className="py-4">
             <div className="flex justify-between gap-1">
-              <Button
+              {/* <Button
+                className="bg-green-400 hover:bg-green-500"
+                onClick={() =>
+                  navigate(`/bac/item-selected-quotation/${pr_no}`)
+                }
+              >
+                <p className="mr-2">View Abstract of Quotation</p>
+                <SquareArrowOutUpRightIcon className="w-4 h-4 mr-2" />
+              </Button> */}
+               <Button
                 className="bg-green-400 hover:bg-green-500"
                 onClick={() =>
                   navigate(`/bac/item-selected-quotation/${pr_no}`)
@@ -166,7 +175,7 @@ export default function Abstract() {
                         className="px-7 bg-orange-300 hover:bg-orange-200 text-slate-950"
                         onClick={handlePrintClick}
                       >
-                        <Printer strokeWidth={1.3} />
+                        Generate AOQ <FileText className="h-5 w-5 ml-2"/>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="top">

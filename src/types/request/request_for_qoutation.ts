@@ -7,7 +7,6 @@ export const itemQuotationSchema = z.object({
       purchase_request: z.string(),
       rfq: z.string().min(1, "Required"),
       item: z.string().min(1, "Required"),
-      unit_quantity: z.number(),
       unit_price: z.number(),
       brand_model: z.string(),
       is_low_price: z.boolean()
@@ -29,7 +28,7 @@ export type itemQuotationRequestType = {
   purchase_request: string;
   rfq: string;
   item: string;
-  unit_quantity: number;
+  // unit_quantity: number;
   unit_price: number;   
   brand_model: string;
   is_low_price: boolean;

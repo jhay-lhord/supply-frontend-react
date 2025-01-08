@@ -156,6 +156,8 @@ export type _itemsDeliveredType = {
     };
   };
   item_details: {
+    item_quantity: string
+    item_cost: string
     item_quotation_details: {
       item_details: {
         stock_property_no: string;

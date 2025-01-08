@@ -19,7 +19,7 @@ import {
 } from "@/services/purchaseRequestServices";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supplierType_ } from "@/types/response/abstract-of-quotation";
-import { Loader2, PackageOpen, ShoppingCart } from "lucide-react";
+import { Loader2, PackageOpen, User } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { AxiosError } from "axios";
 import { purchaseOrderType } from "@/types/request/purchase-order";
@@ -86,7 +86,7 @@ export default function SupplyAOQ() {
   const memoizedHandleOrderPlaced = useCallback(
     (pr_no: string) => {
       handleOrderPlaced(pr_no);
-      console.log("updated to order placed")
+      console.log("updated to order placed");
     },
     [handleOrderPlaced]
   );
@@ -162,7 +162,7 @@ export default function SupplyAOQ() {
       if (allOrdered && !processedPRs.current.has(pr_no)) {
         processedPRs.current.add(pr_no);
         memoizedHandleOrderPlaced(pr_no);
-        console.log("updated the pr")
+        console.log("updated the pr");
       }
     });
   }, [
@@ -344,9 +344,14 @@ export default function SupplyAOQ() {
         filteredPurchaseRequestData.map((data) => (
           <Card key={data.pr_no} className="mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                {data.pr_no} - {data.requisitioner_details.name}
+              <CardTitle className="flex flex-col">
+                <div className="flex gap-2 my-2">
+                  <p>{data.pr_no}</p>
+                </div>
+                <div className="flex gap-2">
+                  <User className="w-4 h-4" />
+                  <p className="text-sm font-thin">{data.requisitioner_details.name}</p>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>

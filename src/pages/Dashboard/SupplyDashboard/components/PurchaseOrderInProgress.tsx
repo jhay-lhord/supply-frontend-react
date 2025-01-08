@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
-  EllipsisVerticalIcon,
   PackageOpen,
   XCircle,
 } from "lucide-react";
@@ -124,7 +123,6 @@ export default function PurchaseOrderInProgess() {
                         <DropdownMenuTrigger asChild>
                           <Button className="">
                             <p>Open Menu</p>
-                            <EllipsisVerticalIcon className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>

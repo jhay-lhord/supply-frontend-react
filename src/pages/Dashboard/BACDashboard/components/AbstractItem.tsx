@@ -42,11 +42,18 @@ export const AbstractItem = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
+  const supplierData = useMemo(() => {
+    return Array.isArray(supplier?.data) ? supplier.data : [];
+  }, [supplier?.data])
 
-  const supplierName = supplierData.map(
+  const filteredSupplierData = useMemo(() => {
+    return supplierData.filter(data => data.rfq_details.purchase_request === pr_no)
+  }, [supplierData, pr_no])
+
+  const supplierName = filteredSupplierData.map(
     (data) => data.rfq_details.supplier_name
   );
+
 
   const abstractData = useMemo(() => {
     if (aoq_data) {

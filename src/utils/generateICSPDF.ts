@@ -65,11 +65,11 @@ export const generateICSPDF = async (itemData: _itemsDeliveredType[]) => {
   const collectedData: collectedDataType[] = [];
   itemData.forEach((data) => {
     const po_no = data.inspection_details.po_details.po_no;
-    const quantity = Number(data.item_details.item_quotation_details.item_details.quantity);
+    const quantity = Number(data.item_details.item_quantity);
     const unit = data.item_details.item_quotation_details.item_details.unit;
     const description =
       data.item_details.item_quotation_details.item_details.item_description;
-    const unitCost = Number(data.item_details.item_quotation_details.unit_price);
+    const unitCost = Number(data.item_details.item_cost);
     const purpose = data.inspection_details.po_details.pr_details.purpose;
     const receivedfromname =
       data.inspection_details.po_details.pr_details.requisitioner_details.name;

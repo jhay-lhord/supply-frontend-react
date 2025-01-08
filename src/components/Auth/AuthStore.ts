@@ -91,6 +91,8 @@ const useAuthStore = create<AuthState>()(
 
       checkUser: async (email, password, onSuccess, onError) => {
         set({ isLoading: true, errorMessage: null, successMessage: null });
+        deleteAuthStorage();
+        deleteCookies();
         try {
           const response = await api.post("/api/user/login_token/", {
             email,

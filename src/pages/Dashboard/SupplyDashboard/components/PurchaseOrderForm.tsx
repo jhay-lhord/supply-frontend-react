@@ -219,16 +219,7 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                   })
                 );
                 reset();
-                setIsLoading(false);
-                setIsDialogOpen(false);
                 isOrderPlaced = true;
-
-                setMessageDialog({
-                  open: true,
-                  message: "Order placed successfully",
-                  title: "Success",
-                  type: "success",
-                });
               } else {
                 reset();
                 setIsLoading(false);
@@ -274,7 +265,9 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
     // Execute all purchase orders concurrently
     await Promise.all(addPurchaseOrders);
     //Update the status of purchase request
-    if (isOrderPlaced) return handleOrderPlaced(data.purchase_request);
+    if (isOrderPlaced) return await handleOrderPlaced(data.purchase_request);
+    setIsLoading(false);
+    setIsDialogOpen(false);
   };
 
   return (

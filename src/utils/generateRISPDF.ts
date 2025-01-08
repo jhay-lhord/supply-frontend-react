@@ -102,7 +102,8 @@ export const generateRISPDF = async (itemData: _itemsDeliveredType[]) => {
     const unit = data.item_details.item_quotation_details.item_details.unit;
     const description =
       data.item_details.item_quotation_details.item_details.item_description;
-    const quantity = data.item_details.item_quotation_details.item_details.quantity;
+    const requesition_quantity = data.item_details.item_quotation_details.item_details.quantity
+    const issue_quantity = data.item_details.item_quantity
     
     // Calculate height needed for wrapped description
     const wrappedDescription = wrapText(description, maxWidth, 9);
@@ -170,18 +171,24 @@ export const generateRISPDF = async (itemData: _itemsDeliveredType[]) => {
     });
 
     // Quantity
-    const quantitytext = quantity.toString() || "";
-    const quantitywidth = timesRomanFont.widthOfTextAtSize(quantitytext, 9);
+    const requesition_quantity_text = requesition_quantity.toString() || "";
+    const requesition_quantity_width = timesRomanFont.widthOfTextAtSize(requesition_quantity_text, 9);
+
+    const issue_quantity_text= issue_quantity.toString() || "";
+    const issue_quantity_width= timesRomanFont.widthOfTextAtSize(issue_quantity_text, 9);
+
+
+
     const quantityplace = (295 + 332) / 2;
     const quantityplace1 = (397 + 471) / 2;
-    page.drawText(quantitytext, {
-      x: quantityplace - quantitywidth / 2,
+    page.drawText(requesition_quantity_text, {
+      x: quantityplace - requesition_quantity_width / 2,
       y: yPosition,
       size: 9,
       font: timesRomanFont,
     });
-    page.drawText(quantitytext, {
-      x: quantityplace1 - quantitywidth / 2,
+    page.drawText(issue_quantity_text, {
+      x: quantityplace1 - issue_quantity_width / 2,
       y: yPosition,
       size: 9,
       font: timesRomanFont,

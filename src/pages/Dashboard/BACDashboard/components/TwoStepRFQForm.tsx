@@ -98,7 +98,6 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
         purchase_request: pr_no,
         rfq: rfq_no,
         item: item.item_no,
-        unit_quantity: item.quantity,
         unit_price: 0,
         brand_model: "",
         is_low_price: false,
@@ -205,7 +204,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
               purchase_request: pr_no!,
               rfq: rfqNo ?? "",
               item: item.item ?? "",
-              unit_quantity: item.unit_quantity ?? 0,
+              // unit_quantity: item.unit_quantity ?? 0,
               unit_price: item.unit_price ?? 0,
               brand_model: item.brand_model ?? "",
               is_low_price: sortedItem
@@ -366,13 +365,13 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                                 <Label className="text-gray-500">
                                   {sortedItems[index]?.item_description}
                                 </Label>
-                                {/* <Label className="text-gray-500">
+                                <Label className="text-gray-500">
                                   {sortedItems[index]?.quantity}
-                                </Label> */}
+                                </Label>
                                 <Label className="text-gray-500">
                                   {sortedItems[index]?.unit_cost}
                                 </Label>
-                                <div className="flex flex-col">
+                                {/* <div className="flex flex-col">
                                   <Input
                                     {...register(`items.${index}.unit_quantity`, {
                                       valueAsNumber: true,
@@ -384,7 +383,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
                                       {errors.items[index].unit_price?.message}
                                     </span>
                                   )}
-                                </div>
+                                </div> */}
                                 <div className="flex flex-col col-span-2">
                                   <Textarea
                                     {...register(`items.${index}.brand_model`)}

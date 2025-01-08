@@ -12,14 +12,15 @@ export default function ModernInventory() {
     ? items_delivered.data
     : [];
 
+
   const flattenedItemDeliveredData = itemDeliveredData.map((item) => ({
     ...item,
     po_no: item.inspection_details.po_details.po_no,
     item_description:
       item.item_details.item_quotation_details.item_details.item_description,
     unit: item.item_details.item_quotation_details.item_details.unit,
-    quantity: item.item_details.item_quotation_details.item_details.quantity,
-    unit_cost: item.item_details.item_quotation_details.item_details.unit_cost,
+    quantity: item.item_details.item_quantity,
+    unit_cost: item.item_details.item_cost,
   }));
 
   console.log(itemDeliveredData);
