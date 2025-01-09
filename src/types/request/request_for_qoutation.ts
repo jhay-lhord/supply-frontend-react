@@ -19,7 +19,14 @@ export const quotationSchema = z.object({
   purchase_request: z.string().min(1, "Required"),
   supplier_name: z.string().min(1, "Required"),
   supplier_address: z.string().min(1, "Required"),
-  tin: z.string().regex(/^\d{3}-\d{3}-\d{3}-\d{3}$/, "TIN must be in the format XXX-XXX-XXX-XXX."),
+  tin: z.string().optional().superRefine((val, ctx) => {
+    if (val !== undefined && val.trim() !== '' && !/^\d{3}-\d{3}-\d{3}-\d{3}$/.test(val)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "TIN must be in the format XXX-XXX-XXX-XXX.",
+      });
+    }
+  }),
   is_VAT: z.boolean(),
 });
 
@@ -28,7 +35,6 @@ export type itemQuotationRequestType = {
   purchase_request: string;
   rfq: string;
   item: string;
-  // unit_quantity: number;
   unit_price: number;   
   brand_model: string;
   is_low_price: boolean;

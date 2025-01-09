@@ -170,6 +170,7 @@ export const TwoStepRFQForm: React.FC<TwoStepRFQFormProps> = ({
     );
   };
 
+
   const onSubmit = async (data: requestForQoutationType) => {
     console.log(data);
     setIsLoading(true);
