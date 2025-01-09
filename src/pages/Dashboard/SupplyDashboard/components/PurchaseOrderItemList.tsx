@@ -24,6 +24,7 @@ import Layout from "./Layout/SupplyDashboardLayout";
 import {
   useGetItemsDelivered,
   useGetPurchaseOrder,
+  useGetPurchaseOrderItem,
 } from "@/services/puchaseOrderServices";
 import { generatePOPDF } from "@/services/generatePOPDF";
 
@@ -34,7 +35,9 @@ export default function PurchaseOrderItemList() {
   const { data: purchase_request } = usePurchaseRequestList(pr_no!);
 
   const { data: purchase_order, isLoading } = useGetPurchaseOrder(po_no!);
-  const { data: item_delivered } = useGetItemsDelivered()
+  const { data: purchase_order_item } = useGetPurchaseOrderItem();
+
+  const purchaseOrderItem = Array.isArray(purchase_order_item?.data) ? purchase_order_item.data : []
   const purchaseOrderData = purchase_order?.data;
   console.log(purchaseOrderData);
 
@@ -75,9 +78,8 @@ export default function PurchaseOrderItemList() {
   }, [setStatus, purchaseData]);
 
   const handleGeneratePDF = async () => {
-    const itemDeliveredData = Array.isArray(item_delivered?.data) ? item_delivered.data : [];
 
-    const pdfURL = await generatePOPDF(purchaseOrderData!, itemDeliveredData);
+    const pdfURL = await generatePOPDF(purchaseOrderItem!);
     return window.open(pdfURL!, "_blank")
   };
 
