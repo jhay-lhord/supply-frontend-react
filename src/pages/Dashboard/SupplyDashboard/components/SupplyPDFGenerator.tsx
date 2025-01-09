@@ -26,11 +26,15 @@ import { GetItemInPurchaseRequest } from "@/services/itemServices";
 import { generatePRPDF } from "@/services/generatePRPDF";
 import { itemType } from "@/types/response/item";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { getPurchaseOrderItem } from "@/services/puchaseOrderServices";
+import { purchaseOrderItemType_ } from "@/types/response/purchase-order";
+import { generatePOPDF } from "@/services/generatePOPDF";
 
-type PDFType = "PR" 
+type PDFType = "PR" | "PO"
 
 const pdfTypes: { value: PDFType; label: string }[] = [
   { value: "PR", label: "PR PDF" },
+  { value: "PO", label: "PO PDF" },
 ];
 
 interface PDFGeneratorDialogProps {
@@ -49,6 +53,16 @@ const pdfConfig: Record<
       return (response.status === "success") && (response.data) ? response?.data as itemType : []
     },
   },
+  PO: {
+    searchFn: async (documentNo) => {
+      const response = await getPurchaseOrderItem();
+      const orderItemData =  Array.isArray(response?.data) ? response.data : []
+      const filteredOrderItemData = () => {
+        return orderItemData.filter(data => data.po_details.po_no === documentNo)
+      } 
+      return (response.status === "success") && (response.data) ? filteredOrderItemData() as purchaseOrderItemType_[] : []
+    },
+  },
 };
 
 export default function PDFGeneratorDialog({
@@ -62,7 +76,7 @@ export default function PDFGeneratorDialog({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPdfReady, setIsPdfReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pdfData, setPdfData] = useState<itemType[]>([]);
+  const [pdfData, setPdfData] = useState<itemType[] | purchaseOrderItemType_[]>([]);
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -91,7 +105,7 @@ export default function PDFGeneratorDialog({
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError(null);
-    const url = await generatePRPDF(pdfData);
+    const url = (selectedType === "PR") ? await generatePRPDF(pdfData as itemType[]) : await generatePOPDF(pdfData as purchaseOrderItemType_[])
     window.open(url!, "_blank");
     setIsGenerating(false);
   };

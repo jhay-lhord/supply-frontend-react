@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Search,
-  FileText,
-  Download,
-  Printer,
-  Loader2,
-  RotateCcw,
-} from "lucide-react";
+import { Search, FileText, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,19 +17,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { GetItemInPurchaseRequest } from "@/services/itemServices";
-import { generatePRPDF } from "@/services/generatePRPDF";
-import { itemType } from "@/types/response/item";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { getAllSupplierItem } from "@/services/AbstractOfQuotationServices";
+import { supplierItemType_ } from "@/types/response/abstract-of-quotation";
+import { generateNTPPDF } from "@/services/generateNTPPDF";
+import { pdf } from "@react-pdf/renderer";
+import { generateNOAPDF } from "@/services/generateNOWPDF";
 
-type PDFType = "NOA" | "NTP" 
+type PDFType = "NOA" | "NTP";
 
 const pdfTypes: { value: PDFType; label: string }[] = [
   { value: "NOA", label: "NOA PDF" },
   { value: "NTP", label: "NTP PDF" },
-  // { value: "RIS", label: "RIS PDF" },
-  // { value: "ICS", label: "ICS PDF" },
-  // { value: "PO", label: "PO PDF" },
 ];
 
 interface PDFGeneratorDialogProps {
@@ -48,18 +44,28 @@ const pdfConfig: Record<
   PDFType,
   { searchFn: (documentNo: string) => Promise<unknown> }
 > = {
-  NOA: {
-    searchFn: async (documentNo) => {
-      const response = await GetItemInPurchaseRequest({ pr_no: documentNo });
-      console.log(response)
-      return (response.status === "success") && (response.data) ? response?.data as itemType : []
-    },
-  },
   NTP: {
     searchFn: async (documentNo) => {
-      const response = await GetItemInPurchaseRequest({ pr_no: documentNo });
-      console.log(response)
-      return (response.status === "success") && (response.data) ? response?.data as itemType : []
+      const response = await getAllSupplierItem();
+      const supplierItem = Array.isArray(response.data) ? response.data : [];
+      const filteredSupplierItem = supplierItem.filter(
+        (data) => data.supplier_details.aoq_details.aoq_no === documentNo
+      );
+      return response.status === "success" && response.data
+        ? (filteredSupplierItem as supplierItemType_[])
+        : [];
+    },
+  },
+  NOA: {
+    searchFn: async (documentNo) => {
+      const response = await getAllSupplierItem();
+      const supplierItem = Array.isArray(response.data) ? response.data : [];
+      const filteredSupplierItem = supplierItem.filter(
+        (data) => data.supplier_details.aoq_details.aoq_no === documentNo
+      );
+      return response.status === "success" && response.data
+        ? (filteredSupplierItem as supplierItemType_[])
+        : [];
     },
   },
 };
@@ -68,15 +74,18 @@ export default function PDFGeneratorDialog({
   isOpen,
   setIsOpen,
 }: PDFGeneratorDialogProps) {
-  const [selectedType, setSelectedType] = useState<PDFType>("NOA");
+  const [selectedType, setSelectedType] = useState<PDFType>("NTP");
   const [documentNo, setDocumentNo] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isFound, setIsFound] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPdfReady, setIsPdfReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pdfData, setPdfData] = useState<itemType[]>([]);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfData, setPdfData] = useState<supplierItemType_[]>([]);
+
+  const supplierName = Array.from(
+    new Set(pdfData.map((data) => data.rfq_details.supplier_name))
+  );
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -84,12 +93,14 @@ export default function PDFGeneratorDialog({
 
     try {
       const data = await pdfConfig[selectedType].searchFn(documentNo);
-      console.log(data)
+      console.log(data);
       if (Array.isArray(data) && data.length !== 0) {
         setPdfData(data);
         setIsFound(true);
       } else {
-        throw new Error(`No items found for PR No. ${documentNo}. Please check the items or add new ones to continue.`);
+        throw new Error(
+          `No Supplier information found for AOQ No. ${documentNo}`
+        );
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -102,26 +113,18 @@ export default function PDFGeneratorDialog({
     }
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (supplier_name: string) => {
     setIsGenerating(true);
     setError(null);
-    // Simulating PDF generation
-    const url = await generatePRPDF(pdfData);
-    console.log(url);
-    setPdfUrl(url);
-    setIsPdfReady(true);
+    const supplierData = pdfData.find(data => data.rfq_details.supplier_name === supplier_name )
+    const blob = (selectedType === "NTP") ? await pdf(generateNTPPDF(supplierData!)).toBlob() : await pdf(generateNOAPDF(supplierData!)).toBlob()
+
+    // Create a Blob URL
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open the Blob URL in a new tab
+    window.open(blobUrl, "_blank");
     setIsGenerating(false);
-  };
-
-  const handleDownload = () => {
-    // Implement download logic here
-    console.log(`Downloading ${selectedType} PDF...`);
-  };
-
-  const handleOpenPrint = () => {
-    // Implement open/print logic here
-    console.log(`Opening/Printing ${selectedType} PDF...`);
-    window.open(pdfUrl!, "_blank");
   };
 
   const resetState = () => {
@@ -142,7 +145,10 @@ export default function PDFGeneratorDialog({
             <div className="flex justify-end">
               <Tooltip delayDuration={100}>
                 <TooltipTrigger>
-                  <RotateCcw className="bg-muted h-9 w-9 rounded-md p-2" onClick={() => resetState()}/>
+                  <RotateCcw
+                    className="bg-muted h-9 w-9 rounded-md p-2"
+                    onClick={() => resetState()}
+                  />
                 </TooltipTrigger>
                 <TooltipContent>Refresh</TooltipContent>
               </Tooltip>
@@ -176,7 +182,7 @@ export default function PDFGeneratorDialog({
                   value={documentNo}
                   onChange={(e) => setDocumentNo(e.target.value)}
                   className="rounded-r-none"
-                  placeholder={`Enter ${selectedType} Number`}
+                  placeholder={`Enter AOQ Number`}
                   disabled={isSearching || isFound}
                 />
                 <Button
@@ -200,40 +206,32 @@ export default function PDFGeneratorDialog({
             {isFound && (
               <Alert variant="default">
                 <AlertDescription>
-                  <div className="flex items-center justify-around">
-                    {documentNo}
-                    <Button
-                      onClick={handleGenerate}
-                      disabled={isGenerating || isPdfReady}
-                      size="sm"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Generate PDF
-                        </>
-                      )}
-                    </Button>
+                  <div className="flex flex-col items-center justify-around w-full">
+                    {supplierName.map((supplier) => (
+                      <div className="flex justify-between gap-2 w-full my-2">
+                        <p>{supplier}</p>
+                        <Button
+                          onClick={() => handleGenerate(supplier)}
+                          disabled={isGenerating || isPdfReady}
+                          size="sm"
+                        >
+                          {isGenerating ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <FileText className="mr-2 h-4 w-4" />
+                              Generate PDF
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </AlertDescription>
               </Alert>
-            )}
-            {isPdfReady && (
-              <div className="flex space-x-2">
-                <Button onClick={handleDownload} className="flex-1">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </Button>
-                <Button onClick={handleOpenPrint} className="flex-1">
-                  <Printer className="mr-2 h-4 w-4" />
-                  Open/Print
-                </Button>
-              </div>
             )}
           </div>
         </DialogContent>

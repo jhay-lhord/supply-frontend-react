@@ -49,7 +49,7 @@ import { MessageDialog } from "../../shared/components/MessageDialog";
 import LoadingDialog from "../../shared/components/LoadingDialog";
 import useStatusStore from "@/store";
 import { generateNOAPDF } from "@/services/generateNOWPDF";
-import { pdf } from '@react-pdf/renderer';
+import { pdf } from "@react-pdf/renderer";
 import { generateNTPPDF } from "@/services/generateNTPPDF";
 
 interface messageDialogProps {
@@ -73,11 +73,12 @@ export const AbstractItemContentList = () => {
   const { aoq_no } = useParams();
   const { status, setStatus } = useStatusStore();
   const navigate = useNavigate();
-
+  console.log(status);
   const { handleReadyToOrder, isPendingReadyToOrder, isError, isSuccess } =
     usePurchaseRequestActions();
   const { data: abstract, isLoading: abstract_loading } =
     useGetAbstractOfQuotation(aoq_no!);
+
   const { data: items, isLoading } = useGetAllSupplierItem();
 
   const supplierItemData = useMemo(() => {
@@ -95,21 +96,26 @@ export const AbstractItemContentList = () => {
   const pr_no = abstractData?.pr_details.pr_no;
 
   const NOAData = useMemo(() => {
-    return supplierItemData.find(data => data.supplier_details.aoq_details.aoq_no === aoq_no)
-  }, [supplierItemData, aoq_no])
-  console.log(NOAData)
+    return supplierItemData.find(
+      (data) => data.supplier_details.aoq_details.aoq_no === aoq_no
+    );
+  }, [supplierItemData, aoq_no]);
+  console.log(NOAData);
 
   useEffect(() => {
-    setStatus(abstractData?.pr_details.status);
+    if (isSuccess) {
+      setStatus("Ready to Order");
 
-    return () => {
-      setStatus("idle");
-    };
-  }, [setStatus, abstractData]);
+      return () => {
+        setStatus("idle");
+      };
+    }
+  }, [setStatus, isSuccess]);
 
   if (isLoading || abstract_loading) return <Loading />;
 
-  const isAlreadyForwardedToSupply = status === "Ready to Order";
+  const isAlreadyForwardedToSupply =
+  status=== "Ready to Order";
 
   const handlePDFPrint = async () => {
     const url = await generateAOQPDF(filteredSupplierItemData!);
@@ -119,30 +125,30 @@ export const AbstractItemContentList = () => {
   const handleGenerateNOAPDF = async () => {
     try {
       const blob = await pdf(generateNOAPDF(NOAData!)).toBlob();
-  
+
       // Create a Blob URL
       const blobUrl = URL.createObjectURL(blob);
-  
+
       // Open the Blob URL in a new tab
-      window.open(blobUrl, '_blank');
+      window.open(blobUrl, "_blank");
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
     }
-  }
+  };
 
   const handleGenerateNTPPDF = async () => {
     try {
       const blob = await pdf(generateNTPPDF(NOAData!)).toBlob();
-  
+
       // Create a Blob URL
       const blobUrl = URL.createObjectURL(blob);
-  
+
       // Open the Blob URL in a new tab
-      window.open(blobUrl, '_blank');
+      window.open(blobUrl, "_blank");
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
     }
-  }
+  };
 
   const handleOpenSupplierInformation = (rfq_no: string) => {
     setIsInformationDialogOpen(true);

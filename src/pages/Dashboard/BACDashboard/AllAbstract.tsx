@@ -1,7 +1,7 @@
 import {
   useAbstractOfQuotation,
   useDeleteAbstractOfQuotation,
-  useGetAllSupplier,
+  useGetAllSupplierItem,
 } from "@/services/AbstractOfQuotationServices";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import {
@@ -33,15 +33,19 @@ export const AllAbstract = () => {
   const [aoqNo, setAoqNo] = useState<string | null>(null);
 
   const { data: aoq_data, isLoading } = useAbstractOfQuotation();
-  const { data: supplier, isLoading: supplier_loading } = useGetAllSupplier();
+  const { data: supplier_item, isLoading: supplier_loading } = useGetAllSupplierItem();
   const { mutate: deleteAOQMutation } = useDeleteAbstractOfQuotation();
 
-  const supplierData = Array.isArray(supplier?.data) ? supplier.data : [];
+  const supplierData = Array.isArray(supplier_item?.data) ? supplier_item.data : [];
 
-  const supplierName = (aoq_no: string) =>
-    supplierData
-      .filter((data) => data.aoq_details.aoq_no === aoq_no)
-      .map((data) => data.rfq_details.supplier_name);
+  const supplierName = (aoq_no: string) => {
+    const names = new Set(
+      supplierData
+        .filter((data) => data.supplier_details.aoq_details.aoq_no === aoq_no)
+        .map((data) => data.rfq_details.supplier_name)
+    );
+    return Array.from(names);
+  };
 
   const navigate = useNavigate();
   const abstract = Array.isArray(aoq_data?.data) ? aoq_data.data : [];
