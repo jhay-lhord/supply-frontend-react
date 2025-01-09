@@ -34,17 +34,13 @@ import {
 } from "@/services/purchaseRequestServices";
 
 const chartConfig = {
-  total_active_pr: {
+  total_purchase_request: {
     label: "All Purchase Request",
     color: "hsl(var(--chart-1))",
   },
-  total_inprogress_pr: {
-    label: "Purchase Request In Progress ",
+  total_purchase_order: {
+    label: "All Purchase Order ",
     color: "hsl(var(--chart-2))",
-  },
-  total_inprogress_po: {
-    label: "Purchase Order In Progress ",
-    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig;
 
@@ -230,26 +226,20 @@ const SupplyDashboard: React.FC = () => {
                           content={<ChartTooltipContent indicator="dot" />}
                         />
                         <Bar
-                          dataKey="total_active_pr"
-                          fill="var(--color-total_active_pr)"
+                          dataKey="total_purchase_request"
+                          fill="var(--color-total_purchase_request)"
                           stackId={"a"}
                           barSize={25}
                           minPointSize={2}
                         />
 
                         <Bar
-                          dataKey="total_inprogress_pr"
-                          fill={"var(--color-total_inprogress_pr)"}
+                          dataKey="total_purchase_order"
+                          fill={"var(--color-total_purchase_order)"}
                           stackId={"a"}
                           barSize={25}
                         />
 
-                        <Bar
-                          dataKey="total_inprogress_po"
-                          fill="var(--color-total_inprogress_po)"
-                          stackId={"a"}
-                          barSize={25}
-                        />
                       </BarChart>
                     </ChartContainer>
                   </CardContent>

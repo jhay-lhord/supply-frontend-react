@@ -23,10 +23,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useGetBACDailyReport } from "@/services/DailyReport";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const chartConfig = {
   total_approved: {
-    label: "Approved PR ",
+    label: "Incoming PR ",
     color: "hsl(var(--chart-1))",
   },
   total_quotation: {
@@ -40,7 +42,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const BACDashboard: React.FC = () => {
-  const { requestInProgressCount, isLoading } = usePurchaseRequestInProgressCount();
+  const { requestInProgressCount, isLoading } =
+    usePurchaseRequestInProgressCount();
 
   const { requestForQuotationCount, isLoading: quotation_loading } =
     useRequestForQuotationCount();
@@ -49,6 +52,7 @@ const BACDashboard: React.FC = () => {
     useAbstractOfQuotationCount();
 
   const { data } = useGetBACDailyReport();
+  const navigate = useNavigate();
 
   const chartData = data?.data;
   const reversedChartData = Array.isArray(chartData)
@@ -67,7 +71,6 @@ const BACDashboard: React.FC = () => {
                 <div className="flex items-center space-x-2"></div>
               </div>
               <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-
                 <Card
                   className={`bg-gradient-to-br from-orange-300 to-orange-400  border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                 >
@@ -76,7 +79,7 @@ const BACDashboard: React.FC = () => {
                   </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-medium text-white/90">
-                      Active Request
+                      Incoming Request
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -91,11 +94,21 @@ const BACDashboard: React.FC = () => {
                       <Activity className="h-6 w-6 text-white/80" />
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        navigate("/bac/purchase-request/incoming");
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </CardFooter>
                 </Card>
                 <Card
                   className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                 >
-                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
                     <FileText className="w-32 h-32" />
                   </div>
                   <CardHeader className="pb-2">
@@ -115,12 +128,22 @@ const BACDashboard: React.FC = () => {
                       <FileText className="h-6 w-6 text-white/80" />
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        navigate("/bac/request-for-quotations");
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </CardFooter>
                 </Card>
 
                 <Card
                   className={`bg-gradient-to-br from-orange-300 to-orange-400 border-0 text-white shadow-lg py-4 overflow-hidden relative`}
                 >
-                   <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
                     <FileText className="w-32 h-32" />
                   </div>
                   <CardHeader className="pb-2">
@@ -140,6 +163,16 @@ const BACDashboard: React.FC = () => {
                       <FileText className="h-6 w-6 text-white/80" />
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        navigate("/bac/abstract-of-quotations");
+                      }}
+                    >
+                      View All
+                    </Button>
+                  </CardFooter>
                 </Card>
               </div>
               <div className="grid grid-cols-3 gap-4 md:grid-cols-2 lg:grid-cols-7">

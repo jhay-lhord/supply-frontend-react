@@ -2,8 +2,6 @@ import { useState } from "react";
 import {
   Search,
   FileText,
-  Download,
-  Printer,
   Loader2,
   RotateCcw,
 } from "lucide-react";
@@ -33,9 +31,6 @@ type PDFType = "PR"
 
 const pdfTypes: { value: PDFType; label: string }[] = [
   { value: "PR", label: "PR PDF" },
-  // { value: "RIS", label: "RIS PDF" },
-  // { value: "ICS", label: "ICS PDF" },
-  // { value: "PO", label: "PO PDF" },
 ];
 
 interface PDFGeneratorDialogProps {
@@ -68,7 +63,6 @@ export default function PDFGeneratorDialog({
   const [isPdfReady, setIsPdfReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pdfData, setPdfData] = useState<itemType[]>([]);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -97,23 +91,9 @@ export default function PDFGeneratorDialog({
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError(null);
-    // Simulating PDF generation
     const url = await generatePRPDF(pdfData);
-    console.log(url);
-    setPdfUrl(url);
-    setIsPdfReady(true);
+    window.open(url!, "_blank");
     setIsGenerating(false);
-  };
-
-  const handleDownload = () => {
-    // Implement download logic here
-    console.log(`Downloading ${selectedType} PDF...`);
-  };
-
-  const handleOpenPrint = () => {
-    // Implement open/print logic here
-    console.log(`Opening/Printing ${selectedType} PDF...`);
-    window.open(pdfUrl!, "_blank");
   };
 
   const resetState = () => {
@@ -215,19 +195,7 @@ export default function PDFGeneratorDialog({
                 </AlertDescription>
               </Alert>
             )}
-            {isPdfReady && (
-              <div className="flex space-x-2">
-                <Button onClick={handleDownload} className="flex-1">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </Button>
-                <Button onClick={handleOpenPrint} className="flex-1">
-                  <Printer className="mr-2 h-4 w-4" />
-                  Open/Print
-                </Button>
-              </div>
-            )}
-          </div>
+          </div>  
         </DialogContent>
       </Dialog>
     </>

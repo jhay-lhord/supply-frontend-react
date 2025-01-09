@@ -2,7 +2,11 @@
 
 import {
   ChevronRight,
+  FileInput,
+  FileOutput,
   FileTextIcon,
+  FolderCheck,
+  FolderDownIcon,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -35,12 +39,12 @@ const purchaseRequest = [
   {
     title: "Incoming Purchase Request",
     url: "/bac/purchase-request/incoming",
-    icon: FileTextIcon,
+    icon: FolderDownIcon,
   },
   {
     title: "Received Purchase Request",
     url: "/bac/purchase-request/received",
-    icon: FileTextIcon,
+    icon: FolderCheck,
   },
 ];
 
@@ -48,24 +52,24 @@ const quotations = [
   {
     title: "Request for Quotation",
     url: "",
-    icon: FileTextIcon,
+    icon: FileInput,
     items: [
       {
         title: "List of all RFQs",
         url: "/bac/request-for-quotations",
-        icon: FileTextIcon,
+        icon: FileInput,
       },
       {
         title: "Purchase Request with RFQ",
         url: "/bac/abstract-of-quotation",
-        icon: FileTextIcon,
+        icon: FileOutput,
       },
     ],
   },
   {
     title: "Abstract Of Quotation",
     url: "",
-    icon: FileTextIcon,
+    icon: FileOutput,
     items: [
       {
         title: "List of all AOQs",

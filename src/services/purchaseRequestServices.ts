@@ -136,11 +136,11 @@ export const usePurchaseRequestInProgress = () => {
 export const usePurchaseRequestInProgressCount = () => {
   const inProgressStatus = [
     "Forwarded to Procurement",
-    "Received by the Procurement",
-    "Items Delivered",
-    "Ready to Order",
-    "Order Placed",
-    "Ready for Distribution",
+    // "Received by the Procurement",
+    // "Items Delivered",
+    // "Ready to Order",
+    // "Order Placed",
+    // "Ready for Distribution",
   ];
 
   const { data, isLoading } = usePurchaseRequest();
