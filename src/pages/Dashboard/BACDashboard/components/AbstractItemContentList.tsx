@@ -48,6 +48,9 @@ import { usePurchaseRequestActions } from "@/services/purchaseRequestServices";
 import { MessageDialog } from "../../shared/components/MessageDialog";
 import LoadingDialog from "../../shared/components/LoadingDialog";
 import useStatusStore from "@/store";
+import { generateNOAPDF } from "@/services/generateNOWPDF";
+import { pdf } from '@react-pdf/renderer';
+import { generateNTPPDF } from "@/services/generateNTPPDF";
 
 interface messageDialogProps {
   open: boolean;
@@ -79,15 +82,22 @@ export const AbstractItemContentList = () => {
 
   const supplierItemData = useMemo(() => {
     return Array.isArray(items?.data) ? items.data : [];
-  }, [items])
+  }, [items]);
 
   const filteredSupplierItemData = useMemo(() => {
-    return supplierItemData.filter(data => data.supplier_details.aoq_details.aoq_no === aoq_no)
-  }, [supplierItemData, aoq_no])
-  console.log(supplierItemData)
+    return supplierItemData.filter(
+      (data) => data.supplier_details.aoq_details.aoq_no === aoq_no
+    );
+  }, [supplierItemData, aoq_no]);
+  console.log(supplierItemData);
 
   const abstractData = abstract && abstract.data;
   const pr_no = abstractData?.pr_details.pr_no;
+
+  const NOAData = useMemo(() => {
+    return supplierItemData.find(data => data.supplier_details.aoq_details.aoq_no === aoq_no)
+  }, [supplierItemData, aoq_no])
+  console.log(NOAData)
 
   useEffect(() => {
     setStatus(abstractData?.pr_details.status);
@@ -105,6 +115,34 @@ export const AbstractItemContentList = () => {
     const url = await generateAOQPDF(filteredSupplierItemData!);
     return window.open(url!, "_blank");
   };
+
+  const handleGenerateNOAPDF = async () => {
+    try {
+      const blob = await pdf(generateNOAPDF(NOAData!)).toBlob();
+  
+      // Create a Blob URL
+      const blobUrl = URL.createObjectURL(blob);
+  
+      // Open the Blob URL in a new tab
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  }
+
+  const handleGenerateNTPPDF = async () => {
+    try {
+      const blob = await pdf(generateNTPPDF(NOAData!)).toBlob();
+  
+      // Create a Blob URL
+      const blobUrl = URL.createObjectURL(blob);
+  
+      // Open the Blob URL in a new tab
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  }
 
   const handleOpenSupplierInformation = (rfq_no: string) => {
     setIsInformationDialogOpen(true);
@@ -154,10 +192,6 @@ export const AbstractItemContentList = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button variant={"outline"} onClick={handlePDFPrint}>
-                    <PrinterIcon width={20} height={20} className="mx-2" />
-                    Generate PDF
-                  </Button>
                   {!isAlreadyForwardedToSupply && (
                     <TooltipProvider delayDuration={100}>
                       <Tooltip>
@@ -185,6 +219,20 @@ export const AbstractItemContentList = () => {
                 </div>
               </div>
               <Separator className="mt-3" />
+              <div className="my-2 flex gap-1">
+                <Button variant={"outline"} onClick={handlePDFPrint}>
+                  <PrinterIcon width={20} height={20} className="mx-2" />
+                  Generate AOQ PDF
+                </Button>
+                <Button variant={"outline"} onClick={handleGenerateNOAPDF}>
+                  <PrinterIcon width={20} height={20} className="mx-2" />
+                  Generate NOA PDF
+                </Button>
+                <Button variant={"outline"} onClick={handleGenerateNTPPDF}>
+                  <PrinterIcon width={20} height={20} className="mx-2" />
+                  Generate NTP PDF
+                </Button>
+              </div>
             </div>
           </CardTitle>
         </CardHeader>
@@ -240,7 +288,7 @@ export const AbstractItemContentList = () => {
                     ) : (
                       <Cross2Icon />
                     )}
-                    {item.item_quotation_details.unit_price}
+                    {item.item_cost}
                   </p>
                 </div>
               );

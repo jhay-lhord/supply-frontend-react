@@ -24,11 +24,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { OrderReceivedDialog } from "./orderReceived";
 import { useGetAllSupplierItem } from "@/services/AbstractOfQuotationServices";
-import { useState } from "react";
-import { useGetAllPurchaseOrder } from "@/services/puchaseOrderServices";
+import { useCallback, useMemo, useState } from "react";
+import { useGetAllPurchaseOrder, useGetPurchaseOrderItem } from "@/services/puchaseOrderServices";
 import Loading from "../../shared/components/Loading";
 import CancelOrderDialog from "./cancelOrder";
 import { useNavigate } from "react-router-dom";
+import { generatePOPDF } from "@/services/generatePOPDF";
 
 export default function PurchaseOrderInProgess() {
   const [poNo, setPoNo] = useState<string>("");
@@ -42,6 +43,15 @@ export default function PurchaseOrderInProgess() {
   const { data, isLoading } = useGetAllPurchaseOrder();
   const { data: supplier_item } = useGetAllSupplierItem();
   const navigate = useNavigate();
+  const { data: order_item} = useGetPurchaseOrderItem()
+
+  const orderItemData = useMemo(() => {
+      return Array.isArray(order_item?.data) ? order_item.data : []
+  }, [order_item?.data])
+
+  const filteredOrderItemData = useCallback((po_no: string) => {
+    return orderItemData.filter(data => data.po_details.po_no === po_no)
+  }, [orderItemData])
 
   const purchaseOrderData = Array.isArray(data?.data) ? data.data : [];
   const inProgressOrders = purchaseOrderData.filter(
@@ -62,6 +72,12 @@ export default function PurchaseOrderInProgess() {
     setOpenDropdowns({ [po_no]: false });
     setPoNo(po_no);
   };
+
+
+  const handleGeneratePOPDF = async (po_no: string) => {
+    const url = await generatePOPDF(filteredOrderItemData(po_no))
+    window.open(url, "_blank")
+  }
 
   const handleCancelOrder = (po_no: string) => {
     setIsCancelDialogOpen(true);
@@ -116,6 +132,7 @@ export default function PurchaseOrderInProgess() {
                   <TableCell>{formatDate(order.created_at)}</TableCell>
                   <TableCell>
                     <div className="flex justify-between items-center ">
+                      <Button variant={"outline"} onClick={() => handleGeneratePOPDF(order.po_no)}>Generate PO PDF</Button>
                       <DropdownMenu
                         open={openDropdowns[order.po_no]}
                         onOpenChange={() => toggleDropdown(order.po_no)}

@@ -25,6 +25,8 @@ export type supplierType_ = {
 export type supplierItemType_ = {
   supplier_item_no: string;
   total_amount: string;
+  item_cost: string;
+  item_quantity: string;
   remaining_quantity: number;
   old_delivered_quantity: number;
   item_quotation_details: {
@@ -64,6 +66,11 @@ export type supplierItemType_ = {
           department: string;
           designation: string;
         };
+        campus_director_details: {
+          name: string
+          department: string
+          designation: string
+        }
         created_at: Date;
       };
     };

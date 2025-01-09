@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
 }) satisfies Record<string, Style>;
 
 
-export const generateNOAPDF = (data: supplierItemType_) => {
+export const generateNTPPDF = (data: supplierItemType_) => {
   const now = new Date()
 
   return (
@@ -190,28 +190,29 @@ export const generateNOAPDF = (data: supplierItemType_) => {
 
           <View style={styles.content}>
             <Text style={{ lineHeight: 0 }}>
-              We are pleased to notify you that the{" "}
-              <Text style={styles.boldText}>{data.supplier_details.aoq_details.pr_details.office}</Text>{" "}
-              request, in connection with the{" "}
-              <Text style={styles.boldText}>{formatDate(data.supplier_details.aoq_details.pr_details.created_at)}</Text>, is
-              hereby awarded{" "}
-              <Text style={styles.boldText}>{data.rfq_details.supplier_name}</Text> being the
-              sole bidder with the Lowest Calculated & Responsive Bid at a
-              contract price equivalent to{" "}
+              Please be informed that I approved the contract of your company{" "}
+              <Text style={styles.boldText}>{data.rfq_details.supplier_name}</Text>{" "}
+              for the Supply and Delivery of{" "}
+              <Text style={styles.boldText}>{data.supplier_details.aoq_details.pr_details.purpose}</Text>, 
+              at the contract price of{" "}
               <Text style={styles.boldText}>
                 {digitsToWords(Number(data.item_cost)).toUpperCase()} (PHP
-                {data.item_cost}.00)
+                {data.item_cost}.00) 
               </Text>
-              .
+              {" "} inclusive of taxes duties and other charges
+              
             </Text>
           </View>
 
           <View style={styles.content}>
             <Text style={{ lineHeight: 0 }}>
-              You are therefore required within ten (10) days upon receipt this
-              Notice of Award, to formally enter into contract with us. Failure
-              to enter into the said contract shall constitute sufficient ground
-              for cancellation of this award.
+              The period of delivery shall commence upon receipt of this notice
+            </Text>
+          </View>
+
+          <View style={styles.content}>
+            <Text style={{ lineHeight: 0 }}>
+              TPlease acknowledge receipt of this action by accomplishing  / signing the blank spaces provided below
             </Text>
           </View>
 

@@ -9,7 +9,7 @@ import {
 import api from "@/api";
 import { handleError, handleSucess } from "@/utils/apiHelper";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { purchaseOrdertype_ } from "@/types/response/purchase-order";
+import { purchaseOrderItemType_, purchaseOrdertype_ } from "@/types/response/purchase-order";
 import { useMemo } from "react";
 
 export const getAllPurchaseOrder = async (): Promise<
@@ -143,8 +143,28 @@ export const useAddPurchaseOrderItem = () => {
     mutationFn: (data) => addPurchaseOrderItem(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["abstract-of-quotations"] });
-      queryClient.invalidateQueries({ queryKey: ["purchase-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["purchase-order-item"] });
     },
+  });
+};
+
+export const getPurchaseOrderItem = async (): Promise<
+  ApiResponse<purchaseOrderItemType_[]>
+> => {
+  try {
+    const response = await api.get<purchaseOrderItemType_[]>(
+      "api/purchase-order-item/"
+    );
+    return handleSucess(response);
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const useGetPurchaseOrderItem = () => {
+  return useQuery<ApiResponse<purchaseOrderItemType_[]>, Error>({
+    queryFn: getPurchaseOrderItem,
+    queryKey: ["purchase-order-item"],
   });
 };
 

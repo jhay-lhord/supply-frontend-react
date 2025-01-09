@@ -63,8 +63,9 @@ const Register = () => {
             });
           } else {
             setErrorMessage(
-              (response.error?.response?.data as { email?: string })?.email ??
-                ""
+              (response.error?.response?.data as { email?: string; employee_id?: string })?.email ??
+              (response.error?.response?.data as { email?: string; employee_id?: string })?.employee_id ??
+              ""
             );
           }
         },

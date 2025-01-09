@@ -1,8 +1,10 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { greetings } from "@/services/greeting";
 import AdminSidebar from "../AdminSidebar";
+import useAuthStore from "@/components/Auth/AuthStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthStore()
+
   return (
     <SidebarProvider>
       <AdminSidebar />
@@ -10,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex justify-between items-center bg-slate-50 sticky top-0 z-10">
           <div className="flex gap-6 py-6">
             <SidebarTrigger />
-            <h1 className="text-xl font-normal">{greetings()}</h1>
+            <p className="text-xl font-bold">Hello, {user?.first_name}</p>
           </div>
         </div>
         <div className="flex   p-4">{children}</div>

@@ -29,10 +29,11 @@ import { generatePRPDF } from "@/services/generatePRPDF";
 import { itemType } from "@/types/response/item";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-type PDFType = "PR" 
+type PDFType = "NOA" | "NTP" 
 
 const pdfTypes: { value: PDFType; label: string }[] = [
-  { value: "PR", label: "PR PDF" },
+  { value: "NOA", label: "NOA PDF" },
+  { value: "NTP", label: "NTP PDF" },
   // { value: "RIS", label: "RIS PDF" },
   // { value: "ICS", label: "ICS PDF" },
   // { value: "PO", label: "PO PDF" },
@@ -47,35 +48,27 @@ const pdfConfig: Record<
   PDFType,
   { searchFn: (documentNo: string) => Promise<unknown> }
 > = {
-  PR: {
+  NOA: {
     searchFn: async (documentNo) => {
       const response = await GetItemInPurchaseRequest({ pr_no: documentNo });
       console.log(response)
       return (response.status === "success") && (response.data) ? response?.data as itemType : []
     },
   },
-  // RIS: {
-  //   searchFn: async (documentNo) => {
-  //     return { exampleKey: "RIS data" };
-  //   },
-  // },
-  // ICS: {
-  //   searchFn: async (documentNo) => {
-  //     return { exampleKey: "ICS data" };
-  //   },
-  // },
-  // PO: {
-  //   searchFn: async (documentNo) => {
-  //     return { exampleKey: "PO data" };
-  //   },
-  // },
+  NTP: {
+    searchFn: async (documentNo) => {
+      const response = await GetItemInPurchaseRequest({ pr_no: documentNo });
+      console.log(response)
+      return (response.status === "success") && (response.data) ? response?.data as itemType : []
+    },
+  },
 };
 
 export default function PDFGeneratorDialog({
   isOpen,
   setIsOpen,
 }: PDFGeneratorDialogProps) {
-  const [selectedType, setSelectedType] = useState<PDFType>("PR");
+  const [selectedType, setSelectedType] = useState<PDFType>("NOA");
   const [documentNo, setDocumentNo] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isFound, setIsFound] = useState(false);

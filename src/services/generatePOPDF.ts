@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { _itemsDeliveredType } from "@/types/request/purchase-order";
-import { purchaseOrdertype_ } from "@/types/response/purchase-order";
+import { purchaseOrderItemType_ } from "@/types/response/purchase-order";
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "pdf-lib";
 import { formatPrDate } from "./formatDate";
 
 
-export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, itemsDelivered: _itemsDeliveredType[]) => {
+export const generatePOPDF = async (purchaseOrderItem: purchaseOrderItemType_[]) => {
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
@@ -51,13 +51,12 @@ export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, items
   let pageIndex = 0; // Page counter
   let page = pdfDoc.addPage([612, pageHeight]);
   pages.push(page);
-  itemsDelivered.forEach((item, index) => {
-    // const { no, unit, description, quantity, unitcost } = entry;
-    const item_description = item.item_details.item_quotation_details.item_details.item_description
-    const unit_price = item.item_details.item_quotation_details.unit_price
-    const quantity = item.item_details.item_quotation_details.item_details.quantity
-    const unit = item.item_details.item_quotation_details.item_details.unit 
-    const unit_cost = item.item_details.item_quotation_details.item_details.unit_cost
+  purchaseOrderItem.forEach((item, index) => {
+    const item_description = item.supplier_item_details.item_quotation_details.item_details.item_description ?? ""
+    const unit_price = item.supplier_item_details.item_cost
+    const quantity = item.supplier_item_details.item_quantity
+    const unit = item.supplier_item_details.item_quotation_details.item_details.unit 
+    const unit_cost = item.supplier_item_details.item_cost
 
     // Calculate height needed for wrapped description
     const wrappedDescription = wrapText(
@@ -220,7 +219,7 @@ export const generatePOPDF = async (purchaseOrderData: purchaseOrdertype_, items
       timesRomanFont,
       timesRomanItalicFont,
       customFont,
-      purchaseOrderData
+      purchaseOrderItem[0]
     );
   }
   const pdfBytes = await pdfDoc.save();
@@ -236,7 +235,7 @@ const textandlines = async (
   timesRomanFont: PDFFont,
   timesRomanItalicFont: PDFFont,
   customFont: PDFFont,
-  purchaseOrderData: purchaseOrdertype_
+  purchaseOrderData: purchaseOrderItemType_
 ) => {
   page.drawText("Appendix 61", {
     x: 495,
@@ -251,7 +250,7 @@ const textandlines = async (
     font: timesBoldFont,
   });
   page.drawText("Supplier:", { x: 40, y: 790, size: 11, font: timesRomanFont });
-  page.drawText(purchaseOrderData.rfq_details.supplier_name, { x: 90, y: 790, size: 11, font: timesRomanFont });
+  page.drawText(purchaseOrderData.supplier_item_details.rfq_details.supplier_name, { x: 90, y: 790, size: 11, font: timesRomanFont });
   page.drawLine({
     start: { x: 85, y: 787 },
     end: { x: 371, y: 787 },
@@ -259,7 +258,7 @@ const textandlines = async (
     color: rgb(0, 0, 0),
   });
   page.drawText("Address:", { x: 40, y: 775, size: 11, font: timesRomanFont });
-  page.drawText(purchaseOrderData.rfq_details.supplier_address, { x: 90, y: 775, size: 11, font: timesRomanFont });
+  page.drawText(purchaseOrderData.supplier_item_details.rfq_details.supplier_address, { x: 90, y: 775, size: 11, font: timesRomanFont });
   page.drawLine({
     start: { x: 85, y: 772 },
     end: { x: 371, y: 772 },
@@ -267,14 +266,14 @@ const textandlines = async (
     color: rgb(0, 0, 0),
   });
   page.drawText("TIN:", { x: 58, y: 760, size: 11, font: timesRomanFont });
-  page.drawText(purchaseOrderData.rfq_details.tin, { x: 90, y: 760, size: 11, font: timesRomanFont });
+  page.drawText(purchaseOrderData.supplier_item_details.rfq_details.tin, { x: 90, y: 760, size: 11, font: timesRomanFont });
   page.drawText("P.O. No. :", {
     x: 375,
     y: 790,
     size: 11,
     font: timesRomanFont,
   });
-  page.drawText(purchaseOrderData.po_no, {
+  page.drawText(purchaseOrderData.po_details.po_no, {
     x: 430,
     y: 790,
     size: 11,

@@ -2,8 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PDFGeneratorDialog from "../../shared/components/PDFGenerator";
-import TrackPurchaseRequestDialog from "../../shared/components/TrackPurchaseRequestDialog";
 
 const buttonVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -18,20 +16,18 @@ const buttonVariants = {
   }),
 };
 
-export const FloatingButton = () => {
+interface FloatingButtonProps {
+  buttons: {
+    label: string;
+    onClick: () => void;
+  }[];
+}
+
+export const FloatingButton: React.FC<FloatingButtonProps> = ({buttons}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isPDFGeneratorOpen, setIsPDFGeneratorOpen] = useState<boolean>(false);
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState<boolean>(false);
+
 
   const toggleOpen = () => setIsOpen(!isOpen)
-
-  const pdfButtons = [
-    { label: "PDF Generator", onClick: () => setIsPDFGeneratorOpen(true) },
-    {
-      label: "Track Purchase Request",
-      onClick: () => setIsSearchDialogOpen(true),
-    },
-  ];
 
   return (
     <>
@@ -44,7 +40,7 @@ export const FloatingButton = () => {
               animate="visible"
               exit="hidden"
             >
-              {pdfButtons.map((button, index) => (
+              {buttons.map((button, index) => (
                 <motion.div
                   key={button.label}
                   variants={buttonVariants}
@@ -83,8 +79,6 @@ export const FloatingButton = () => {
           </Button>
         </motion.div>
       </div>
-      <PDFGeneratorDialog isOpen={isPDFGeneratorOpen} setIsOpen={setIsPDFGeneratorOpen}/>
-      <TrackPurchaseRequestDialog isOpen={isSearchDialogOpen} setIsOpen={setIsSearchDialogOpen}/>
-    </>
+     </>
   );
 };

@@ -6,9 +6,24 @@ import {
 } from "@/components/ui/sidebar";
 import BACSidebar from "../BACSidebar";
 import useAuthStore from "@/components/Auth/AuthStore";
+import { useState } from "react";
+import PDFGeneratorDialog from "../BACPDFGenerator";
+import TrackPurchaseRequestDialog from "@/pages/Dashboard/shared/components/TrackPurchaseRequestDialog";
+import { FloatingButton } from "@/pages/Dashboard/SupplyDashboard/components/QuickAccess";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore()
+  const [isPDFGeneratorOpen, setIsPDFGeneratorOpen] = useState<boolean>(false);
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState<boolean>(false);
+
+  const { user } = useAuthStore();
+
+  const buttons = [
+    { label: "PDF Generator", onClick: () => setIsPDFGeneratorOpen(true) },
+    {
+      label: "Track Purchase Request",
+      onClick: () => setIsSearchDialogOpen(true),
+    },
+  ];
 
   return (
     <SidebarProvider>
@@ -19,23 +34,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <p className="text-xl font-bold">Hello, {user?.first_name}</p>
-            {/* <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb> */}
           </div>
         </header>
-        <main className="flex p-10">{children}</main>
+        <main className="flex p-10">
+          <FloatingButton buttons={buttons} />
+          {children}
+        </main>
       </SidebarInset>
+      <PDFGeneratorDialog
+        isOpen={isPDFGeneratorOpen}
+        setIsOpen={setIsPDFGeneratorOpen}
+      />
+      <TrackPurchaseRequestDialog
+        isOpen={isSearchDialogOpen}
+        setIsOpen={setIsSearchDialogOpen}
+      />
     </SidebarProvider>
   );
 }
