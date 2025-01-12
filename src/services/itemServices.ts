@@ -89,9 +89,9 @@ export const FilteredItemInPurchaseRequest = (pr_no: string) => {
 };
 
 
-export const GetItem = async (id: string): Promise<ApiResponse<ItemType>> => {
+export const GetItem = async (id: string): Promise<ApiResponse<itemType>> => {
   try {
-    const response = await api.get<ItemType>(`api/item/${id}`);
+    const response = await api.get<itemType>(`api/item/${id}`);
     return handleSucess(response);
   } catch (error) {
     return handleError(error);
@@ -99,7 +99,7 @@ export const GetItem = async (id: string): Promise<ApiResponse<ItemType>> => {
 };
 
 export const useGetItem = (id: string) => {
-  return useQuery<ApiResponse<ItemType>, Error>({
+  return useQuery<ApiResponse<itemType>, Error>({
     queryKey: ["items", id],
     queryFn: () => GetItem(id!),
   });

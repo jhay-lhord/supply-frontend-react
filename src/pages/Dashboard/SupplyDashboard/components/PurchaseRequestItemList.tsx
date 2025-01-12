@@ -308,7 +308,7 @@ export default function PurchaseRequestItemList() {
                   purchaseData?.status !== "Ready to Order" &&
                   purchaseData?.status !== "Completed" &&
                   purchaseData?.status !== "Items Delivered" &&
-                  purchaseData?.status !== "Ready to Distribute" && (
+                  purchaseData?.status !== "Ready for Distribution" && (
                     <>
                       {purchaseData?.status !== "Approved" &&
                         purchaseData?.status !== "Rejected" && (

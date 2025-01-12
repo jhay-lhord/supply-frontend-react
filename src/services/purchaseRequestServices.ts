@@ -136,11 +136,11 @@ export const usePurchaseRequestInProgress = () => {
 export const usePurchaseRequestInProgressCount = () => {
   const inProgressStatus = [
     "Forwarded to Procurement",
-    // "Received by the Procurement",
-    // "Items Delivered",
-    // "Ready to Order",
-    // "Order Placed",
-    // "Ready for Distribution",
+    "Received by the Procurement",
+    "Items Delivered",
+    "Ready to Order",
+    "Order Placed",
+    "Ready for Distribution",
   ];
 
   const { data, isLoading } = usePurchaseRequest();
@@ -151,6 +151,21 @@ export const usePurchaseRequestInProgressCount = () => {
   const requestInProgressCount = inProgress.length ?? 0;
 
   return { requestInProgressCount, isLoading };
+};
+
+export const usePurchaseRequestIncomingCount = () => {
+  const incomingStatus = [
+    "Forwarded to Procurement",
+  ];
+
+  const { data, isLoading } = usePurchaseRequest();
+  const purchaseRequestData = Array.isArray(data?.data) ? data.data : [];
+  const incoming = purchaseRequestData
+    .filter((data) => incomingStatus.includes(data.status))
+    .map((data) => data);
+  const incomingCount = incoming.length ?? 0;
+
+  return { incomingCount, isLoading };
 };
 
 export const usePurchaseRequestCompletedCount = () => {

@@ -172,7 +172,7 @@ export const generateNTPPDF = (data: supplierItemType_) => {
         {/* Main Content */}
         <View style={styles.mainContent}>
           <Text style={styles.title}>Bids and Awards Committee</Text>
-          <Text style={styles.title_big}>NOTICE OF AWARD</Text>
+          <Text style={styles.title_big}>NOTICE TO PROCEED</Text>
 
           <View style={{ marginBottom: 24 }}>
             <Text>{formatDate(now)}</Text>

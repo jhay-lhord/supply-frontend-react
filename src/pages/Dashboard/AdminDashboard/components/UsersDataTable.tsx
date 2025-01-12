@@ -5,21 +5,26 @@ import { UsersType } from "@/types/response/users";
 import Loading from "../../shared/components/Loading";
 
 export default function UsersDataTable() {
-  const { isLoading, error, data } = useGetUsers()
+  const { isLoading, error, data } = useGetUsers();
 
-  console.log(data)
+  console.log(data);
 
-  if(isLoading) return <Loading/>
+  if (isLoading) return <Loading />;
 
-  if (error) return <div>{error.message}</div>
+  if (error) return <div>{error.message}</div>;
   const usersData: UsersType[] =
     data?.status === "success" ? data.data || [] : [];
+
+  const flattenedUserData = usersData.map((data) => ({
+    ...data,
+    fullname: `${data.first_name} ${data.last_name}`
+  }))
 
   return (
     <>
       <div className="hidden flex-col md:flex">
         <p className="mx-6 my-4 text-xl">All Users</p>
-        <DataTable data={usersData} columns={columns} />
+        <DataTable data={flattenedUserData} columns={columns} />
       </div>
     </>
   );

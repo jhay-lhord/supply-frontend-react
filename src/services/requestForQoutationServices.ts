@@ -712,8 +712,76 @@ export const generateRFQPDF = async () => {
     color: rgb(0, 0, 0),
   });
 
+  const headerjpg = "/header.jpeg";
+  const headerjpgBytes = await fetch(headerjpg).then((res) =>
+    res.arrayBuffer()
+  );
+  const headerimage = await pdfDoc.embedJpg(headerjpgBytes);
+  page.drawImage(headerimage, {
+    x: 145,
+    y: 808,
+    width: 325,
+    height: 62,
+  });
+  page.drawText("Republic of the Philippines", {
+    x: 255,
+    y: 858,
+    size: 10,
+    font: timesRomanFont,
+  });
+  page.drawText("CEBU TECHNOLOGICAL UNIVERSITY", {
+    x: 225,
+    y: 848,
+    size: 9,
+    font: timesBoldFont,
+  });
+  page.drawText("ARGAO CAMPUS", {
+    x: 275,
+    y: 838,
+    size: 10,
+    font: timesRomanFont,
+  });
+  page.drawText("Ed Kintanar Street, Lamacan, Argao Cebu Philippines", {
+    x: 220,
+    y: 830,
+    size: 8,
+    font: timesRomanFont,
+  });
+  page.drawText("Website:", { x: 212, y: 823, size: 7, font: timesRomanFont });
+  page.drawText("http://www.argao.ctu.edu.ph ", {
+    x: 237,
+    y: 823,
+    size: 7,
+    font: timesRomanFont,
+    color: rgb(0, 0, 1),
+  });
+  page.drawText("E-mail: cdargao@ctu.edu.ph", {
+    x: 323,
+    y: 823,
+    size: 7,
+    font: timesRomanFont,
+  });
+  page.drawText("Phone No.: (032) 401-0737 local 1700", {
+    x: 255,
+    y: 815,
+    size: 7,
+    font: timesRomanFont,
+  });
+
+  const jpgUrl = "/footer.jpeg";
+  const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer());
+  const jpgImage = await pdfDoc.embedJpg(jpgImageBytes);
+  const jpgDims = jpgImage.scale(0.2);
+
+  page.drawImage(jpgImage, {
+    x: 145,
+    y: 10,
+    width: jpgDims.width,
+    height: jpgDims.height,
+  });
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
   const pdfBlobUrl = URL.createObjectURL(blob);
   return pdfBlobUrl;
 };
+

@@ -12,7 +12,7 @@ import Layout from "./components/Layout/BACDashboardLayout";
 
 import { Activity, FileText, Loader2 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { usePurchaseRequestInProgressCount } from "@/services/purchaseRequestServices";
+import { usePurchaseRequestIncomingCount } from "@/services/purchaseRequestServices";
 import { useRequestForQuotationCount } from "@/services/requestForQoutationServices";
 import { useAbstractOfQuotationCount } from "@/services/AbstractOfQuotationServices";
 
@@ -42,8 +42,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const BACDashboard: React.FC = () => {
-  const { requestInProgressCount, isLoading } =
-    usePurchaseRequestInProgressCount();
+  const { incomingCount, isLoading } =
+    usePurchaseRequestIncomingCount();
 
   const { requestForQuotationCount, isLoading: quotation_loading } =
     useRequestForQuotationCount();
@@ -88,7 +88,7 @@ const BACDashboard: React.FC = () => {
                         {isLoading ? (
                           <Loader2 className="animate-spin" />
                         ) : (
-                          requestInProgressCount
+                          incomingCount
                         )}
                       </span>
                       <Activity className="h-6 w-6 text-white/80" />

@@ -129,7 +129,7 @@ export const Quotation = () => {
         <CardContent className="border-2 mx-6 rounded-md p-4 ">
           <div className=" my-2 flex gap-3 items-center">
             <ClipboardIcon className="h-6 w-6" />
-            <p className="text-xl">Qoutations</p>
+            <p className="text-xl">Quotations</p>
           </div>
           <div className="grid grid-cols-8 gap-2 items-center py-2  border-b-2 sticky top-0">
             <p className="text-base">UNIT</p>

@@ -78,7 +78,6 @@ export default function PDFGeneratorDialog({
   const [documentNo, setDocumentNo] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isFound, setIsFound] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isPdfReady, setIsPdfReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pdfData, setPdfData] = useState<supplierItemType_[]>([]);
@@ -114,7 +113,6 @@ export default function PDFGeneratorDialog({
   };
 
   const handleGenerate = async (supplier_name: string) => {
-    setIsGenerating(true);
     setError(null);
     const supplierData = pdfData.find(data => data.rfq_details.supplier_name === supplier_name )
     const blob = (selectedType === "NTP") ? await pdf(generateNTPPDF(supplierData!)).toBlob() : await pdf(generateNOAPDF(supplierData!)).toBlob()
@@ -124,7 +122,6 @@ export default function PDFGeneratorDialog({
 
     // Open the Blob URL in a new tab
     window.open(blobUrl, "_blank");
-    setIsGenerating(false);
   };
 
   const resetState = () => {
@@ -212,20 +209,11 @@ export default function PDFGeneratorDialog({
                         <p>{supplier}</p>
                         <Button
                           onClick={() => handleGenerate(supplier)}
-                          disabled={isGenerating || isPdfReady}
+                          disabled={isPdfReady}
                           size="sm"
                         >
-                          {isGenerating ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Generating...
-                            </>
-                          ) : (
-                            <>
-                              <FileText className="mr-2 h-4 w-4" />
-                              Generate PDF
-                            </>
-                          )}
+                          <FileText className="mr-2 h-4 w-4" />
+                          Generate PDF
                         </Button>
                       </div>
                     ))}

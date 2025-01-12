@@ -16,7 +16,6 @@ import {
   CalendarIcon,
   ClipboardIcon,
   CreditCardIcon,
-  FileTextIcon,
   Loader2,
   MapPinIcon,
   PrinterIcon,
@@ -33,7 +32,6 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog } from "@radix-ui/react-dialog";
 import {
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -48,9 +46,6 @@ import { usePurchaseRequestActions } from "@/services/purchaseRequestServices";
 import { MessageDialog } from "../../shared/components/MessageDialog";
 import LoadingDialog from "../../shared/components/LoadingDialog";
 import useStatusStore from "@/store";
-import { generateNOAPDF } from "@/services/generateNOWPDF";
-import { pdf } from "@react-pdf/renderer";
-import { generateNTPPDF } from "@/services/generateNTPPDF";
 import { useGetAllBACmember } from "@/services/BACmemberServices";
 
 interface messageDialogProps {
@@ -129,33 +124,33 @@ export const AbstractItemContentList = () => {
     return window.open(url!, "_blank");
   };
 
-  const handleGenerateNOAPDF = async () => {
-    try {
-      const blob = await pdf(generateNOAPDF(NOAData!)).toBlob();
+  // const handleGenerateNOAPDF = async () => {
+  //   try {
+  //     const blob = await pdf(generateNOAPDF(NOAData!)).toBlob();
 
-      // Create a Blob URL
-      const blobUrl = URL.createObjectURL(blob);
+  //     // Create a Blob URL
+  //     const blobUrl = URL.createObjectURL(blob);
 
-      // Open the Blob URL in a new tab
-      window.open(blobUrl, "_blank");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
-  };
+  //     // Open the Blob URL in a new tab
+  //     window.open(blobUrl, "_blank");
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //   }
+  // };
 
-  const handleGenerateNTPPDF = async () => {
-    try {
-      const blob = await pdf(generateNTPPDF(NOAData!)).toBlob();
+  // const handleGenerateNTPPDF = async () => {
+  //   try {
+  //     const blob = await pdf(generateNTPPDF(NOAData!)).toBlob();
 
-      // Create a Blob URL
-      const blobUrl = URL.createObjectURL(blob);
+  //     // Create a Blob URL
+  //     const blobUrl = URL.createObjectURL(blob);
 
-      // Open the Blob URL in a new tab
-      window.open(blobUrl, "_blank");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
-  };
+  //     // Open the Blob URL in a new tab
+  //     window.open(blobUrl, "_blank");
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //   }
+  // };
 
   const handleOpenSupplierInformation = (rfq_no: string) => {
     setIsInformationDialogOpen(true);
@@ -237,14 +232,14 @@ export const AbstractItemContentList = () => {
                   <PrinterIcon width={20} height={20} className="mx-2" />
                   Generate AOQ PDF
                 </Button>
-                <Button variant={"outline"} onClick={handleGenerateNOAPDF}>
+                {/* <Button variant={"outline"} onClick={handleGenerateNOAPDF}>
                   <PrinterIcon width={20} height={20} className="mx-2" />
                   Generate NOA PDF
                 </Button>
                 <Button variant={"outline"} onClick={handleGenerateNTPPDF}>
                   <PrinterIcon width={20} height={20} className="mx-2" />
                   Generate NTP PDF
-                </Button>
+                </Button> */}
               </div>
             </div>
           </CardTitle>
@@ -381,12 +376,6 @@ export const SupplierInformation: React.FC<SupplierInformationProps> = ({
             </Badge>
           </div>
         )}
-        <DialogFooter>
-          <Button>
-            {" "}
-            <FileTextIcon className="h-4 w-4 mr-2" /> Generate NOA
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

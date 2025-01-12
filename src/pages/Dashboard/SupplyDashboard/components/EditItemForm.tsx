@@ -58,7 +58,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     resolver: zodResolver(itemSchema),
     defaultValues: {
       item_no: item?.data?.item_no,
-      purchase_request: item?.data?.purchase_request,
+      purchase_request: item?.data?.pr_details.pr_no,
       stock_property_no: item?.data?.stock_property_no,
       unit: item?.data?.unit,
       item_description: item?.data?.item_description,
@@ -71,7 +71,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
   useEffect(() => {
     if (item?.data) {
       setValue("item_no", item?.data?.item_no);
-      setValue("purchase_request", item?.data?.purchase_request);
+      setValue("purchase_request", item?.data?.pr_details.pr_no);
       setValue("stock_property_no", item?.data?.stock_property_no);
       setValue("unit", item?.data?.unit);
       setValue("item_description", item?.data?.item_description);
@@ -132,6 +132,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       console.log(error);
     }
   };
+
 
   const renderField = (
     label: string,

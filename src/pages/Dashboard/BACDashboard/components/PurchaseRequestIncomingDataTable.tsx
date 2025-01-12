@@ -4,15 +4,14 @@ import { usePurchaseRequestIncoming } from "@/services/purchaseRequestServices";
 import { incoming_columns } from "./incoming-column";
 
 export default function PurchaseRequestIncomingDataTable() {
-  const { purchaseRequestIncoming, isLoading } =
-    usePurchaseRequestIncoming();
+  const { purchaseRequestIncoming, isLoading } = usePurchaseRequestIncoming();
 
-    const flattenIncomingData = purchaseRequestIncoming .map(data => ({
-      ...data,
-      name: data.requisitioner_details.name
-    }))
+  const flattenIncomingData = purchaseRequestIncoming.map((data) => ({
+    ...data,
+    name: data.requisitioner_details.name,
+  }));
 
-    console.log(flattenIncomingData)
+  console.log(flattenIncomingData);
 
   if (isLoading) return <Loading />;
 

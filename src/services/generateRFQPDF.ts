@@ -130,6 +130,13 @@ const textandlines = async (
     font: timesRomanFont,
   });
 
+  page.drawText(rfq.purchase_request, {
+    x: 430,
+    y: 736.33,
+    size: 11,
+    font: timesRomanFont,
+  });
+
   page.drawLine({
     start: { x: 30.52, y: 720.87 },
     end: { x: 287, y: 720.87 },

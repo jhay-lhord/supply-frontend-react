@@ -5,6 +5,7 @@ import { UsersType } from "@/types/response/users";
 
 
 export const columns: ColumnDef<UsersType>[] = [
+ 
   {
     accessorKey: "employee_id",
     header: ({ column }) => (
@@ -21,18 +22,16 @@ export const columns: ColumnDef<UsersType>[] = [
     },
   },
   {
-    accessorKey: "full_name",
+    accessorKey: "fullname",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
     cell: ({ row }) => {
-      const firstName = row.original.first_name;
-      const lastName = row.original.last_name;
 
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {`${firstName} ${lastName}`}
+          {row.getValue("fullname")}
           </span>
         </div>
       );
@@ -117,7 +116,7 @@ export const columns: ColumnDef<UsersType>[] = [
       <DataTableColumnHeader column={column} title="Actions" />
     ),
     cell: ({ row }) => (
-      <DataTableRowActions id={row.getValue("id")} _data={row.original} />
+      <DataTableRowActions id={row.original.id} _data={row.original} />
     ),
   },
 ];

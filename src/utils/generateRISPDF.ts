@@ -753,14 +753,81 @@ const textandlines = async (
     color: rgb(0, 0, 0),
   });
 
+  // const headerjpg = "/header.jpeg";
+  // const headerjpgBytes = await fetch(headerjpg).then((res) =>
+  //   res.arrayBuffer()
+  // );
+  // const headerimage = await pdfDoc.embedJpg(headerjpgBytes);
+  // page.drawImage(headerimage, { x: 155, y: 860, width: 326, height: 45 });
+  // const jpgUrl = "/footer.jpeg";
+  // const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer());
+  // const jpgImage = await pdfDoc.embedJpg(jpgImageBytes);
+  // page.drawImage(jpgImage, { x: 65, y: 50, width: 480, height: 25 });
   const headerjpg = "/header.jpeg";
   const headerjpgBytes = await fetch(headerjpg).then((res) =>
     res.arrayBuffer()
   );
   const headerimage = await pdfDoc.embedJpg(headerjpgBytes);
-  page.drawImage(headerimage, { x: 155, y: 860, width: 326, height: 45 });
+  page.drawImage(headerimage, {
+    x: 145,
+    y: 840,
+    width: 325,
+    height: 62,
+  });
+  page.drawText("Republic of the Philippines", {
+    x: 255,
+    y: 890,
+    size: 10,
+    font: timesRomanFont,
+  });
+  page.drawText("CEBU TECHNOLOGICAL UNIVERSITY", {
+    x: 225,
+    y: 880,
+    size: 9,
+    font: timesBoldFont,
+  });
+  page.drawText("ARGAO CAMPUS", {
+    x: 275,
+    y: 870,
+    size: 10,
+    font: timesRomanFont,
+  });
+  page.drawText("Ed Kintanar Street, Lamacan, Argao Cebu Philippines", {
+    x: 220,
+    y: 860,
+    size: 8,
+    font: timesRomanFont,
+  });
+  page.drawText("Website:", { x: 212, y: 850, size: 7, font: timesRomanFont });
+  page.drawText("http://www.argao.ctu.edu.ph ", {
+    x: 237,
+    y: 850,
+    size: 7,
+    font: timesRomanFont,
+    color: rgb(0, 0, 1),
+  });
+  page.drawText("E-mail: cdargao@ctu.edu.ph", {
+    x: 323,
+    y: 850,
+    size: 7,
+    font: timesRomanFont,
+  });
+  page.drawText("Phone No.: (032) 401-0737 local 1700", {
+    x: 255,
+    y: 840,
+    size: 7,
+    font: timesRomanFont,
+  });
+
   const jpgUrl = "/footer.jpeg";
   const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer());
   const jpgImage = await pdfDoc.embedJpg(jpgImageBytes);
-  page.drawImage(jpgImage, { x: 65, y: 50, width: 480, height: 25 });
+  const jpgDims = jpgImage.scale(0.2);
+
+  page.drawImage(jpgImage, {
+    x: 145,
+    y: 10,
+    width: jpgDims.width,
+    height: jpgDims.height,
+  });
 };
