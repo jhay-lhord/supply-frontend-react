@@ -36,6 +36,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatDate } from "@/services/formatDate";
+import { useGetAllBACmember } from "@/services/BACmemberServices";
 
 export default function Abstract() {
   const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
@@ -44,6 +45,11 @@ export default function Abstract() {
 
     useAbstractOfQuotation();
   const { data: items } = useGetAllSupplierItem();
+  const { data: bac_members } = useGetAllBACmember()
+
+  const bacMembersData = useMemo(() => {
+    return Array.isArray(bac_members?.data) ? bac_members.data : [] 
+  }, [bac_members?.data])
 
   const supplierItemData = useMemo(() => {
     return Array.isArray(items?.data) ? items.data : []
@@ -63,17 +69,6 @@ export default function Abstract() {
 
   const navigate = useNavigate();
 
-  // const { setValue } = useForm<PurchaseRequestData>({
-  //   resolver: zodResolver(purchaseRequestFormSchema),
-  //   defaultValues: {
-  //     pr_no: pr_no,
-  //     purpose: purchaseRequestData?.purpose,
-  //     status: purchaseRequestData?.status,
-  //     office: purchaseRequestData?.office,
-  //     requisitioner: purchaseRequestData?.requisitioner_details.name,
-  //     campus_director: purchaseRequestData?.campus_director_details.name,
-  //   },
-  // });
 
   useEffect(() => {
     const fetchPdfUrl = async () => {
@@ -83,28 +78,13 @@ export default function Abstract() {
     fetchPdfUrl();
   }, []);
 
-  // useEffect(() => {
-  //   if (purchaseRequestData) {
-  //     setValue("purpose", purchaseRequestData?.purpose ?? "");
-  //     setValue("office", purchaseRequestData?.office ?? "");
-  //     setValue(
-  //       "requisitioner",
-  //       purchaseRequestData?.requisitioner_details.name ?? ""
-  //     );
-  //     setValue(
-  //       "campus_director",
-  //       purchaseRequestData?.campus_director_details.name ?? ""
-  //     );
-  //     setValue("status", purchaseRequestData?.status);
-  //   }
-  // }, [purchaseRequestData, setValue]);
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
 
   const handlePrintClick = async () => {
-    const url = await generateAOQPDF(filteredSupplierItem!);
+    const url = await generateAOQPDF(filteredSupplierItem!, bacMembersData);
     window.open(url!, "_blank");
   };
 
@@ -149,15 +129,6 @@ export default function Abstract() {
           </CardTitle>
           <div className="py-4">
             <div className="flex justify-between gap-1">
-              {/* <Button
-                className="bg-green-400 hover:bg-green-500"
-                onClick={() =>
-                  navigate(`/bac/item-selected-quotation/${pr_no}`)
-                }
-              >
-                <p className="mr-2">View Abstract of Quotation</p>
-                <SquareArrowOutUpRightIcon className="w-4 h-4 mr-2" />
-              </Button> */}
                <Button
                 className="bg-green-400 hover:bg-green-500"
                 onClick={() =>

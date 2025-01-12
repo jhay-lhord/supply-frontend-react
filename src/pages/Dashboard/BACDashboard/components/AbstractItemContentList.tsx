@@ -87,7 +87,6 @@ export const AbstractItemContentList = () => {
     return Array.isArray(bac_members?.data) ? bac_members.data : [] 
   }, [bac_members?.data])
   
-  console.log(bacMembersData)
 
   const supplierItemData = useMemo(() => {
     return Array.isArray(items?.data) ? items.data : [];
