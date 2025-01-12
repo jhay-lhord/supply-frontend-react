@@ -1,3 +1,5 @@
+import { BACmemberType } from "@/types/request/BACmember";
+import { supplierItemType_ } from "@/types/response/abstract-of-quotation";
 import { PDFDocument, PDFFont, PDFPage, rgb } from "pdf-lib";
 
 export const HeaderAndFooter = async (  
@@ -6,7 +8,9 @@ export const HeaderAndFooter = async (
   boldFont: PDFFont,
   timesRomanFont: PDFFont,
   footerYPosition: number,
-  timesBoldFont: PDFFont
+  timesBoldFont: PDFFont,
+  bac_members: BACmemberType[],
+  data: supplierItemType_
 ) => {
     // Draw header
  
@@ -40,23 +44,23 @@ export const HeaderAndFooter = async (
   
   
     //text signature
-    page.drawText('RYAN H. TEO, MPA', {x: 80.39, y: footerYPosition - 57.15, size: 11, font: timesBoldFont });
-    page.drawText('BAC Member', {x: 96.92, y: footerYPosition - 72.32, size: 11, font: timesRomanFont });
-    page.drawText('LEMUEL M. VELASCO, Dev.Ed.D', {x: 334.72, y: footerYPosition - 57.15, size: 11, font: timesBoldFont });
-    page.drawText('BAC Member', {x: 381.93, y: footerYPosition - 72.32, size: 11, font: timesRomanFont });
+    page.drawText(bac_members[0].name, {x: 80.39, y: footerYPosition - 57.15, size: 11, font: timesBoldFont });
+    page.drawText(bac_members[0].designation, {x: 96.92, y: footerYPosition - 72.32, size: 11, font: timesRomanFont });
+    page.drawText(bac_members[1].name, {x: 334.72, y: footerYPosition - 57.15, size: 11, font: timesBoldFont });
+    page.drawText(bac_members[1].designation, {x: 381.93, y: footerYPosition - 72.32, size: 11, font: timesRomanFont });
   
     page.drawText('End-user', {x: 726.77, y: footerYPosition - 72.32 , size: 11, font: timesRomanFont });
   
-    page.drawText('JUNE REY A. VILLEGAS', {x: 68.57, y: footerYPosition - 130.07, size: 11, font: timesBoldFont });
-    page.drawText('BAC Member', {x: 96.92, y: footerYPosition - 145.2 , size: 11, font: timesRomanFont });
-    page.drawText('CHARISSA JANE S. SAMBOLA, CPA', {x: 331.46, y: footerYPosition - 130.07, size: 11, font: timesBoldFont });
-    page.drawText('BAC Vice-Chairman', {x: 371.14, y: footerYPosition - 140.2  , size: 11, font: timesRomanFont });
+    page.drawText(bac_members[2].name, {x: 68.57, y: footerYPosition - 130.07, size: 11, font: timesBoldFont });
+    page.drawText(bac_members[2].designation, {x: 96.92, y: footerYPosition - 145.2 , size: 11, font: timesRomanFont });
+    page.drawText(bac_members[3].name, {x: 331.46, y: footerYPosition - 130.07, size: 11, font: timesBoldFont });
+    page.drawText(bac_members[3].designation, {x: 371.14, y: footerYPosition - 140.2  , size: 11, font: timesRomanFont });
   
-    page.drawText('LEVI U. PANGAN, LPT', {x: 200, y:  footerYPosition - 91.32, size: 11, font: timesBoldFont });
-    page.drawText('BAC Chairman', {x: 225.14, y:  footerYPosition - 105.07   , size: 11, font: timesRomanFont });
+    page.drawText(bac_members[4].name, {x: 200, y:  footerYPosition - 91.32, size: 11, font: timesBoldFont });
+    page.drawText(bac_members[4].designation, {x: 225.14, y:  footerYPosition - 105.07   , size: 11, font: timesRomanFont });
   
-    page.drawText('EINGILBERT C. BENOLIRAO, Dev.Ed.D.', {x: 658.44, y: footerYPosition - 130.07, size: 11, font: timesBoldFont });
-    page.drawText('Campus Director / Head of Procuring Entity', {x: 665, y:  footerYPosition - 140.2 , size: 11, font: timesRomanFont });
+    page.drawText(data.supplier_details.aoq_details.pr_details.campus_director_details.name, {x: 658.44, y: footerYPosition - 130.07, size: 11, font: timesBoldFont });
+    page.drawText(data.supplier_details.aoq_details.pr_details.campus_director_details.designation, {x: 665, y:  footerYPosition - 140.2 , size: 11, font: timesRomanFont });
      //Horizontal Line
      page.drawLine({start: { x: 29.53  , y: 401.57 }, end: { x: 898.98, y: 401.57 }, thickness: 1.5 , color: rgb(0, 0, 0)});
      page.drawLine({start: { x: 29.53  , y: 368.57 }, end: { x: 898.98, y: 368.57 }, thickness: 1.5 , color: rgb(0, 0, 0)});  

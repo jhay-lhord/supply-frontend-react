@@ -73,6 +73,8 @@ export function InputOTPForm() {
         });
       },
       (errorMessage) => {
+        setIsloading(false)
+        form.reset()
         toast({
           title: "Error",
           description: errorMessage,

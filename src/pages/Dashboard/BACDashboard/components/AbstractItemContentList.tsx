@@ -51,6 +51,7 @@ import useStatusStore from "@/store";
 import { generateNOAPDF } from "@/services/generateNOWPDF";
 import { pdf } from "@react-pdf/renderer";
 import { generateNTPPDF } from "@/services/generateNTPPDF";
+import { useGetAllBACmember } from "@/services/BACmemberServices";
 
 interface messageDialogProps {
   open: boolean;
@@ -80,6 +81,13 @@ export const AbstractItemContentList = () => {
     useGetAbstractOfQuotation(aoq_no!);
 
   const { data: items, isLoading } = useGetAllSupplierItem();
+  const { data: bac_members } = useGetAllBACmember()
+
+  const bacMembersData = useMemo(() => {
+    return Array.isArray(bac_members?.data) ? bac_members.data : [] 
+  }, [bac_members?.data])
+  
+  console.log(bacMembersData)
 
   const supplierItemData = useMemo(() => {
     return Array.isArray(items?.data) ? items.data : [];
@@ -90,7 +98,7 @@ export const AbstractItemContentList = () => {
       (data) => data.supplier_details.aoq_details.aoq_no === aoq_no
     );
   }, [supplierItemData, aoq_no]);
-  console.log(supplierItemData);
+  console.log(filteredSupplierItemData);
 
   const abstractData = abstract && abstract.data;
   const pr_no = abstractData?.pr_details.pr_no;
@@ -117,8 +125,8 @@ export const AbstractItemContentList = () => {
   const isAlreadyForwardedToSupply =
   status=== "Ready to Order";
 
-  const handlePDFPrint = async () => {
-    const url = await generateAOQPDF(filteredSupplierItemData!);
+  const handleGenerateAOQPDF = async () => {
+    const url = await generateAOQPDF(filteredSupplierItemData!, bacMembersData);
     return window.open(url!, "_blank");
   };
 
@@ -226,7 +234,7 @@ export const AbstractItemContentList = () => {
               </div>
               <Separator className="mt-3" />
               <div className="my-2 flex gap-1">
-                <Button variant={"outline"} onClick={handlePDFPrint}>
+                <Button variant={"outline"} onClick={handleGenerateAOQPDF}>
                   <PrinterIcon width={20} height={20} className="mx-2" />
                   Generate AOQ PDF
                 </Button>

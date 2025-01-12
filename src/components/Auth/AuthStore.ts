@@ -164,7 +164,7 @@ const useAuthStore = create<AuthState>()(
           console.log(response.data.user);
           set({
             isAuthenticated: true,
-            otpSent: false,
+            // otpSent: false,
             user: response.data.user,
           });
           onSuccess?.(response.data.message);
@@ -173,7 +173,7 @@ const useAuthStore = create<AuthState>()(
           const errorMsg =
             (axiosError.response?.data as { error?: string })?.error ||
             "Failed to verify the token. Please try again.";
-          set({ otpSent: false, errorMessage: errorMsg });
+          set({ errorMessage: errorMsg });
           onError?.(errorMsg);
         } finally {
           set({ isLoading: false });

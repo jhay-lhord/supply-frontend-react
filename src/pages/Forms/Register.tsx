@@ -130,7 +130,7 @@ const Register = () => {
             </p>
 
             <div>
-              <Input placeholder="Employee ID" {...register("employee_id")} />
+              <Input placeholder="Employee No." {...register("employee_id")} />
               {errors.employee_id && (
                 <p className="text-red-500 text-xs">
                   {errors.employee_id.message}

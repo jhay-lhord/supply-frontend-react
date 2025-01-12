@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ColumnDef } from "@tanstack/react-table";
 import { purchaseRequestType } from "@/types/response/puchase-request";
 import { DataTableColumnHeader } from "./data-table-column-header";
@@ -6,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { FilteredItemInPurchaseRequest } from "@/services/itemServices";
 import { Copy } from "lucide-react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { useToast } from "@/hooks/use-toast";
 
 
 export const columns: ColumnDef<purchaseRequestType>[] = [
@@ -15,14 +17,22 @@ export const columns: ColumnDef<purchaseRequestType>[] = [
       <DataTableColumnHeader column={column} title="PR No." />
     ),
     cell: ({ row }) => {
+      const { toast } = useToast()
       const itemData = FilteredItemInPurchaseRequest(row.getValue("pr_no"));
       const itemCount = itemData?.length ?? 0;
+
+      const handleCopy = () => {
+        toast({
+          title: "Copied!",
+          description: "PR No. copied",
+        });
+      }
       return (
         <div className="flex space-x-2">
           <span className="max-w-[300px] truncate font-medium">
             <div className="flex items-center">
               <p className="font-thin text-sm">{row.getValue("pr_no")}</p>
-              <CopyToClipboard text={row.getValue("pr_no")}>
+              <CopyToClipboard text={row.getValue("pr_no")} onCopy={handleCopy}>
                 <button><Copy className="h-4 w-4 mx-2" /></button>
               </CopyToClipboard>
               

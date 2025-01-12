@@ -23,20 +23,25 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "./components/Layout/BACDashboardLayout";
 import Loading from "../shared/components/Loading";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DeleteDialog } from "../shared/components/DeleteDialog";
 import { BuildingIcon, CalendarIcon, Loader2, TrashIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 
 export const AllAbstract = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [aoqNo, setAoqNo] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const { data: aoq_data, isLoading } = useAbstractOfQuotation();
-  const { data: supplier_item, isLoading: supplier_loading } = useGetAllSupplierItem();
+  const { data: supplier_item, isLoading: supplier_loading } =
+    useGetAllSupplierItem();
   const { mutate: deleteAOQMutation } = useDeleteAbstractOfQuotation();
 
-  const supplierData = Array.isArray(supplier_item?.data) ? supplier_item.data : [];
+  const supplierData = Array.isArray(supplier_item?.data)
+    ? supplier_item.data
+    : [];
 
   const supplierName = (aoq_no: string) => {
     const names = new Set(
@@ -48,7 +53,13 @@ export const AllAbstract = () => {
   };
 
   const navigate = useNavigate();
-  const abstract = Array.isArray(aoq_data?.data) ? aoq_data.data : [];
+  const abstractData = useMemo(() => {
+    return Array.isArray(aoq_data?.data) ? aoq_data.data : [];
+  }, [aoq_data?.data])
+
+  const filteredAbstract = abstractData.filter((abstract) =>
+    abstract.pr_details.pr_no.toString().includes(searchQuery)
+  );
 
   const handleOpenDialog = (aoq_no: string) => {
     setIsDialogOpen(true);
@@ -63,12 +74,24 @@ export const AllAbstract = () => {
     <Layout>
       <div className=" rounded relative w-full">
         <div className=" pb-8">
-          <p className="text-xl"> All Abstract of Quotation</p>
+          <div className="flex justify-between">
+            <p className="text-xl"> All Abstract of Quotation</p>
+            <div className="flex">
+              <Input
+                type="search"
+                className="w-60"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={`Search for PR No.`}
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 gap-4 mt-8 w-full">
             {isLoading ? (
               <Loading />
-            ) : abstract && abstract.length > 0 ? (
-              abstract.map((data) => (
+            ) : filteredAbstract && filteredAbstract.length > 0 ? (
+              filteredAbstract.map((data) => (
                 <Card className="group">
                   <CardHeader className="">
                     <CardTitle>

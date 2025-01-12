@@ -63,7 +63,7 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
   const quotations = Array.isArray(data?.data) ? data?.data : [];
 
   const filteredQuotation = quotations.filter((quotation) =>
-    quotation[selectedDropdown].toString().includes(searchQuery)
+    quotation[selectedDropdown].toString().toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDialogOpen = (rfq_no: string) => {
@@ -92,7 +92,7 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
                 setSelectedDropdown(value)
               }
             >
-              <SelectTrigger className="w-[180px] bg-orange-200 active:focus-none">
+              <SelectTrigger className="w-[180px] bg-orange-200 active:focus-none rounded-r-none">
                 <SelectValue placeholder="Search By..." />
               </SelectTrigger>
               <SelectContent>
@@ -109,7 +109,7 @@ export const AllQuotations: React.FC<QuotationCardProps> = ({ title }) => {
             </Select>
             <Input
               type="search"
-              className="w-60"
+              className="w-60 rounded-l-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search for ${selectedDropdown.replace("_", " ")}`}

@@ -1,8 +1,9 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { HeaderAndFooter } from "./HeaderAndFooter";
 import { supplierItemType_ } from "@/types/response/abstract-of-quotation";
+import { BACmemberType } from "@/types/request/BACmember";
 
-export const generateAOQPDF = async (data: supplierItemType_[]) => {
+export const generateAOQPDF = async (data: supplierItemType_[], bac_members: BACmemberType[]) => {
   const items = Array.isArray(data) ? data : [];
 
   if (items.length === 0) {
@@ -120,7 +121,9 @@ export const generateAOQPDF = async (data: supplierItemType_[]) => {
       timesBoldFont,
       timesRomanFont,
       footerYPosition,
-      timesBoldFont
+      timesBoldFont,
+      bac_members,
+      data[0]
     );
   }
 

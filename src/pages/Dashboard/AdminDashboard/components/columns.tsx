@@ -6,15 +6,15 @@ import { UsersType } from "@/types/response/users";
 
 export const columns: ColumnDef<UsersType>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "employee_id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Id" />
+      <DataTableColumnHeader column={column} title="Employee No." />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("id")}
+            {row.getValue("employee_id")}
           </span>
         </div>
       );
