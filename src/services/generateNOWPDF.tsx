@@ -10,7 +10,7 @@ import {
 import type { Style } from "@react-pdf/types";
 import { digitsToWords } from "../utils/digitsToWords";
 import { supplierItemType_ } from "@/types/response/abstract-of-quotation";
-import { formatDate } from "@/utils/formateDate";
+import { formatDate } from "@/utils/formatDateInBAC";
 
 // Register a fallback font
 Font.register({
