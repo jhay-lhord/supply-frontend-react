@@ -269,10 +269,10 @@ export const AbstractItemContentList = () => {
                     {item.item_quotation_details.item_details.item_description}
                   </p>
                   <p className="text-gray-500">
-                    {item.item_quotation_details.item_details.quantity}
+                    {item.item_quantity}
                   </p>
                   <p className="text-gray-500">
-                    {item.item_quotation_details.item_details.unit_cost}
+                    {item.item_cost}
                   </p>
 
                   <p

@@ -46,7 +46,7 @@ export const generateAOQPDF = async (data: supplierItemType_[], bac_members: BAC
         font: timesRomanFont,
       });
       const quantityText =
-        item.item_quotation_details.item_details.quantity?.toString() || "";
+        item.item_quantity?.toString() || "";
       const quantityWidth = timesRomanFont.widthOfTextAtSize(quantityText, 12);
       const quantityColumnCenter = (405 + 366.14) / 2;
       page.drawText(quantityText, {
@@ -56,7 +56,7 @@ export const generateAOQPDF = async (data: supplierItemType_[], bac_members: BAC
         font: timesRomanFont,
       });
       const agencypricePriceText =
-        item.item_quotation_details.item_details.unit_cost || "";
+        item.item_cost.toString() || "";
       const agencypricepricewidth = timesRomanFont.widthOfTextAtSize(
         agencypricePriceText,
         12
