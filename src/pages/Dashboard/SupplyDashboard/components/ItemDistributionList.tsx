@@ -19,7 +19,7 @@ import {
   MapPinIcon,
   MoveHorizontal,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -34,6 +34,7 @@ import Layout from "./Layout/SupplyDashboardLayout";
 import { usePurchaseRequestActions } from "@/services/purchaseRequestServices";
 import { MessageDialog } from "../../shared/components/MessageDialog";
 import { generateIARPDF } from "@/utils/generateIARPDF";
+import useStatusStore from "@/store";
 
 interface messageDialogProps {
   open: boolean;
@@ -51,6 +52,7 @@ export const ItemDistributionList = () => {
   });
   const navigate = useNavigate();
   const { pr_no } = useParams();
+  const { status, setStatus } = useStatusStore();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const { handleDistribute, isError, isSuccess, isPendingDistribute } =
@@ -70,14 +72,26 @@ export const ItemDistributionList = () => {
     );
   }, [itemsDeliveredData]);
 
-  console.log(filteredItemsDeliveredData)
+  useEffect(() => {
+    if (isSuccess) {
+      setStatus("Completed");
+
+      return () => {
+        setStatus("idle");
+      };
+    }
+  }, [setStatus, isSuccess]);
+
+  const isAlreadyDistributed = status === "Completed";
+
+  console.log(filteredItemsDeliveredData);
 
   if (isItemsDeliveredLoading) return <Loading />;
 
   const handleGenerateIARPDF = async () => {
-    const url = await generateIARPDF(filteredItemsDeliveredData)
+    const url = await generateIARPDF(filteredItemsDeliveredData);
     window.open(url, "_blank");
-  }
+  };
 
   const handleDistributeClick = async () => {
     await handleDistribute(pr_no!);
@@ -130,30 +144,32 @@ export const ItemDistributionList = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <TooltipProvider
-                      delayDuration={100}
-                      skipDelayDuration={200}
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button onClick={handleDistributeClick}>
-                            {isPendingDistribute ? (
-                              <Loader2 className="animate-spin" />
-                            ) : (
-                              "Distribute"
-                            )}
-                            <MoveHorizontal
-                              width={20}
-                              height={20}
-                              className="mx-2"
-                            />{" "}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                          Click to distribute
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    {!isAlreadyDistributed && (
+                      <TooltipProvider
+                        delayDuration={100}
+                        skipDelayDuration={200}
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button onClick={handleDistributeClick}>
+                              {isPendingDistribute ? (
+                                <Loader2 className="animate-spin" />
+                              ) : (
+                                "Distribute"
+                              )}
+                              <MoveHorizontal
+                                width={20}
+                                height={20}
+                                className="mx-2"
+                              />{" "}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            Click to distribute
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                 </div>
                 <Separator className="mt-3" />
