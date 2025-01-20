@@ -16,19 +16,19 @@ import { Description } from "@radix-ui/react-dialog";
 import Loading from "../../shared/components/Loading";
 import { Loader2 } from "lucide-react";
 
+import {
+  useGetBACmember,
+  useUpdateBACmember,
+} from "@/services/BACmemberServices";
 
-import { useGetBACmember, useUpdateBACmember } from "@/services/BACmemberServices";
-
-
-import { BACmemberSchema, BACmemberType } from "@/types/request/BACmember";
+import { EditBACmemberSchema, EditBACmemberType } from "@/types/request/BACmember";
 
 import { Label } from "@/components/ui/label";
-
 
 interface EditBACmemberFormProps {
   isEditDialogOpen: boolean;
   setIsEditDialogOpen: (open: boolean) => void;
- member_id: string;
+  member_id: string;
 }
 
 const EditBACmemberForm: React.FC<EditBACmemberFormProps> = ({
@@ -36,9 +36,7 @@ const EditBACmemberForm: React.FC<EditBACmemberFormProps> = ({
   setIsEditDialogOpen,
   member_id,
 }) => {
-  const { isLoading, data: BACmember } = useGetBACmember(
-    member_id!
-  );
+  const { isLoading, data: BACmember } = useGetBACmember(member_id!);
   const { mutate, isPending } = useUpdateBACmember();
   const {
     register,
@@ -46,8 +44,8 @@ const EditBACmemberForm: React.FC<EditBACmemberFormProps> = ({
     formState: { errors },
 
     setValue,
-  } = useForm<BACmemberType>({
-    resolver: zodResolver(BACmemberSchema),
+  } = useForm<EditBACmemberType>({
+    resolver: zodResolver(EditBACmemberSchema),
     defaultValues: {
       member_id: BACmember?.data?.member_id,
       name: BACmember?.data?.name,
@@ -63,9 +61,11 @@ const EditBACmemberForm: React.FC<EditBACmemberFormProps> = ({
     }
   }, [BACmember, setValue]);
 
-  const onSubmit = async (data: BACmemberType) => {
+  const onSubmit = async (data: EditBACmemberType) => {
     try {
-      const result = BACmemberSchema.safeParse(data);
+      const result = EditBACmemberSchema.safeParse({...data, 
+        name:`${data.last_name}, ${data.first_name} ${data.middle_name}`
+      });
 
       if (result.success) {
         mutate(data);
@@ -75,6 +75,20 @@ const EditBACmemberForm: React.FC<EditBACmemberFormProps> = ({
       console.log(error);
     }
   };
+
+  const renderField = (
+    label: string,
+    name: keyof EditBACmemberType,
+    component: React.ReactNode
+  ) => (
+    <div className="mb-4 text-gray-950">
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">{errors[name]?.message}</span>
+      )}
+    </div>
+  );
 
   return (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -87,34 +101,21 @@ const EditBACmemberForm: React.FC<EditBACmemberFormProps> = ({
             {isLoading ? (
               <Loading />
             ) : (
-              <form
-                onSubmit={handleSubmit((BACmember) =>
-                  onSubmit(BACmember)
-                )}
-              >
+              <form onSubmit={handleSubmit((BACmember) => onSubmit(BACmember))}>
                 <div className="flex flex-col gap-6">
-                  <div>
-                    <Label >Name</Label>
+                  {renderField(
+                    "Last Name, First Name MI.",
+                    "name",
                     <Input {...register("name")} />
-                    {errors?.name && (
-                      <span className="text-xs text-red-500">
-                        {errors?.name?.message}
-                      </span>
-                    )}
-                  </div>
+                  )}
 
-
-                  <div>
-                  <Label >Designation</Label>
+                  {renderField(
+                    "Designation",
+                    "designation",
                     <Input {...register("designation")} />
-                    {errors?.designation && (
-                      <span className="text-xs text-red-500">
-                        {errors?.designation?.message}
-                      </span>
-                    )}
-                  </div>
+                  )}
 
-                  <div className="mt-6 fixed bottom-6 right-6">
+                  <div className="mt-6 fixed bottom-6 right-6"> 
                     <Button
                       className="text-slate-950 bg-orange-200 hover:bg-orange-300 px-10"
                       type="submit"

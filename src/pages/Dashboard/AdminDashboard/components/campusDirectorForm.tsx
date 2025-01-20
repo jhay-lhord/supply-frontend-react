@@ -8,9 +8,16 @@ import { Loader2 } from "lucide-react";
 import { DataTable } from "./data-table";
 import Loading from "../../shared/components/Loading";
 
-import { campusdirectorSchema, CampusDirectorType } from "@/types/request/campus-director";
-import { useAddCampusDirector, useGetAllCampusDirector } from "@/services/campusDirectorServices";
+import {
+  campusdirectorSchema,
+  CampusDirectorType,
+} from "@/types/request/campus-director";
+import {
+  useAddCampusDirector,
+  useGetAllCampusDirector,
+} from "@/services/campusDirectorServices";
 import { campusdirector_columns } from "./campusDirector-column";
+import { useMemo } from "react";
 
 const CampusDirectorForm = () => {
   const {
@@ -22,30 +29,47 @@ const CampusDirectorForm = () => {
     resolver: zodResolver(campusdirectorSchema),
     defaultValues: {
       cd_id: uuidv4(),
+      first_name: "",
+      last_name: "",
+      middle_name: "",
       name: "",
       designation: "",
     },
   });
 
   const { data, isLoading } = useGetAllCampusDirector();
-  const campusdirector_data = Array.isArray(data?.data) ? data.data : [];
+  const campusdirector_data = useMemo(() => {
+    return Array.isArray(data?.data) ? data.data : [];
+  }, [data?.data]);
+
   const { mutate, isPending } = useAddCampusDirector();
 
-  if(isLoading) return <Loading/>
+
+  if (isLoading) return <Loading />;
 
   const onSubmit = async (data: CampusDirectorType) => {
-    const cd_id = uuidv4()
+    const cd_id = uuidv4();
     try {
       const result = campusdirectorSchema.safeParse({
         ...data,
         cd_id: cd_id,
+        name: `${data.last_name}, ${data.first_name} ${data.middle_name}`,
       });
 
       if (result.success) {
-        mutate(data);
+        mutate({
+          cd_id,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          middle_name: data.middle_name,
+          name: `${data.last_name.toUpperCase()} ${data.first_name.toUpperCase()} ${data.middle_name?.toUpperCase()}`,
+          designation: data.designation
+        });
         reset({
           cd_id: uuidv4(), // Update default value with the new UUID
-          name: "",
+          first_name: "",
+          last_name: "",
+          middle_name: "",
           designation: "",
         });
       }
@@ -53,48 +77,67 @@ const CampusDirectorForm = () => {
       console.log(error);
     }
   };
+
+  const renderField = (
+    label: string,
+    name: keyof CampusDirectorType,
+    component: React.ReactNode
+  ) => (
+    <div className="mb-4 text-gray-950">
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">{errors[name]?.message}</span>
+      )}
+    </div>
+  );
+
   return (
     <>
-      <form className="m-6 p-6 bg-slate-100 rounded" onSubmit={handleSubmit((data) => onSubmit(data))}> 
-        <div className="">
-          <div className="grid grid-cols-3 gap-2 mb-4 items-center">
-            <Label className="text-base">Name</Label>
-            <Label className="text-base">Designation</Label>
-          </div>
+      <form
+        className="m-6 p-6 bg-slate-100 rounded"
+        onSubmit={handleSubmit((data) => onSubmit(data))}
+      >
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {renderField(
+            "First Name",
+            "first_name",
+            <Input {...register("first_name")} />
+          )}
 
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div>
-              <Input {...register("name")} />
-              {errors?.name && (
-                <span className="text-xs text-red-500">
-                  {errors?.name?.message}
-                </span>
-              )}
-            </div>
+          {renderField(
+            "Last Name",
+            "last_name",
+            <Input {...register("last_name")} />
+          )}
 
-            <div>
-              <Input {...register("designation")} />
-              {errors?.designation && (
-                <span className="text-xs text-red-500">
-                  {errors?.designation?.message}
-                </span>
-              )}
-            </div>
+          {renderField(
+            "Middle Initial",
+            "middle_name",
+            <Input {...register("middle_name")} />
+          )}
 
-            <Button
-              className="text-slate-950 bg-orange-200 hover:bg-orange-300"
-              type="submit"
-            >
-              {isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Add Campus Director"
-              )}
-            </Button>
-          </div>
+          {renderField(
+            "Designation",
+            "designation",
+            <Input {...register("designation")} />
+          )}
         </div>
+        <Button
+          className="text-slate-950 bg-orange-200 hover:bg-orange-300"
+          type="submit"
+        >
+          {isPending ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            "Add Campus Director"
+          )}
+        </Button>
       </form>
-      <DataTable data={campusdirector_data} columns={campusdirector_columns} />
+      <DataTable
+        data={campusdirector_data}
+        columns={campusdirector_columns}
+      />
     </>
   );
 };

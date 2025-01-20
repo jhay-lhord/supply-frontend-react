@@ -12,10 +12,12 @@ export const campusdirector_columns: ColumnDef<CampusDirectorType>[] = [
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
     cell: ({ row }) => {
+
+      const name: string = row.getValue("name")
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("name")}
+            {name.toUpperCase()}
           </span>
         </div>
       );

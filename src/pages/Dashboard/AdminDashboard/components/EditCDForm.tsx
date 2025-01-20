@@ -16,18 +16,22 @@ import { Description } from "@radix-ui/react-dialog";
 import Loading from "../../shared/components/Loading";
 import { Loader2 } from "lucide-react";
 
+import {
+  useGetCampusDirector,
+  useUpdateCampusDirector,
+} from "@/services/campusDirectorServices";
 
-import { useGetCampusDirector, useUpdateCampusDirector } from "@/services/campusDirectorServices";
-
-import { campusdirectorSchema, CampusDirectorType } from "@/types/request/campus-director";
+import {
+  editCampusdirectorSchema,
+  EditCampusDirectorType,
+} from "@/types/request/campus-director";
 
 import { Label } from "@/components/ui/label";
-
 
 interface EditCDFormProps {
   isEditDialogOpen: boolean;
   setIsEditDialogOpen: (open: boolean) => void;
- cd_id: string;
+  cd_id: string;
 }
 
 const EditCDForm: React.FC<EditCDFormProps> = ({
@@ -35,9 +39,7 @@ const EditCDForm: React.FC<EditCDFormProps> = ({
   setIsEditDialogOpen,
   cd_id,
 }) => {
-  const { isLoading, data: campusdirector } = useGetCampusDirector(
-    cd_id!
-  );
+  const { isLoading, data: campusdirector } = useGetCampusDirector(cd_id!);
   const { mutate, isPending } = useUpdateCampusDirector();
   const {
     register,
@@ -45,11 +47,11 @@ const EditCDForm: React.FC<EditCDFormProps> = ({
     formState: { errors },
 
     setValue,
-  } = useForm<CampusDirectorType>({
-    resolver: zodResolver(campusdirectorSchema),
+  } = useForm<EditCampusDirectorType>({
+    resolver: zodResolver(editCampusdirectorSchema),
     defaultValues: {
       cd_id: campusdirector?.data?.cd_id,
-      name: campusdirector?.data?.name,
+      name: campusdirector?.data?.first_name,
       designation: campusdirector?.data?.designation,
     },
   });
@@ -62,9 +64,12 @@ const EditCDForm: React.FC<EditCDFormProps> = ({
     }
   }, [campusdirector, setValue]);
 
-  const onSubmit = async (data: CampusDirectorType) => {
+  const onSubmit = async (data: EditCampusDirectorType) => {
     try {
-      const result = campusdirectorSchema.safeParse(data);
+      const result = editCampusdirectorSchema.safeParse({
+        ...data,
+        name: `${data.last_name}, ${data.first_name} ${data.middle_name}`,
+      });
 
       if (result.success) {
         mutate(data);
@@ -74,6 +79,20 @@ const EditCDForm: React.FC<EditCDFormProps> = ({
       console.log(error);
     }
   };
+
+  const renderField = (
+    label: string,
+    name: keyof EditCampusDirectorType,
+    component: React.ReactNode
+  ) => (
+    <div className="mb-4 text-gray-950">
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">{errors[name]?.message}</span>
+      )}
+    </div>
+  );
 
   return (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -92,26 +111,17 @@ const EditCDForm: React.FC<EditCDFormProps> = ({
                 )}
               >
                 <div className="flex flex-col gap-6">
-                  <div>
-                    <Label >Name</Label>
+                  {renderField(
+                    "Last Name, First Name MI.",
+                    "name",
                     <Input {...register("name")} />
-                    {errors?.name && (
-                      <span className="text-xs text-red-500">
-                        {errors?.name?.message}
-                      </span>
-                    )}
-                  </div>
+                  )}
 
-
-                  <div>
-                  <Label >Designation</Label>
+                  {renderField(
+                    "Designation",
+                    "designation",
                     <Input {...register("designation")} />
-                    {errors?.designation && (
-                      <span className="text-xs text-red-500">
-                        {errors?.designation?.message}
-                      </span>
-                    )}
-                  </div>
+                  )}
 
                   <div className="mt-6 fixed bottom-6 right-6">
                     <Button

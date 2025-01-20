@@ -11,11 +11,13 @@ export const BACmember_columns: ColumnDef<BACmemberType>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
-    cell: ({ row }) => {
+    cell: ({ row }) => {  
+      const name: string = row.getValue("name")
+
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("name")}
+            {name.toUpperCase()}
           </span>
         </div>
       );

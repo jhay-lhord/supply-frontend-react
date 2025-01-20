@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
@@ -20,10 +20,19 @@ import {
   useUpdateRequisitioner,
 } from "@/services/requisitionerServices";
 import {
-  requisitionerSchema,
-  RequisitionerType,
+  EditRequisitionerSchema,
+  EditRequisitionerType,
 } from "@/types/request/requisitioner";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EditRequisitionerFormProps {
   isEditDialogOpen: boolean;
@@ -43,11 +52,12 @@ const EditRequisitionerForm: React.FC<EditRequisitionerFormProps> = ({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
 
     setValue,
-  } = useForm<RequisitionerType>({
-    resolver: zodResolver(requisitionerSchema),
+  } = useForm<EditRequisitionerType>({
+    resolver: zodResolver(EditRequisitionerSchema),
     defaultValues: {
       requisition_id: requisitioner?.data?.requisition_id,
       name: requisitioner?.data?.name,
@@ -67,18 +77,45 @@ const EditRequisitionerForm: React.FC<EditRequisitionerFormProps> = ({
     }
   }, [requisitioner, setValue]);
 
-  const onSubmit = async (data: RequisitionerType) => {
+  const onSubmit = async (data: EditRequisitionerType) => {
     try {
-      const result = requisitionerSchema.safeParse(data);
+      const result = EditRequisitionerSchema.safeParse({
+        ...data,
+        name: `${data.last_name}, ${data.first_name} ${data.middle_name}`,
+      });
 
       if (result.success) {
-        mutate(data);
+        console.log(data);
+        mutate({
+          requisition_id: requisition_id,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          middle_name: data.middle_name,
+          name: data.name,
+          gender: data.gender,
+          department: data.department,
+          designation: data.designation,
+        });
         setIsEditDialogOpen(false);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const renderField = (
+    label: string,
+    name: keyof EditRequisitionerType,
+    component: React.ReactNode
+  ) => (
+    <div className="mb-4 text-gray-950">
+      <Label>{label}</Label>
+      {component}
+      {errors[name] && (
+        <span className="text-red-400 text-xs">{errors[name]?.message}</span>
+      )}
+    </div>
+  );
 
   return (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -97,45 +134,86 @@ const EditRequisitionerForm: React.FC<EditRequisitionerFormProps> = ({
                 )}
               >
                 <div className="flex flex-col gap-6">
-                  <div>
-                    <Label >Name</Label>
+                  {renderField(
+                    "Last Name, First Name, MI",
+                    "name",
                     <Input {...register("name")} />
-                    {errors?.name && (
-                      <span className="text-xs text-red-500">
-                        {errors?.name?.message}
-                      </span>
-                    )}
-                  </div>
+                  )}
 
-                  <div>
-                  <Label >Gender</Label>
-                    <Input {...register("gender")} />
-                    {errors?.gender && (
-                      <span className="text-xs text-red-500">
-                        {errors?.gender?.message}
-                      </span>
-                    )}
-                  </div>
 
-                  <div>
-                  <Label >Department</Label>
-                    <Input {...register("department")} />
-                    {errors?.department && (
-                      <span className="text-xs text-red-500">
-                        {errors?.department?.message}
-                      </span>
-                    )}
-                  </div>
+                  {renderField(
+                    "Gender",
+                    "gender",
+                    <Controller
+                      name="gender"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => field.onChange(value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Gender</SelectLabel>
+                              <SelectItem value="Male">Male</SelectItem>
+                              <SelectItem value="Female">Female</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  )}
 
-                  <div>
-                  <Label >Designation</Label>
+                  {renderField(
+                    "Department",
+                    "department",
+                    <Controller
+                      name="department"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => field.onChange(value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Department</SelectLabel>
+                              <SelectItem value="College of Technology and Engineering">
+                                College of Technology and Engineering
+                              </SelectItem>
+                              <SelectItem value="College of Education">
+                                College of Education
+                              </SelectItem>
+                              <SelectItem value="College of Arts and Sciences">
+                                College of Arts and Sciences
+                              </SelectItem>
+                              <SelectItem value="College of Hospitality Management and Tourism">
+                                College of Hospitality Management and Tourism
+                              </SelectItem>
+                              <SelectItem value="College of Agriculture">
+                                College of Agriculture
+                              </SelectItem>
+                              <SelectItem value="College of Forestry">
+                                College of Forestry
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  )}
+
+                  {renderField(
+                    "Designation",
+                    "designation",
                     <Input {...register("designation")} />
-                    {errors?.designation && (
-                      <span className="text-xs text-red-500">
-                        {errors?.designation?.message}
-                      </span>
-                    )}
-                  </div>
+                  )}
 
                   <div className="mt-6 fixed bottom-6 right-6">
                     <Button
