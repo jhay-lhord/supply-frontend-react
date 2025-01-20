@@ -116,9 +116,9 @@ export default function SupplyAOQ() {
     (supplierNo: string) => {
       return filterItemBySupplier(supplierNo).reduce((total, item) => {
         const itemQuantity = Number(
-          item.item_quotation_details.item_details.quantity
+          item.item_quantity
         );
-        const itemUnitPrice = Number(item.item_quotation_details.unit_price);
+        const itemUnitPrice = Number(item.item_cost);
         return total + itemQuantity * itemUnitPrice;
       }, 0);
     },
@@ -298,10 +298,10 @@ export default function SupplyAOQ() {
                 const itemDescription =
                   item.item_quotation_details.item_details.item_description;
                 const itemQuantity = Number(
-                  item.item_quotation_details.item_details.quantity
+                  item.item_quantity
                 );
                 const itemUnitPrice = Number(
-                  item.item_quotation_details.unit_price
+                  item.item_cost
                 );
                 return (
                   <TableRow key={index}>

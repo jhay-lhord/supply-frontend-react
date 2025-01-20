@@ -193,20 +193,6 @@ export const ItemDistributionList = () => {
                 </div>
                 <div className="flex gap-4 mt-2">
                   <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-                    {/* <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          className="bg-green-200 hover:bg-green-300"
-                          onClick={() => setIsDialogOpen(true)}
-                        >
-                          <FileText width={20} height={20} className="mx-2" />{" "}
-                          Generate ICS PDF
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top">
-                        Click to Generate ICS PDF
-                      </TooltipContent>
-                    </Tooltip> */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -275,7 +261,7 @@ export const ItemDistributionList = () => {
                     <p className="text-gray-500 col-span-2">
                       {item.item_details.item_quotation_details.brand_model}
                     </p>
-                    <p className="text-gray-500 col-span-2">
+                    <p className="text-gray-500">
                       {item.item_details.item_quotation_details.unit_price}
                     </p>
                   </div>
